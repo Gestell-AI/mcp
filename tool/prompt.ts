@@ -29,7 +29,7 @@ export function registerCollectionPromptTool(
       cot,
       messages
     }) => {
-      const stream = await gestell.query.prompt({
+      const response = await gestell.query.prompt({
         collectionId,
         categoryId,
         prompt,
@@ -44,7 +44,14 @@ export function registerCollectionPromptTool(
         messages
       })
 
-      const text = await new Response(stream).text()
+      const stream = response.getReader()
+      let text = ''
+
+      while (true) {
+        const { done, value } = await stream.read()
+        if (done) break
+        text += value
+      }
 
       return {
         content: [

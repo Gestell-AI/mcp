@@ -1,43 +1,63 @@
 import { z } from 'zod'
 
-/**
- * Core fields shared by feature-related endpoints.
- */
 export const FeaturesCoreSchema = {
-  /** The ID of the collection to query. */
-  collectionId: z.string().describe('The ID of the collection to query.'),
-  /** The ID of the category of features. */
+  /**
+   * The ID of the collection to query.
+   * Must be a valid UUID.
+   */
+  collectionId: z
+    .string()
+    .uuid()
+    .describe('The ID of the collection to query. Must be a valid UUID.'),
+
+  /**
+   * The ID of the category whose features are being requested.
+   * Must be a valid UUID.
+   */
   categoryId: z
     .string()
-    .describe('The ID of the category whose features are being requested.')
-}
-
-/**
- * Schema for the features query request.
- */
-export const FeaturesQueryRequestSchema = {
-  ...FeaturesCoreSchema,
-  /** Number of results to skip (for pagination). */
-  skip: z
-    .number()
-    .optional()
+    .uuid()
     .describe(
-      'An optional parameter to skip a specified number of results (for pagination).'
-    ),
-  /** Maximum number of results to return (for pagination). */
-  take: z
-    .number()
-    .optional()
-    .describe(
-      'An optional parameter to limit the number of results returned (for pagination).'
+      'The ID of the category whose features are being requested. Must be a valid UUID.'
     )
 }
 
-/**
- * Schema for the export-features request.
- */
+export const FeaturesQueryRequestSchema = {
+  ...FeaturesCoreSchema,
+
+  /**
+   * An optional parameter to skip a specified number of results (for pagination).
+   * Must be an integer ≥ 0.
+   */
+  skip: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe(
+      'An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0.'
+    ),
+
+  /**
+   * An optional parameter to limit the number of results returned (for pagination).
+   * Must be an integer ≥ 1.
+   */
+  take: z
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .describe(
+      'An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1.'
+    )
+}
+
 export const ExportFeaturesRequestSchema = {
   ...FeaturesCoreSchema,
-  /** Desired export format. */
+
+  /**
+   * The export format.
+   * Allowed values: "json" or "csv".
+   */
   type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
 }

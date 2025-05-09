@@ -1,43 +1,59 @@
 import { z } from 'zod'
 
-/**
- * Core fields shared by table-related endpoints.
- */
 export const TablesCoreSchema = {
-  /** The ID of the collection to query. */
-  collectionId: z.string().describe('The ID of the collection to query.'),
-  /** The ID of the category whose table data is being requested. */
+  /**
+   * The UUID of the collection to query.
+   * Must be a 36-character RFC-4122 string.
+   */
+  collectionId: z
+    .string()
+    .uuid()
+    .describe('The UUID of the collection to query.'),
+
+  /**
+   * The UUID of the category whose table data is being requested.
+   * Must be a 36-character RFC-4122 string.
+   */
   categoryId: z
     .string()
-    .describe('The ID of the category whose table data is being requested.')
+    .uuid()
+    .describe('The UUID of the category whose table data is being requested.')
 }
 
-/**
- * Schema for the tables query request.
- */
 export const TablesQueryRequestSchema = {
   ...TablesCoreSchema,
-  /** Number of results to skip (for pagination). */
+
+  /**
+   * Number of results to skip (for pagination).
+   * Must be an integer ≥ 0 if provided.
+   */
   skip: z
     .number()
+    .min(0)
     .optional()
     .describe(
-      'An optional parameter to skip a specified number of results (for pagination).'
+      'An optional parameter to skip a specified number of results (for pagination); must be at least 0.'
     ),
-  /** Maximum number of results to return (for pagination). */
+
+  /**
+   * Maximum number of results to return (for pagination).
+   * Must be an integer ≥ 1 if provided.
+   */
   take: z
     .number()
+    .min(1)
     .optional()
     .describe(
-      'An optional parameter to limit the number of results returned (for pagination).'
+      'An optional parameter to limit the number of results returned (for pagination); must be at least 1.'
     )
 }
 
-/**
- * Schema for the export-table request.
- */
 export const ExportTableRequestSchema = {
   ...TablesCoreSchema,
-  /** Desired export format. */
+
+  /**
+   * Desired export format.
+   * Must be either "json" or "csv".
+   */
   type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
 }

@@ -1,142 +1,278 @@
 import { z } from 'zod'
 
-/*
- * Core definition shared by both create- and update-collection operations.
- * All fields except IDs are defined here so they can be reused consistently.
- */
 export const CollectionCoreSchema = {
-  /** The name of the collection */
-  name: z.string().describe('The name of the collection'),
+  /**
+   * A concise, human-readable name for the collection.
+   * • Recommended max length: 50 characters
+   * • Use Title Case and avoid special characters
+   * • Example: “Sales Reports Q2 2025”
+   */
+  name: z
+    .string()
+    .min(1, { message: 'Collection name cannot be empty.' })
+    .describe(
+      'A concise, human-readable name for the collection (≤50 chars; Title Case; no special symbols). Example: "Sales Reports Q2 2025".'
+    ),
 
-  /** Collection classification; defaults to `canon` */
+  /**
+   * Specifies the classification of this collection.
+   * Allowed values:
+   *   • frame – Ephemeral datasets for one-off or streaming use cases
+   *   • searchable-frame – Optimized for search queries over recent or moving data
+   *   • canon – Default, general-purpose collection for long-term storage and retrieval
+   *   • features – For storing precomputed feature vectors or embeddings
+   * Defaults to `canon`.
+   */
   type: z
     .enum(['frame', 'searchable-frame', 'canon', 'features'])
+    .default('canon')
     .describe(
-      'The type of collection to create. Defaults to `canon` unless instructed otherwise.'
-    )
-    .default('canon'),
+      'Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'
+    ),
 
-  /** Optional tags applied to the collection */
+  /**
+   * Optional tags to categorize the collection.
+   * • Use short, single-word labels (no spaces)
+   * • Example: [ "finance", "Q2", "internal" ]
+   */
   tags: z
-    .array(z.string())
+    .array(z.string().min(1), {
+      invalid_type_error: 'Each tag must be a non‐empty string.'
+    })
     .optional()
-    .describe('Optional tags to label the collection'),
+    .describe(
+      'Array of short keyword tags (single words, no spaces). Example: ["finance","Q2","internal"].'
+    ),
 
-  /** Human-readable description */
+  /**
+   * A detailed description of the collection’s purpose and contents.
+   * • Multi-sentence narrative, outlining scope and intended use
+   * • Example: “Contains all client invoices from January to March 2025, used for quarterly auditing and trend analysis.”
+   */
   description: z
     .string()
     .optional()
-    .describe('A description of the collection'),
+    .describe(
+      'Multi-sentence description of purpose, contents, and intended usage (≤500 chars). Example: "Contains all client invoices from Jan–Mar 2025 for auditing."'
+    ),
 
-  /** High-level ingestion instructions */
+  /**
+   * High-level instructions for indexing or ingesting data.
+   * • Outline source types, preprocessing steps, and field mappings
+   * • Provide any contextual guidelines or constraints
+   * • Aim for clear, numbered steps or bullet points
+   */
   instructions: z
     .string()
     .optional()
-    .describe('The instructions for indexing data in the collection'),
+    .describe(
+      'High-level ingestion guidelines: outline data sources, preprocessing steps, and field mappings (e.g. "1. Convert PDFs to text…").'
+    ),
 
-  /** Graph-generation instructions */
+  /**
+   * Directions for building the graph structure.
+   * • Specify node types, edge semantics, and any heuristics
+   * • Include rules for relationship extraction
+   * • Example: “Link invoices to client nodes by matching client_id field…”
+   */
   graphInstructions: z
     .string()
     .optional()
     .describe(
-      'The instructions for generating relations in the graph for the collection'
+      'Graph generation rules: define node types, edge semantics, and heuristics (e.g. "Link orders to customers by matching customer_id").'
     ),
 
-  /** Prompt-handling instructions */
+  /**
+   * Guidance for how the model should format and tone its responses.
+   * • Specify desired style (formal, friendly, bullet points, etc.)
+   * • Recommend structure (summary, examples, code snippets)
+   * • Example: “Respond in bullet points, providing a brief summary followed by detailed steps.”
+   */
   promptInstructions: z
     .string()
     .optional()
-    .describe('The instructions for how the model should respond to prompts'),
+    .describe(
+      'LLM response guidelines: tone, format, and structure (e.g. "Use bullets, start with a one-sentence summary").'
+    ),
 
-  /** Search-specific instructions */
+  /**
+   * A bullet-point list of search keys to prioritize.
+   * • One key per line (≤5 keys)
+   * • Example:
+   *     - title
+   *     - author
+   *     - publication_date
+   */
   searchInstructions: z
     .string()
     .optional()
     .describe(
-      'Bullet-point list of search keys to use (e.g. name, topic). Aim for ≤ 3 keys unless otherwise specified.'
+      'Bullet-point list of ≤5 search keys (one per line). Example:\n- title\n- author\n- publication_date'
     )
 }
 
-/*
- * Schema used when **creating** a collection.
- * Requires `organizationId` in addition to the core fields.
- */
 export const CollectionCreateSchema = {
-  organizationId: z.string(),
-  /** Optional fine-grained categories */
+  /**
+   * The UUID of the organization that will own this collection.
+   * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
+   */
+  organizationId: z
+    .string()
+    .uuid()
+    .describe(
+      'The UUID of the organization that owns this collection. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'
+    ),
+
+  /**
+   * Optional, fine-grained categories for breaking your data into sub-groups.
+   * • Leave empty ([]) unless you need to index by specific facets
+   * • Each category should have:
+   *     – name: human-readable label (e.g. “Customer Profiles”)
+   *     – type: one of
+   *         • concepts — high-level topics or tags
+   *         • features — numeric vectors for ML embedding stores
+   *         • content — chunks of text or documents
+   *         • table — tabular data structures
+   *     – instructions: how to extract or interpret items in this category
+   * Example:
+   * ```jsonc
+   * [
+   *   {
+   *     "name": "Invoices",
+   *     "type": "content",
+   *     "instructions": "Index each invoice PDF as a separate document, extracting header fields and line items."
+   *   }
+   * ]
+   * ```
+   */
   categories: z
     .array(
       z.object({
-        /** Category name */
-        name: z.string(),
-        /** Category type */
-        type: z.enum(['concepts', 'features', 'content', 'table']),
-        /** Category-specific instructions */
-        instructions: z.string()
+        /** Category name (e.g. “Invoices”, “Products”, “UserActions”) */
+        name: z
+          .string()
+          .describe(
+            'Human-readable category name, e.g. "Invoices", "Products".'
+          ),
+
+        /**
+         * Category type, defining how data in this category is treated.
+         * • concepts — for high level conceptual sumamries
+         * • features — for retrieving and extracting labels
+         * • content — for categorizing raw text in existing nodes
+         * • table — for structured, row/column data
+         */
+        type: z
+          .enum(['concepts', 'features', 'content', 'table'])
+          .describe(
+            'The data model for this category: "concepts", "features", "content", or "table".'
+          ),
+
+        /**
+         * Detailed extraction or indexing instructions for this category.
+         * Describe parsing steps, field mappings, or any preprocessing rules.
+         * Example: “Split each invoice into header and line-item records, map invoice_date to ISO format.”
+         */
+        instructions: z
+          .string()
+          .describe(
+            'Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings).'
+          )
       })
     )
     .optional()
     .default([])
     .describe(
-      'Categories to index data further. Leave empty unless instructed otherwise.'
+      'List of zero or more categories for sub-indexing. Leave as [] if you do not need additional facets.'
     ),
+
+  // Reuse all of the core collection fields (name, type, tags, descriptions, instructions, etc.)
   ...CollectionCoreSchema
 }
 
-/*
- * Schema used when **updating** an existing collection.
- * `collectionId` is mandatory; everything else is optional so callers can
- * patch only what they need.
- */
 export const CollectionUpdateSchema = {
-  /** Target collection ID (required) */
+  /**
+   * The UUID of the collection to update.
+   * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
+   */
   collectionId: z
     .string()
-    .describe('The unique identifier of the collection to update.'),
-  /** Optionally move the collection to another organization */
+    .uuid()
+    .describe(
+      'The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'
+    ),
+
+  /**
+   * Optional new owner organization UUID.
+   * You must have admin rights in both organizations to transfer ownership.
+   * Example: “d2719e84-89b0-4c25-a6f2-1a2bef3c9dbe”
+   */
   organizationId: z
     .string()
+    .uuid()
     .optional()
     .describe(
-      'Optional update for the Organization ID associated with the collection. You must be an admin of both Organizations to change this.'
+      'New organization UUID to assign this collection. Requires admin permissions in both orgs.'
     ),
   ...CollectionCoreSchema
 }
 
-/**
- * Schema for the `get` collection operation.
- * Validates the `collectionId` parameter.
- */
 export const GetCollectionRequestSchema = {
-  /** The ID of the collection to retrieve. */
-  collectionId: z.string().describe('The ID of the collection to retrieve.')
+  /**
+   * The UUID of the collection to update.
+   * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
+   */
+  collectionId: z
+    .string()
+    .uuid()
+    .describe(
+      'The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'
+    )
 }
 
-/**
- * Schema for the `list` collections operation payload.
- * All fields are optional to allow filtering, pagination, and detail level.
- */
 export const GetCollectionsRequestSchema = {
-  /** A search query to filter collections by name, description, or tags. */
+  /**
+   * Optional filter string to match against collection name, description, or tags.
+   * Example: "finance Q2" will return collections whose name, description, or tags contain those terms.
+   */
   search: z
     .string()
     .optional()
     .describe(
-      'A search query to filter collections by name, description, or tags.'
+      'Optional filter string to match name, description, or tags. Example: "finance Q2".'
     ),
-  /** The number of collections to retrieve. */
+
+  /**
+   * Optional limit on the number of collections to retrieve.
+   * Use for pagination sizing. Example: 5
+   */
   take: z
     .number()
+    .int()
     .optional()
-    .describe('The number of collections to retrieve.'),
-  /** The number of collections to skip (useful for pagination). */
+    .describe('Optional maximum number of collections to return. Example: 5.'),
+
+  /**
+   * Optional offset for pagination.
+   * Skip this many collections before starting to collect the result set.
+   * Example: to fetch page 2 with page size 10, set skip = 10.
+   */
   skip: z
     .number()
+    .int()
     .optional()
-    .describe('The number of collections to skip (useful for pagination).'),
-  /** Whether to include extended details for each collection. */
+    .describe(
+      'Optional number of collections to skip (pagination offset). Example: 10.'
+    ),
+
+  /**
+   * When true, include extended metadata (documents in collection etc.)
+   * If false or omitted, only basic metadata (id, name, type) is returned.
+   */
   extended: z
     .boolean()
     .optional()
-    .describe('Whether to include extended details for each collection.')
+    .describe(
+      'Optional flag to include extended details (documents in collection etc.).'
+    )
 }

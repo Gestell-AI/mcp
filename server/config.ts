@@ -11,12 +11,8 @@ export const PORT = Number(process.env.GESTELL_MCP_PORT || 3000)
 // The IP to bind the remote MCP server to (defaults to 0.0.0.0)
 export const HOST = process.env.GESTELL_MCP_HOST || '0.0.0.0'
 
-// The resources exposed in the MCP server (advanced = more tools exposed)
-export type Modality = 'SIMPLE' | 'ADVANCED'
-
-// The mode the MCP server is set to (defaults to SIMPLE)
-export const MODE: Modality =
-  (process.env.GESTELL_MCP_MODE as Modality) || 'SIMPLE'
+// Optional Authorization Header for MCP Server
+export const REMOTE_AUTH = process.env.GESTELL_REMOTE_AUTH || ''
 
 // The service type either terminal or a remote http server
 export type ServiceType = 'TERMINAL' | 'REMOTE'
@@ -28,7 +24,6 @@ export const SERVICE: ServiceType =
 // Gestell MCP Configuration Controls
 export interface GestellTerminalConfig {
   apiKey?: string
-  mode?: Modality
 }
 
 export interface GestellRemoteConfig extends GestellTerminalConfig {

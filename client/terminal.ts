@@ -6,8 +6,8 @@ export default async function startTerminalClient(
   entrypoint = join(import.meta.dir, '..', 'dist', 'entry.js')
 ) {
   const transport = new StdioClientTransport({
-    command: 'bun',
-    args: ['run', entrypoint]
+    command: 'node',
+    args: [entrypoint]
   })
 
   const client = new Client({ name: 'Gestell Client', version: '1.0.0' })

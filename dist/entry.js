@@ -19,751 +19,6 @@ var __toESM = (mod, isNodeMode, target) => {
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __require = /* @__PURE__ */ createRequire(import.meta.url);
 
-// node_modules/colors/lib/styles.js
-var require_styles = __commonJS((exports, module) => {
-  var styles = {};
-  module["exports"] = styles;
-  var codes = {
-    reset: [0, 0],
-    bold: [1, 22],
-    dim: [2, 22],
-    italic: [3, 23],
-    underline: [4, 24],
-    inverse: [7, 27],
-    hidden: [8, 28],
-    strikethrough: [9, 29],
-    black: [30, 39],
-    red: [31, 39],
-    green: [32, 39],
-    yellow: [33, 39],
-    blue: [34, 39],
-    magenta: [35, 39],
-    cyan: [36, 39],
-    white: [37, 39],
-    gray: [90, 39],
-    grey: [90, 39],
-    brightRed: [91, 39],
-    brightGreen: [92, 39],
-    brightYellow: [93, 39],
-    brightBlue: [94, 39],
-    brightMagenta: [95, 39],
-    brightCyan: [96, 39],
-    brightWhite: [97, 39],
-    bgBlack: [40, 49],
-    bgRed: [41, 49],
-    bgGreen: [42, 49],
-    bgYellow: [43, 49],
-    bgBlue: [44, 49],
-    bgMagenta: [45, 49],
-    bgCyan: [46, 49],
-    bgWhite: [47, 49],
-    bgGray: [100, 49],
-    bgGrey: [100, 49],
-    bgBrightRed: [101, 49],
-    bgBrightGreen: [102, 49],
-    bgBrightYellow: [103, 49],
-    bgBrightBlue: [104, 49],
-    bgBrightMagenta: [105, 49],
-    bgBrightCyan: [106, 49],
-    bgBrightWhite: [107, 49],
-    blackBG: [40, 49],
-    redBG: [41, 49],
-    greenBG: [42, 49],
-    yellowBG: [43, 49],
-    blueBG: [44, 49],
-    magentaBG: [45, 49],
-    cyanBG: [46, 49],
-    whiteBG: [47, 49]
-  };
-  Object.keys(codes).forEach(function(key) {
-    var val = codes[key];
-    var style = styles[key] = [];
-    style.open = "\x1B[" + val[0] + "m";
-    style.close = "\x1B[" + val[1] + "m";
-  });
-});
-
-// node_modules/colors/lib/system/has-flag.js
-var require_has_flag = __commonJS((exports, module) => {
-  module.exports = function(flag, argv) {
-    argv = argv || process.argv;
-    var terminatorPos = argv.indexOf("--");
-    var prefix = /^-{1,2}/.test(flag) ? "" : "--";
-    var pos = argv.indexOf(prefix + flag);
-    return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
-  };
-});
-
-// node_modules/colors/lib/system/supports-colors.js
-var require_supports_colors = __commonJS((exports, module) => {
-  var os = __require("os");
-  var hasFlag = require_has_flag();
-  var env = process.env;
-  var forceColor = undefined;
-  if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false")) {
-    forceColor = false;
-  } else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) {
-    forceColor = true;
-  }
-  if ("FORCE_COLOR" in env) {
-    forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
-  }
-  function translateLevel(level) {
-    if (level === 0) {
-      return false;
-    }
-    return {
-      level,
-      hasBasic: true,
-      has256: level >= 2,
-      has16m: level >= 3
-    };
-  }
-  function supportsColor(stream) {
-    if (forceColor === false) {
-      return 0;
-    }
-    if (hasFlag("color=16m") || hasFlag("color=full") || hasFlag("color=truecolor")) {
-      return 3;
-    }
-    if (hasFlag("color=256")) {
-      return 2;
-    }
-    if (stream && !stream.isTTY && forceColor !== true) {
-      return 0;
-    }
-    var min = forceColor ? 1 : 0;
-    if (process.platform === "win32") {
-      var osRelease = os.release().split(".");
-      if (Number(process.versions.node.split(".")[0]) >= 8 && Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
-        return Number(osRelease[2]) >= 14931 ? 3 : 2;
-      }
-      return 1;
-    }
-    if ("CI" in env) {
-      if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI"].some(function(sign) {
-        return sign in env;
-      }) || env.CI_NAME === "codeship") {
-        return 1;
-      }
-      return min;
-    }
-    if ("TEAMCITY_VERSION" in env) {
-      return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
-    }
-    if ("TERM_PROGRAM" in env) {
-      var version = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
-      switch (env.TERM_PROGRAM) {
-        case "iTerm.app":
-          return version >= 3 ? 3 : 2;
-        case "Hyper":
-          return 3;
-        case "Apple_Terminal":
-          return 2;
-      }
-    }
-    if (/-256(color)?$/i.test(env.TERM)) {
-      return 2;
-    }
-    if (/^screen|^xterm|^vt100|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
-      return 1;
-    }
-    if ("COLORTERM" in env) {
-      return 1;
-    }
-    if (env.TERM === "dumb") {
-      return min;
-    }
-    return min;
-  }
-  function getSupportLevel(stream) {
-    var level = supportsColor(stream);
-    return translateLevel(level);
-  }
-  module.exports = {
-    supportsColor: getSupportLevel,
-    stdout: getSupportLevel(process.stdout),
-    stderr: getSupportLevel(process.stderr)
-  };
-});
-
-// node_modules/colors/lib/custom/trap.js
-var require_trap = __commonJS((exports, module) => {
-  module["exports"] = function runTheTrap(text, options) {
-    var result = "";
-    text = text || "Run the trap, drop the bass";
-    text = text.split("");
-    var trap = {
-      a: ["@", "Ą", "Ⱥ", "Ʌ", "Δ", "Λ", "Д"],
-      b: ["ß", "Ɓ", "Ƀ", "ɮ", "β", "฿"],
-      c: ["©", "Ȼ", "Ͼ"],
-      d: ["Ð", "Ɗ", "Ԁ", "ԁ", "Ԃ", "ԃ"],
-      e: [
-        "Ë",
-        "ĕ",
-        "Ǝ",
-        "ɘ",
-        "Σ",
-        "ξ",
-        "Ҽ",
-        "੬"
-      ],
-      f: ["Ӻ"],
-      g: ["ɢ"],
-      h: ["Ħ", "ƕ", "Ң", "Һ", "Ӈ", "Ԋ"],
-      i: ["༏"],
-      j: ["Ĵ"],
-      k: ["ĸ", "Ҡ", "Ӄ", "Ԟ"],
-      l: ["Ĺ"],
-      m: ["ʍ", "Ӎ", "ӎ", "Ԡ", "ԡ", "൩"],
-      n: ["Ñ", "ŋ", "Ɲ", "Ͷ", "Π", "Ҋ"],
-      o: [
-        "Ø",
-        "õ",
-        "ø",
-        "Ǿ",
-        "ʘ",
-        "Ѻ",
-        "ם",
-        "۝",
-        "๏"
-      ],
-      p: ["Ƿ", "Ҏ"],
-      q: ["্"],
-      r: ["®", "Ʀ", "Ȑ", "Ɍ", "ʀ", "Я"],
-      s: ["§", "Ϟ", "ϟ", "Ϩ"],
-      t: ["Ł", "Ŧ", "ͳ"],
-      u: ["Ʊ", "Ս"],
-      v: ["ט"],
-      w: ["Ш", "Ѡ", "Ѽ", "൰"],
-      x: ["Ҳ", "Ӿ", "Ӽ", "ӽ"],
-      y: ["¥", "Ұ", "Ӌ"],
-      z: ["Ƶ", "ɀ"]
-    };
-    text.forEach(function(c) {
-      c = c.toLowerCase();
-      var chars = trap[c] || [" "];
-      var rand = Math.floor(Math.random() * chars.length);
-      if (typeof trap[c] !== "undefined") {
-        result += trap[c][rand];
-      } else {
-        result += c;
-      }
-    });
-    return result;
-  };
-});
-
-// node_modules/colors/lib/custom/zalgo.js
-var require_zalgo = __commonJS((exports, module) => {
-  module["exports"] = function zalgo(text, options) {
-    text = text || "   he is here   ";
-    var soul = {
-      up: [
-        "̍",
-        "̎",
-        "̄",
-        "̅",
-        "̿",
-        "̑",
-        "̆",
-        "̐",
-        "͒",
-        "͗",
-        "͑",
-        "̇",
-        "̈",
-        "̊",
-        "͂",
-        "̓",
-        "̈",
-        "͊",
-        "͋",
-        "͌",
-        "̃",
-        "̂",
-        "̌",
-        "͐",
-        "̀",
-        "́",
-        "̋",
-        "̏",
-        "̒",
-        "̓",
-        "̔",
-        "̽",
-        "̉",
-        "ͣ",
-        "ͤ",
-        "ͥ",
-        "ͦ",
-        "ͧ",
-        "ͨ",
-        "ͩ",
-        "ͪ",
-        "ͫ",
-        "ͬ",
-        "ͭ",
-        "ͮ",
-        "ͯ",
-        "̾",
-        "͛",
-        "͆",
-        "̚"
-      ],
-      down: [
-        "̖",
-        "̗",
-        "̘",
-        "̙",
-        "̜",
-        "̝",
-        "̞",
-        "̟",
-        "̠",
-        "̤",
-        "̥",
-        "̦",
-        "̩",
-        "̪",
-        "̫",
-        "̬",
-        "̭",
-        "̮",
-        "̯",
-        "̰",
-        "̱",
-        "̲",
-        "̳",
-        "̹",
-        "̺",
-        "̻",
-        "̼",
-        "ͅ",
-        "͇",
-        "͈",
-        "͉",
-        "͍",
-        "͎",
-        "͓",
-        "͔",
-        "͕",
-        "͖",
-        "͙",
-        "͚",
-        "̣"
-      ],
-      mid: [
-        "̕",
-        "̛",
-        "̀",
-        "́",
-        "͘",
-        "̡",
-        "̢",
-        "̧",
-        "̨",
-        "̴",
-        "̵",
-        "̶",
-        "͜",
-        "͝",
-        "͞",
-        "͟",
-        "͠",
-        "͢",
-        "̸",
-        "̷",
-        "͡",
-        " ҉"
-      ]
-    };
-    var all = [].concat(soul.up, soul.down, soul.mid);
-    function randomNumber(range) {
-      var r = Math.floor(Math.random() * range);
-      return r;
-    }
-    function isChar(character) {
-      var bool = false;
-      all.filter(function(i) {
-        bool = i === character;
-      });
-      return bool;
-    }
-    function heComes(text2, options2) {
-      var result = "";
-      var counts;
-      var l;
-      options2 = options2 || {};
-      options2["up"] = typeof options2["up"] !== "undefined" ? options2["up"] : true;
-      options2["mid"] = typeof options2["mid"] !== "undefined" ? options2["mid"] : true;
-      options2["down"] = typeof options2["down"] !== "undefined" ? options2["down"] : true;
-      options2["size"] = typeof options2["size"] !== "undefined" ? options2["size"] : "maxi";
-      text2 = text2.split("");
-      for (l in text2) {
-        if (isChar(l)) {
-          continue;
-        }
-        result = result + text2[l];
-        counts = { up: 0, down: 0, mid: 0 };
-        switch (options2.size) {
-          case "mini":
-            counts.up = randomNumber(8);
-            counts.mid = randomNumber(2);
-            counts.down = randomNumber(8);
-            break;
-          case "maxi":
-            counts.up = randomNumber(16) + 3;
-            counts.mid = randomNumber(4) + 1;
-            counts.down = randomNumber(64) + 3;
-            break;
-          default:
-            counts.up = randomNumber(8) + 1;
-            counts.mid = randomNumber(6) / 2;
-            counts.down = randomNumber(8) + 1;
-            break;
-        }
-        var arr = ["up", "mid", "down"];
-        for (var d in arr) {
-          var index = arr[d];
-          for (var i = 0;i <= counts[index]; i++) {
-            if (options2[index]) {
-              result = result + soul[index][randomNumber(soul[index].length)];
-            }
-          }
-        }
-      }
-      return result;
-    }
-    return heComes(text, options);
-  };
-});
-
-// node_modules/colors/lib/maps/america.js
-var require_america = __commonJS((exports, module) => {
-  module["exports"] = function(colors) {
-    return function(letter, i, exploded) {
-      if (letter === " ")
-        return letter;
-      switch (i % 3) {
-        case 0:
-          return colors.red(letter);
-        case 1:
-          return colors.white(letter);
-        case 2:
-          return colors.blue(letter);
-      }
-    };
-  };
-});
-
-// node_modules/colors/lib/maps/zebra.js
-var require_zebra = __commonJS((exports, module) => {
-  module["exports"] = function(colors) {
-    return function(letter, i, exploded) {
-      return i % 2 === 0 ? letter : colors.inverse(letter);
-    };
-  };
-});
-
-// node_modules/colors/lib/maps/rainbow.js
-var require_rainbow = __commonJS((exports, module) => {
-  module["exports"] = function(colors) {
-    var rainbowColors = ["red", "yellow", "green", "blue", "magenta"];
-    return function(letter, i, exploded) {
-      if (letter === " ") {
-        return letter;
-      } else {
-        return colors[rainbowColors[i++ % rainbowColors.length]](letter);
-      }
-    };
-  };
-});
-
-// node_modules/colors/lib/maps/random.js
-var require_random = __commonJS((exports, module) => {
-  module["exports"] = function(colors) {
-    var available = [
-      "underline",
-      "inverse",
-      "grey",
-      "yellow",
-      "red",
-      "green",
-      "blue",
-      "white",
-      "cyan",
-      "magenta",
-      "brightYellow",
-      "brightRed",
-      "brightGreen",
-      "brightBlue",
-      "brightWhite",
-      "brightCyan",
-      "brightMagenta"
-    ];
-    return function(letter, i, exploded) {
-      return letter === " " ? letter : colors[available[Math.round(Math.random() * (available.length - 2))]](letter);
-    };
-  };
-});
-
-// node_modules/colors/lib/colors.js
-var require_colors = __commonJS((exports, module) => {
-  var colors = {};
-  module["exports"] = colors;
-  colors.themes = {};
-  var util = __require("util");
-  var ansiStyles = colors.styles = require_styles();
-  var defineProps = Object.defineProperties;
-  var newLineRegex = new RegExp(/[\r\n]+/g);
-  colors.supportsColor = require_supports_colors().supportsColor;
-  if (typeof colors.enabled === "undefined") {
-    colors.enabled = colors.supportsColor() !== false;
-  }
-  colors.enable = function() {
-    colors.enabled = true;
-  };
-  colors.disable = function() {
-    colors.enabled = false;
-  };
-  colors.stripColors = colors.strip = function(str) {
-    return ("" + str).replace(/\x1B\[\d+m/g, "");
-  };
-  var stylize = colors.stylize = function stylize(str, style) {
-    if (!colors.enabled) {
-      return str + "";
-    }
-    var styleMap = ansiStyles[style];
-    if (!styleMap && style in colors) {
-      return colors[style](str);
-    }
-    return styleMap.open + str + styleMap.close;
-  };
-  var matchOperatorsRe = /[|\\{}()[\]^$+*?.]/g;
-  var escapeStringRegexp = function(str) {
-    if (typeof str !== "string") {
-      throw new TypeError("Expected a string");
-    }
-    return str.replace(matchOperatorsRe, "\\$&");
-  };
-  function build(_styles) {
-    var builder = function builder() {
-      return applyStyle.apply(builder, arguments);
-    };
-    builder._styles = _styles;
-    builder.__proto__ = proto;
-    return builder;
-  }
-  var styles = function() {
-    var ret = {};
-    ansiStyles.grey = ansiStyles.gray;
-    Object.keys(ansiStyles).forEach(function(key) {
-      ansiStyles[key].closeRe = new RegExp(escapeStringRegexp(ansiStyles[key].close), "g");
-      ret[key] = {
-        get: function() {
-          return build(this._styles.concat(key));
-        }
-      };
-    });
-    return ret;
-  }();
-  var proto = defineProps(function colors() {}, styles);
-  function applyStyle() {
-    var args = Array.prototype.slice.call(arguments);
-    var str = args.map(function(arg) {
-      if (arg != null && arg.constructor === String) {
-        return arg;
-      } else {
-        return util.inspect(arg);
-      }
-    }).join(" ");
-    if (!colors.enabled || !str) {
-      return str;
-    }
-    var newLinesPresent = str.indexOf(`
-`) != -1;
-    var nestedStyles = this._styles;
-    var i = nestedStyles.length;
-    while (i--) {
-      var code = ansiStyles[nestedStyles[i]];
-      str = code.open + str.replace(code.closeRe, code.open) + code.close;
-      if (newLinesPresent) {
-        str = str.replace(newLineRegex, function(match) {
-          return code.close + match + code.open;
-        });
-      }
-    }
-    return str;
-  }
-  colors.setTheme = function(theme) {
-    if (typeof theme === "string") {
-      console.log("colors.setTheme now only accepts an object, not a string.  " + "If you are trying to set a theme from a file, it is now your (the " + "caller's) responsibility to require the file.  The old syntax " + "looked like colors.setTheme(__dirname + " + "'/../themes/generic-logging.js'); The new syntax looks like " + "colors.setTheme(require(__dirname + " + "'/../themes/generic-logging.js'));");
-      return;
-    }
-    for (var style in theme) {
-      (function(style2) {
-        colors[style2] = function(str) {
-          if (typeof theme[style2] === "object") {
-            var out = str;
-            for (var i in theme[style2]) {
-              out = colors[theme[style2][i]](out);
-            }
-            return out;
-          }
-          return colors[theme[style2]](str);
-        };
-      })(style);
-    }
-  };
-  function init() {
-    var ret = {};
-    Object.keys(styles).forEach(function(name) {
-      ret[name] = {
-        get: function() {
-          return build([name]);
-        }
-      };
-    });
-    return ret;
-  }
-  var sequencer = function sequencer(map2, str) {
-    var exploded = str.split("");
-    exploded = exploded.map(map2);
-    return exploded.join("");
-  };
-  colors.trap = require_trap();
-  colors.zalgo = require_zalgo();
-  colors.maps = {};
-  colors.maps.america = require_america()(colors);
-  colors.maps.zebra = require_zebra()(colors);
-  colors.maps.rainbow = require_rainbow()(colors);
-  colors.maps.random = require_random()(colors);
-  for (map in colors.maps) {
-    (function(map2) {
-      colors[map2] = function(str) {
-        return sequencer(colors.maps[map2], str);
-      };
-    })(map);
-  }
-  var map;
-  defineProps(colors, init());
-});
-
-// node_modules/colors/lib/extendStringPrototype.js
-var require_extendStringPrototype = __commonJS((exports, module) => {
-  var colors = require_colors();
-  module["exports"] = function() {
-    var addProperty = function(color, func) {
-      String.prototype.__defineGetter__(color, func);
-    };
-    addProperty("strip", function() {
-      return colors.strip(this);
-    });
-    addProperty("stripColors", function() {
-      return colors.strip(this);
-    });
-    addProperty("trap", function() {
-      return colors.trap(this);
-    });
-    addProperty("zalgo", function() {
-      return colors.zalgo(this);
-    });
-    addProperty("zebra", function() {
-      return colors.zebra(this);
-    });
-    addProperty("rainbow", function() {
-      return colors.rainbow(this);
-    });
-    addProperty("random", function() {
-      return colors.random(this);
-    });
-    addProperty("america", function() {
-      return colors.america(this);
-    });
-    var x = Object.keys(colors.styles);
-    x.forEach(function(style) {
-      addProperty(style, function() {
-        return colors.stylize(this, style);
-      });
-    });
-    function applyTheme(theme) {
-      var stringPrototypeBlacklist = [
-        "__defineGetter__",
-        "__defineSetter__",
-        "__lookupGetter__",
-        "__lookupSetter__",
-        "charAt",
-        "constructor",
-        "hasOwnProperty",
-        "isPrototypeOf",
-        "propertyIsEnumerable",
-        "toLocaleString",
-        "toString",
-        "valueOf",
-        "charCodeAt",
-        "indexOf",
-        "lastIndexOf",
-        "length",
-        "localeCompare",
-        "match",
-        "repeat",
-        "replace",
-        "search",
-        "slice",
-        "split",
-        "substring",
-        "toLocaleLowerCase",
-        "toLocaleUpperCase",
-        "toLowerCase",
-        "toUpperCase",
-        "trim",
-        "trimLeft",
-        "trimRight"
-      ];
-      Object.keys(theme).forEach(function(prop) {
-        if (stringPrototypeBlacklist.indexOf(prop) !== -1) {
-          console.log("warn: ".red + ("String.prototype" + prop).magenta + " is probably something you don't want to override.  " + "Ignoring style name");
-        } else {
-          if (typeof theme[prop] === "string") {
-            colors[prop] = colors[theme[prop]];
-            addProperty(prop, function() {
-              return colors[prop](this);
-            });
-          } else {
-            var themePropApplicator = function(str) {
-              var ret = str || this;
-              for (var t = 0;t < theme[prop].length; t++) {
-                ret = colors[theme[prop][t]](ret);
-              }
-              return ret;
-            };
-            addProperty(prop, themePropApplicator);
-            colors[prop] = function(str) {
-              return themePropApplicator(str);
-            };
-          }
-        }
-      });
-    }
-    colors.setTheme = function(theme) {
-      if (typeof theme === "string") {
-        console.log("colors.setTheme now only accepts an object, not a string. " + "If you are trying to set a theme from a file, it is now your (the " + "caller's) responsibility to require the file.  The old syntax " + "looked like colors.setTheme(__dirname + " + "'/../themes/generic-logging.js'); The new syntax looks like " + "colors.setTheme(require(__dirname + " + "'/../themes/generic-logging.js'));");
-        return;
-      } else {
-        applyTheme(theme);
-      }
-    };
-  };
-});
-
-// node_modules/colors/lib/index.js
-var require_lib = __commonJS((exports, module) => {
-  var colors = require_colors();
-  module["exports"] = colors;
-  require_extendStringPrototype()();
-});
-
 // node_modules/dotenv/package.json
 var require_package = __commonJS((exports, module) => {
   module.exports = {
@@ -37003,7 +36258,7 @@ var require_stringify = __commonJS((exports, module) => {
 });
 
 // node_modules/fast-querystring/lib/index.js
-var require_lib2 = __commonJS((exports, module) => {
+var require_lib = __commonJS((exports, module) => {
   var parse = require_parse4();
   var stringify = require_stringify();
   var fastQuerystring = {
@@ -38651,7 +37906,7 @@ var require_url_sanitizer = __commonJS((exports, module) => {
 // node_modules/find-my-way/index.js
 var require_find_my_way = __commonJS((exports, module) => {
   var assert = __require("node:assert");
-  var querystring = require_lib2();
+  var querystring = require_lib();
   var isRegexSafe = require_safe_regex2();
   var deepEqual = require_fast_deep_equal();
   var { prettyPrintTree } = require_pretty_print();
@@ -41677,7 +40932,7 @@ var require_response = __commonJS((exports, module) => {
   var { Writable, Readable, addAbortSignal } = __require("node:stream");
   var util = __require("node:util");
   var setCookie = require_set_cookie();
-  function Response2(req, onEnd, reject) {
+  function Response(req, onEnd, reject) {
     http.ServerResponse.call(this, req);
     if (req._lightMyRequest?.payloadAsStream) {
       const read = this.emit.bind(this, "drain");
@@ -41743,15 +40998,15 @@ var require_response = __commonJS((exports, module) => {
     this.once("error", onEndFailure);
     this.once("close", onEndFailure);
   }
-  util.inherits(Response2, http.ServerResponse);
-  Response2.prototype.setTimeout = function(msecs, callback) {
+  util.inherits(Response, http.ServerResponse);
+  Response.prototype.setTimeout = function(msecs, callback) {
     this.timeoutHandle = setTimeout(() => {
       this.emit("timeout");
     }, msecs);
     this.on("timeout", callback);
     return this;
   };
-  Response2.prototype.writeHead = function() {
+  Response.prototype.writeHead = function() {
     const result = http.ServerResponse.prototype.writeHead.apply(this, arguments);
     copyHeaders(this);
     if (this._lightMyRequest.stream) {
@@ -41759,7 +41014,7 @@ var require_response = __commonJS((exports, module) => {
     }
     return result;
   };
-  Response2.prototype.write = function(data, encoding, callback) {
+  Response.prototype.write = function(data, encoding, callback) {
     if (this.timeoutHandle) {
       clearTimeout(this.timeoutHandle);
     }
@@ -41771,7 +41026,7 @@ var require_response = __commonJS((exports, module) => {
       return true;
     }
   };
-  Response2.prototype.end = function(data, encoding, callback) {
+  Response.prototype.end = function(data, encoding, callback) {
     if (data) {
       this.write(data, encoding);
     }
@@ -41779,7 +41034,7 @@ var require_response = __commonJS((exports, module) => {
     this.emit("finish");
     this.destroy();
   };
-  Response2.prototype.destroy = function(error) {
+  Response.prototype.destroy = function(error) {
     if (this.destroyed)
       return;
     this.destroyed = true;
@@ -41788,7 +41043,7 @@ var require_response = __commonJS((exports, module) => {
     }
     process.nextTick(() => this.emit("close"));
   };
-  Response2.prototype.addTrailers = function(trailers) {
+  Response.prototype.addTrailers = function(trailers) {
     for (const key in trailers) {
       this._lightMyRequest.trailers[key.toLowerCase().trim()] = trailers[key].toString().trim();
     }
@@ -41860,7 +41115,7 @@ var require_response = __commonJS((exports, module) => {
       }
     });
   }
-  module.exports = Response2;
+  module.exports = Response;
 });
 
 // node_modules/light-my-request/lib/config-validator.js
@@ -42693,7 +41948,7 @@ var require_config_validator = __commonJS((exports, module) => {
 var require_light_my_request = __commonJS((exports, module) => {
   var assert = __require("node:assert");
   var Request = require_request2();
-  var Response2 = require_response();
+  var Response = require_response();
   var errorMessage = "The dispatch function has already been invoked";
   var optsValidator = require_config_validator();
   function inject(dispatchFunc, options, callback) {
@@ -42744,16 +41999,16 @@ var require_light_my_request = __commonJS((exports, module) => {
     const RequestConstructor = options.Request ? Request.CustomRequest : Request;
     if (dispatchFunc.request && dispatchFunc.request.app === dispatchFunc) {
       Object.setPrototypeOf(Object.getPrototypeOf(dispatchFunc.request), RequestConstructor.prototype);
-      Object.setPrototypeOf(Object.getPrototypeOf(dispatchFunc.response), Response2.prototype);
+      Object.setPrototypeOf(Object.getPrototypeOf(dispatchFunc.response), Response.prototype);
     }
     if (typeof callback === "function") {
       const req = new RequestConstructor(options);
-      const res = new Response2(req, callback);
+      const res = new Response(req, callback);
       return makeRequest(dispatchFunc, server, req, res);
     } else {
       return new Promise((resolve, reject) => {
         const req = new RequestConstructor(options);
-        const res = new Response2(req, resolve, reject);
+        const res = new Response(req, resolve, reject);
         makeRequest(dispatchFunc, server, req, res);
       });
     }
@@ -42838,7 +42093,7 @@ var require_light_my_request = __commonJS((exports, module) => {
     };
   });
   function isInjection(obj) {
-    return obj instanceof Request || obj instanceof Response2 || obj?.constructor?.name === "_CustomLMRRequest";
+    return obj instanceof Request || obj instanceof Response || obj?.constructor?.name === "_CustomLMRRequest";
   }
   module.exports = inject;
   module.exports.default = inject;
@@ -47778,7 +47033,7 @@ var require_streams = __commonJS((exports, module) => {
 });
 
 // node_modules/iconv-lite/lib/index.js
-var require_lib3 = __commonJS((exports, module) => {
+var require_lib2 = __commonJS((exports, module) => {
   var Buffer2 = require_safer().Buffer;
   var bomHandling = require_bom_handling();
   var iconv = exports;
@@ -47942,7 +47197,7 @@ var require_raw_body = __commonJS((exports, module) => {
   var asyncHooks = tryRequireAsyncHooks();
   var bytes = require_bytes();
   var createError = require_http_errors();
-  var iconv = require_lib3();
+  var iconv = require_lib2();
   var unpipe = require_unpipe();
   module.exports = getRawBody;
   var ICONV_ENCODING_MESSAGE_REGEXP = /^Encoding not recognized: /;
@@ -48237,7 +47492,7 @@ var require_content_type = __commonJS((exports) => {
 });
 
 // node_modules/webidl-conversions/lib/index.js
-var require_lib4 = __commonJS((exports, module) => {
+var require_lib3 = __commonJS((exports, module) => {
   var conversions = {};
   module.exports = conversions;
   function sign(x) {
@@ -49794,7 +49049,7 @@ var require_URL_impl = __commonJS((exports) => {
 
 // node_modules/whatwg-url/lib/URL.js
 var require_URL = __commonJS((exports, module) => {
-  var conversions = require_lib4();
+  var conversions = require_lib3();
   var utils = require_utils2();
   var Impl = require_URL_impl();
   var impl = utils.implSymbol;
@@ -49986,7 +49241,7 @@ var require_public_api = __commonJS((exports) => {
 });
 
 // node_modules/node-fetch/lib/index.js
-var require_lib5 = __commonJS((exports, module) => {
+var require_lib4 = __commonJS((exports, module) => {
   Object.defineProperty(exports, "__esModule", { value: true });
   function _interopDefault(ex) {
     return ex && typeof ex === "object" && "default" in ex ? ex["default"] : ex;
@@ -50635,7 +49890,7 @@ var require_lib5 = __commonJS((exports, module) => {
   var INTERNALS$1 = Symbol("Response internals");
   var STATUS_CODES = http.STATUS_CODES;
 
-  class Response2 {
+  class Response {
     constructor() {
       let body = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       let opts = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
@@ -50675,7 +49930,7 @@ var require_lib5 = __commonJS((exports, module) => {
       return this[INTERNALS$1].headers;
     }
     clone() {
-      return new Response2(clone(this), {
+      return new Response(clone(this), {
         url: this.url,
         status: this.status,
         statusText: this.statusText,
@@ -50685,8 +49940,8 @@ var require_lib5 = __commonJS((exports, module) => {
       });
     }
   }
-  Body.mixIn(Response2.prototype);
-  Object.defineProperties(Response2.prototype, {
+  Body.mixIn(Response.prototype);
+  Object.defineProperties(Response.prototype, {
     url: { enumerable: true },
     status: { enumerable: true },
     ok: { enumerable: true },
@@ -50695,7 +49950,7 @@ var require_lib5 = __commonJS((exports, module) => {
     headers: { enumerable: true },
     clone: { enumerable: true }
   });
-  Object.defineProperty(Response2.prototype, Symbol.toStringTag, {
+  Object.defineProperty(Response.prototype, Symbol.toStringTag, {
     value: "Response",
     writable: false,
     enumerable: false,
@@ -51029,7 +50284,7 @@ var require_lib5 = __commonJS((exports, module) => {
         };
         const codings = headers.get("Content-Encoding");
         if (!request.compress || request.method === "HEAD" || codings === null || res.statusCode === 204 || res.statusCode === 304) {
-          response = new Response2(body, response_options);
+          response = new Response(body, response_options);
           resolve(response);
           return;
         }
@@ -51039,7 +50294,7 @@ var require_lib5 = __commonJS((exports, module) => {
         };
         if (codings == "gzip" || codings == "x-gzip") {
           body = body.pipe(zlib.createGunzip(zlibOptions));
-          response = new Response2(body, response_options);
+          response = new Response(body, response_options);
           resolve(response);
           return;
         }
@@ -51051,12 +50306,12 @@ var require_lib5 = __commonJS((exports, module) => {
             } else {
               body = body.pipe(zlib.createInflateRaw());
             }
-            response = new Response2(body, response_options);
+            response = new Response(body, response_options);
             resolve(response);
           });
           raw.on("end", function() {
             if (!response) {
-              response = new Response2(body, response_options);
+              response = new Response(body, response_options);
               resolve(response);
             }
           });
@@ -51064,11 +50319,11 @@ var require_lib5 = __commonJS((exports, module) => {
         }
         if (codings == "br" && typeof zlib.createBrotliDecompress === "function") {
           body = body.pipe(zlib.createBrotliDecompress());
-          response = new Response2(body, response_options);
+          response = new Response(body, response_options);
           resolve(response);
           return;
         }
-        response = new Response2(body, response_options);
+        response = new Response(body, response_options);
         resolve(response);
       });
       writeToStream(req, request);
@@ -51110,7 +50365,7 @@ var require_lib5 = __commonJS((exports, module) => {
   exports.default = exports;
   exports.Headers = Headers;
   exports.Request = Request;
-  exports.Response = Response2;
+  exports.Response = Response;
   exports.FetchError = FetchError;
   exports.AbortError = AbortError;
 });
@@ -51124,7 +50379,7 @@ var require_fetch = __commonJS((exports) => {
       return fetch;
     }
     if (typeof process !== "undefined") {
-      const { default: nodeFetch } = await Promise.resolve().then(() => __toESM(require_lib5(), 1));
+      const { default: nodeFetch } = await Promise.resolve().then(() => __toESM(require_lib4(), 1));
       return nodeFetch;
     }
     throw new Error("Unsupported environment: neither browser nor Node.js detected.");
@@ -60339,7 +59594,7 @@ var require_upload = __commonJS((exports) => {
       };
     }
     if (typeof file === "string" || file instanceof Buffer) {
-      const { default: fetch2 } = await Promise.resolve().then(() => __toESM(require_lib5(), 1));
+      const { default: fetch2 } = await Promise.resolve().then(() => __toESM(require_lib4(), 1));
       const { readFileSync } = await import("node:fs");
       if (typeof file === "string") {
         try {
@@ -61744,16 +60999,13 @@ var require_esm = __commonJS((exports) => {
   exports.default = Gestell;
 });
 
-// server/entry.ts
-var import_colors = __toESM(require_lib(), 1);
-
 // server/config.ts
 var import_dotenv = __toESM(require_main(), 1);
 import_dotenv.config();
 var API_KEY = process.env.GESTELL_API_KEY || "";
 var PORT = Number(process.env.GESTELL_MCP_PORT || 3000);
 var HOST = process.env.GESTELL_MCP_HOST || "0.0.0.0";
-var MODE = process.env.GESTELL_MCP_MODE || "SIMPLE";
+var REMOTE_AUTH = process.env.GESTELL_REMOTE_AUTH || "";
 var SERVICE = process.env.GESTELL_MCP_SERVICE_TYPE || "TERMINAL";
 
 // server/remote.ts
@@ -68809,76 +68061,81 @@ var EMPTY_COMPLETION_RESULT = {
 
 // client/schemas/collection.ts
 var CollectionCoreSchema = {
-  name: z.string().describe("The name of the collection"),
-  type: z.enum(["frame", "searchable-frame", "canon", "features"]).describe("The type of collection to create. Defaults to `canon` unless instructed otherwise.").default("canon"),
-  tags: z.array(z.string()).optional().describe("Optional tags to label the collection"),
-  description: z.string().optional().describe("A description of the collection"),
-  instructions: z.string().optional().describe("The instructions for indexing data in the collection"),
-  graphInstructions: z.string().optional().describe("The instructions for generating relations in the graph for the collection"),
-  promptInstructions: z.string().optional().describe("The instructions for how the model should respond to prompts"),
-  searchInstructions: z.string().optional().describe("Bullet-point list of search keys to use (e.g. name, topic). Aim for ≤ 3 keys unless otherwise specified.")
+  name: z.string().min(1, { message: "Collection name cannot be empty." }).describe('A concise, human-readable name for the collection (≤50 chars; Title Case; no special symbols). Example: "Sales Reports Q2 2025".'),
+  type: z.enum(["frame", "searchable-frame", "canon", "features"]).default("canon").describe('Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'),
+  tags: z.array(z.string().min(1), {
+    invalid_type_error: "Each tag must be a non‐empty string."
+  }).optional().describe('Array of short keyword tags (single words, no spaces). Example: ["finance","Q2","internal"].'),
+  description: z.string().optional().describe('Multi-sentence description of purpose, contents, and intended usage (≤500 chars). Example: "Contains all client invoices from Jan–Mar 2025 for auditing."'),
+  instructions: z.string().optional().describe('High-level ingestion guidelines: outline data sources, preprocessing steps, and field mappings (e.g. "1. Convert PDFs to text…").'),
+  graphInstructions: z.string().optional().describe('Graph generation rules: define node types, edge semantics, and heuristics (e.g. "Link orders to customers by matching customer_id").'),
+  promptInstructions: z.string().optional().describe('LLM response guidelines: tone, format, and structure (e.g. "Use bullets, start with a one-sentence summary").'),
+  searchInstructions: z.string().optional().describe(`Bullet-point list of ≤5 search keys (one per line). Example:
+- title
+- author
+- publication_date`)
 };
 var CollectionCreateSchema = {
-  organizationId: z.string(),
+  organizationId: z.string().uuid().describe('The UUID of the organization that owns this collection. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'),
   categories: z.array(z.object({
-    name: z.string(),
-    type: z.enum(["concepts", "features", "content", "table"]),
-    instructions: z.string()
-  })).optional().default([]).describe("Categories to index data further. Leave empty unless instructed otherwise."),
+    name: z.string().describe('Human-readable category name, e.g. "Invoices", "Products".'),
+    type: z.enum(["concepts", "features", "content", "table"]).describe('The data model for this category: "concepts", "features", "content", or "table".'),
+    instructions: z.string().describe("Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings).")
+  })).optional().default([]).describe("List of zero or more categories for sub-indexing. Leave as [] if you do not need additional facets."),
   ...CollectionCoreSchema
 };
 var CollectionUpdateSchema = {
-  collectionId: z.string().describe("The unique identifier of the collection to update."),
-  organizationId: z.string().optional().describe("Optional update for the Organization ID associated with the collection. You must be an admin of both Organizations to change this."),
+  collectionId: z.string().uuid().describe('The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'),
+  organizationId: z.string().uuid().optional().describe("New organization UUID to assign this collection. Requires admin permissions in both orgs."),
   ...CollectionCoreSchema
 };
 var GetCollectionRequestSchema = {
-  collectionId: z.string().describe("The ID of the collection to retrieve.")
+  collectionId: z.string().uuid().describe('The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".')
 };
 var GetCollectionsRequestSchema = {
-  search: z.string().optional().describe("A search query to filter collections by name, description, or tags."),
-  take: z.number().optional().describe("The number of collections to retrieve."),
-  skip: z.number().optional().describe("The number of collections to skip (useful for pagination)."),
-  extended: z.boolean().optional().describe("Whether to include extended details for each collection.")
+  search: z.string().optional().describe('Optional filter string to match name, description, or tags. Example: "finance Q2".'),
+  take: z.number().int().optional().describe("Optional maximum number of collections to return. Example: 5."),
+  skip: z.number().int().optional().describe("Optional number of collections to skip (pagination offset). Example: 10."),
+  extended: z.boolean().optional().describe("Optional flag to include extended details (documents in collection etc.).")
 };
 // client/schemas/document.ts
 var DocumentCoreSchema = {
-  collectionId: z.string().describe("The ID of the collection where the document will be created.")
+  collectionId: z.string().uuid().describe("The UUID of the collection associated with the document operation.")
 };
 var UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  name: z.string().describe("The name of the document."),
-  type: z.string().optional().describe("Optional MIME type of the document (e.g., application/pdf)."),
-  file: z.string().describe("The path to the file to upload"),
-  instructions: z.string().optional().describe("Additional instructions related to the document. Not recommended unless needed."),
-  job: z.boolean().optional().default(true).describe("Whether to dispatch a processing job; set to false to skip."),
+  name: z.string().min(1).describe("The name of the document. Must not be empty."),
+  type: z.string().optional().describe('Optional MIME type of the document (e.g., "application/pdf").'),
+  file: z.string().min(1).describe("The path to the file to upload. Must be a non-empty string representing a valid file path."),
+  instructions: z.string().min(1).optional().describe("Optional additional instructions for processing the document. If provided, must not be empty."),
+  job: z.boolean().optional().default(true).describe("Whether to dispatch a processing job. Defaults to true. Set to false to skip."),
   tables: z.boolean().describe("Flag to perform additional table processing and analysis on the document.")
 };
 var UpdateDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  documentId: z.string().describe("The ID of the document to update."),
-  name: z.string().optional().describe("The updated name of the document."),
-  instructions: z.string().optional().describe("Updated instructions related to the document."),
-  job: z.boolean().optional().describe("Whether to dispatch a reprocessing job; set to true to dispatch."),
+  documentId: z.string().uuid().describe("The UUID of the document to update."),
+  name: z.string().min(1).optional().describe("The updated name of the document. If provided, must not be empty."),
+  instructions: z.string().min(1).optional().describe("Updated instructions related to the document. If provided, must not be empty."),
+  job: z.boolean().optional().default(false).describe("Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch."),
   tables: z.boolean().optional().describe("Flag to perform additional table processing and analysis on the document.")
 };
 var DeleteDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  documentId: z.string().describe("The ID of the document to delete.")
+  documentId: z.string().uuid().describe("The UUID of the document to delete.")
 };
 var ReprocessDocumentsRequestSchema = {
   ...DocumentCoreSchema,
-  ids: z.array(z.string()).describe("An array of Document IDs to reprocess"),
-  type: z.enum(["status", "nodes", "vectors", "edges", "category"]).describe("The type of the job to dispatch reprocessing for ('status', 'nodes', 'vectors', 'edges', 'category')")
+  ids: z.array(z.string().uuid()).describe("An array of UUIDs of the documents to reprocess."),
+  type: z.enum(["status", "nodes", "vectors", "edges", "category"]).describe('The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category").')
 };
 var ExportDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  documentId: z.string().describe("The ID of the document to retrieve."),
+  documentId: z.string().uuid().describe("The UUID of the document to retrieve."),
   type: z.enum(["json", "text"]).describe('Output format: "json" for layout or "text" for raw text output.')
 };
 var GetDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  documentId: z.string().describe("The ID of the document to retrieve.")
+  documentId: z.string().uuid().describe("The UUID of the document to retrieve.")
 };
 var JobStatusSchema = z.enum([
   "processing",
@@ -68892,8 +68149,8 @@ var JobStatusSchema = z.enum([
 var GetDocumentsRequestSchema = {
   ...DocumentCoreSchema,
   search: z.string().optional().describe("A search query string to filter documents."),
-  take: z.number().optional().describe("The number of documents to retrieve."),
-  skip: z.number().optional().describe("The number of documents to skip for pagination."),
+  take: z.number().int().positive().optional().describe("The number of documents to retrieve. Must be a positive integer."),
+  skip: z.number().int().nonnegative().optional().describe("The number of documents to skip for pagination. Must be a non-negative integer."),
   extended: z.boolean().optional().describe("Whether to retrieve extended information for the documents."),
   status: JobStatusSchema.optional().describe("Filter by the overall job status."),
   nodes: JobStatusSchema.optional().describe("Filter by the job status for layout nodes."),
@@ -68903,13 +68160,13 @@ var GetDocumentsRequestSchema = {
 };
 // client/schemas/feature.ts
 var FeaturesCoreSchema = {
-  collectionId: z.string().describe("The ID of the collection to query."),
-  categoryId: z.string().describe("The ID of the category whose features are being requested.")
+  collectionId: z.string().uuid().describe("The ID of the collection to query. Must be a valid UUID."),
+  categoryId: z.string().uuid().describe("The ID of the category whose features are being requested. Must be a valid UUID.")
 };
 var FeaturesQueryRequestSchema = {
   ...FeaturesCoreSchema,
-  skip: z.number().optional().describe("An optional parameter to skip a specified number of results (for pagination)."),
-  take: z.number().optional().describe("An optional parameter to limit the number of results returned (for pagination).")
+  skip: z.number().int().min(0).optional().describe("An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0."),
+  take: z.number().int().min(1).optional().describe("An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1.")
 };
 var ExportFeaturesRequestSchema = {
   ...FeaturesCoreSchema,
@@ -68917,11 +68174,11 @@ var ExportFeaturesRequestSchema = {
 };
 // client/schemas/search.ts
 var GestellCoreSearchSchema = {
-  collectionId: z.string().describe("The ID of the collection to query"),
-  categoryId: z.string().optional().describe("Optional category ID to filter results"),
+  collectionId: z.string().uuid().describe("The ID of the collection to query (UUID)"),
+  categoryId: z.string().uuid().optional().describe("Optional category ID to filter results (UUID)"),
   prompt: z.string().describe("The prompt or query to execute"),
   method: z.enum(["fast", "normal", "precise"]).optional().default("normal").describe("The search method to use"),
-  type: z.enum(["keywords", "phrase", "summary"]).default("phrase").optional().describe("Optional search type to specify, default to phrase unless otherwise specified"),
+  type: z.enum(["keywords", "phrase", "summary"]).optional().default("phrase").describe("The type of search to perform"),
   vectorDepth: z.number().int().positive().optional().describe("Depth of vector search"),
   nodeDepth: z.number().int().positive().optional().describe("Depth of node search"),
   maxQueries: z.number().int().positive().optional().describe("Maximum number of queries to run"),
@@ -68943,13 +68200,13 @@ var GestellPromptSchema = {
 };
 // client/schemas/table.ts
 var TablesCoreSchema = {
-  collectionId: z.string().describe("The ID of the collection to query."),
-  categoryId: z.string().describe("The ID of the category whose table data is being requested.")
+  collectionId: z.string().uuid().describe("The UUID of the collection to query."),
+  categoryId: z.string().uuid().describe("The UUID of the category whose table data is being requested.")
 };
 var TablesQueryRequestSchema = {
   ...TablesCoreSchema,
-  skip: z.number().optional().describe("An optional parameter to skip a specified number of results (for pagination)."),
-  take: z.number().optional().describe("An optional parameter to limit the number of results returned (for pagination).")
+  skip: z.number().min(0).optional().describe("An optional parameter to skip a specified number of results (for pagination); must be at least 0."),
+  take: z.number().min(1).optional().describe("An optional parameter to limit the number of results returned (for pagination); must be at least 1.")
 };
 var ExportTableRequestSchema = {
   ...TablesCoreSchema,
@@ -69272,7 +68529,7 @@ function registerCollectionPromptTool(server, gestell) {
     cot,
     messages
   }) => {
-    const stream = await gestell.query.prompt({
+    const response = await gestell.query.prompt({
       collectionId,
       categoryId,
       prompt,
@@ -69286,7 +68543,14 @@ function registerCollectionPromptTool(server, gestell) {
       cot,
       messages
     });
-    const text = await new Response(stream).text();
+    const stream = response.getReader();
+    let text = "";
+    while (true) {
+      const { done, value } = await stream.read();
+      if (done)
+        break;
+      text += value;
+    }
     return {
       content: [
         {
@@ -69338,26 +68602,24 @@ function registerCollectionSearchTool(server, gestell) {
 }
 
 // server/mcp.ts
-function buildMcpServer(mode = "SIMPLE", key = process.env.GESTELL_API_KEY || "") {
+function buildMcpServer(key = process.env.GESTELL_API_KEY || "") {
   const gestell = new import_sdk.Gestell({ key });
   const server = new McpServer({ name: "Gestell", version: "1.0.0" });
   registerCollectionSearchTool(server, gestell);
   registerCollectionPromptTool(server, gestell);
-  if (mode === "ADVANCED") {
-    registerCollectionQueryTools(server, gestell);
-    registerCollectionCreateTool(server, gestell);
-    registerCollectionUpdateTool(server, gestell);
-    registerDocumentQueryTools(server, gestell);
-    registerUpdateDocumentTool(server, gestell);
-    registerUploadDocumentTool(server, gestell);
-    registerDeleteDocumentTool(server, gestell);
-    registerReprocessDocumentsTool(server, gestell);
-    registerExportDocumentTool(server, gestell);
-    registerQueryFeaturesTool(server, gestell);
-    registerExportFeaturesTool(server, gestell);
-    registerQueryTablesTool(server, gestell);
-    registerExportTableTool(server, gestell);
-  }
+  registerCollectionQueryTools(server, gestell);
+  registerCollectionCreateTool(server, gestell);
+  registerCollectionUpdateTool(server, gestell);
+  registerDocumentQueryTools(server, gestell);
+  registerUpdateDocumentTool(server, gestell);
+  registerUploadDocumentTool(server, gestell);
+  registerDeleteDocumentTool(server, gestell);
+  registerReprocessDocumentsTool(server, gestell);
+  registerExportDocumentTool(server, gestell);
+  registerQueryFeaturesTool(server, gestell);
+  registerExportFeaturesTool(server, gestell);
+  registerQueryTablesTool(server, gestell);
+  registerExportTableTool(server, gestell);
   return server;
 }
 
@@ -69373,12 +68635,17 @@ var fastify = import_fastify.default({
 async function startRemoteServer(config2 = {
   apiKey: API_KEY,
   host: HOST,
-  port: PORT,
-  mode: MODE
+  port: PORT
 }) {
-  const { apiKey, host, port, mode } = config2;
+  const { apiKey, host, port } = config2;
   fastify.post("/mcp", async (request, reply) => {
-    const server = buildMcpServer(mode, apiKey);
+    if (REMOTE_AUTH) {
+      const authHeader = request.headers.authorization;
+      if (!authHeader || authHeader !== REMOTE_AUTH) {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+    }
+    const server = buildMcpServer(apiKey);
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined
     });
@@ -69389,9 +68656,8 @@ async function startRemoteServer(config2 = {
     await server.connect(transport);
     await transport.handleRequest(request.raw, reply.raw, request.body);
   });
-  await fastify.listen({ port, host });
-  fastify.log.info(`GESTELL MCP HTTP server running on :${PORT}`);
-  console.log(`GESTELL MCP HTTP server running on :${PORT}`.green.bold);
+  await fastify.listen({ host, port });
+  fastify.log.info(`GESTELL MCP HTTP server running on ${host}:${port}`);
 }
 
 // node_modules/@modelcontextprotocol/sdk/dist/esm/server/stdio.js
@@ -69489,9 +68755,9 @@ class StdioServerTransport {
 }
 
 // server/terminal.ts
-async function startTerminalSession(config2 = { apiKey: API_KEY, mode: MODE }) {
-  const { apiKey, mode } = config2;
-  const server = buildMcpServer(mode, apiKey);
+async function startTerminalSession(config2 = { apiKey: API_KEY }) {
+  const { apiKey } = config2;
+  const server = buildMcpServer(apiKey);
   const transport = new StdioServerTransport;
   await server.connect(transport);
   return {
@@ -69502,8 +68768,6 @@ async function startTerminalSession(config2 = { apiKey: API_KEY, mode: MODE }) {
 
 // server/entry.ts
 async function entry() {
-  console.log(`[GESTELL] SERVICE TYPE: ${SERVICE}`.blue.bold);
-  console.log(`[GESTELL] SERVICE MODE: ${MODE}`.blue.bold);
   if (SERVICE === "REMOTE") {
     await startRemoteServer();
   } else {

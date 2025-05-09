@@ -1,3 +1,4 @@
+import type { FastifyReply, FastifyRequest } from 'fastify'
 import Fastify from 'fastify'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
@@ -5,10 +6,10 @@ import {
   API_KEY,
   type GestellRemoteConfig,
   HOST,
-  MODE,
-  PORT
+  PORT,
+  REMOTE_AUTH
 } from '@server/config'
-import { buildMcpServer } from '@server/mcp'
+import buildMcpServer from '@server/mcp'
 
 export const fastify = Fastify({
   logger: {
@@ -19,22 +20,29 @@ export const fastify = Fastify({
   }
 })
 
-/*
- * Starts the Gestell MCP HTTP server
- * Configure the exposed PORT in a terminal session or using an .env file
+/**
+ * Starts the Gestell MCP HTTP server.
+ *
+ * @param config - Configuration options for the remote server.
  */
 export default async function startRemoteServer(
   config: GestellRemoteConfig = {
     apiKey: API_KEY,
     host: HOST,
-    port: PORT,
-    mode: MODE
+    port: PORT
   }
-) {
-  const { apiKey, host, port, mode } = config
+): Promise<void> {
+  const { apiKey, host, port } = config
 
-  fastify.post('/mcp', async (request, reply) => {
-    const server: McpServer = buildMcpServer(mode, apiKey)
+  fastify.post('/mcp', async (request: FastifyRequest, reply: FastifyReply) => {
+    if (REMOTE_AUTH) {
+      const authHeader = request.headers.authorization
+      if (!authHeader || authHeader !== REMOTE_AUTH) {
+        return reply.code(401).send({ error: 'Unauthorized' })
+      }
+    }
+
+    const server: McpServer = buildMcpServer(apiKey)
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined
     })
@@ -52,7 +60,6 @@ export default async function startRemoteServer(
     )
   })
 
-  await fastify.listen({ port, host })
-  fastify.log.info(`GESTELL MCP HTTP server running on :${PORT}`)
-  console.log(`GESTELL MCP HTTP server running on :${PORT}`.green.bold)
+  await fastify.listen({ host, port })
+  fastify.log.info(`GESTELL MCP HTTP server running on ${host}:${port}`)
 }

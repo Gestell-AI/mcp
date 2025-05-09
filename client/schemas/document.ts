@@ -1,52 +1,57 @@
 import { z } from 'zod'
 
-/**
- * Shared subset of fields for any document‐based payload.
- */
 export const DocumentCoreSchema = {
-  /** The ID of the collection where the document will be created. */
+  /** The UUID of the collection associated with the document operation. */
   collectionId: z
     .string()
-    .describe('The ID of the collection where the document will be created.')
-} as const
+    .uuid()
+    .describe(
+      'The UUID of the collection associated with the document operation.'
+    )
+}
 
-/**
- * Schema for the “upload” operation payload.
- */
 export const UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** The name of the document. */
-  name: z.string().describe('The name of the document.'),
+  /** The name of the document. Must not be empty. */
+  name: z
+    .string()
+    .min(1)
+    .describe('The name of the document. Must not be empty.'),
 
   /** Optional MIME type of the document (e.g., 'application/pdf'). */
   type: z
     .string()
     .optional()
-    .describe('Optional MIME type of the document (e.g., application/pdf).'),
+    .describe('Optional MIME type of the document (e.g., "application/pdf").'),
 
-  /** The file to upload — **must** be a Buffer. */
-  file: z.string().describe('The path to the file to upload'),
-
-  /** Additional instructions related to the document. */
-  instructions: z
+  /** The path to the file to upload. Must be a non-empty string representing a valid file path. */
+  file: z
     .string()
-    .optional()
+    .min(1)
     .describe(
-      'Additional instructions related to the document. Not recommended unless needed.'
+      'The path to the file to upload. Must be a non-empty string representing a valid file path.'
     ),
 
-  /**
-   * Whether to dispatch a processing job.
-   * Set to `false` to skip dispatching.
-   */
+  /** Optional additional instructions for processing the document. If provided, must not be empty. */
+  instructions: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'Optional additional instructions for processing the document. If provided, must not be empty.'
+    ),
+
+  /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
   job: z
     .boolean()
     .optional()
     .default(true)
-    .describe('Whether to dispatch a processing job; set to false to skip.'),
+    .describe(
+      'Whether to dispatch a processing job. Defaults to true. Set to false to skip.'
+    ),
 
-  /** Flag to perform extra table processing & analysis on the document. */
+  /** Flag to perform additional table processing and analysis on the document. */
   tables: z
     .boolean()
     .describe(
@@ -54,39 +59,40 @@ export const UploadDocumentRequestSchema = {
     )
 }
 
-/**
- * Schema for the “update” operation payload.
- */
 export const UpdateDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** The ID of the document to update. */
-  documentId: z.string().describe('The ID of the document to update.'),
+  /** The UUID of the document to update. */
+  documentId: z.string().uuid().describe('The UUID of the document to update.'),
 
-  /** The updated name of the document. */
-  name: z.string().optional().describe('The updated name of the document.'),
+  /** The updated name of the document. If provided, must not be empty. */
+  name: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'The updated name of the document. If provided, must not be empty.'
+    ),
 
-  /** Updated instructions related to the document. */
+  /** Updated instructions related to the document. If provided, must not be empty. */
   instructions: z
     .string()
+    .min(1)
     .optional()
-    .describe('Updated instructions related to the document.'),
+    .describe(
+      'Updated instructions related to the document. If provided, must not be empty.'
+    ),
 
-  /**
-   * Whether to dispatch a reprocessing job.
-   * Set to `true` to reprocess; defaults to `false`.
-   */
+  /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch. */
   job: z
     .boolean()
     .optional()
+    .default(false)
     .describe(
-      'Whether to dispatch a reprocessing job; set to true to dispatch.'
+      'Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch.'
     ),
 
-  /**
-   * Flag to perform additional table processing and analysis
-   * on the document (useful for PDFs with complex tables).
-   */
+  /** Flag to perform additional table processing and analysis on the document. */
   tables: z
     .boolean()
     .optional()
@@ -95,41 +101,37 @@ export const UpdateDocumentRequestSchema = {
     )
 }
 
-/**
- * Payload schema for deleting a document.
- */
 export const DeleteDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** The ID of the document to delete. */
-  documentId: z.string().describe('The ID of the document to delete.')
+  /** The UUID of the document to delete. */
+  documentId: z.string().uuid().describe('The UUID of the document to delete.')
 }
 
-/**
- * Payload schema for reprocessing documents in a collection.
- */
 export const ReprocessDocumentsRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** An array of Document IDs to reprocess. */
-  ids: z.array(z.string()).describe('An array of Document IDs to reprocess'),
+  /** An array of UUIDs of the documents to reprocess. */
+  ids: z
+    .array(z.string().uuid())
+    .describe('An array of UUIDs of the documents to reprocess.'),
 
-  /**
-   * The type of job to dispatch reprocessing for.
-   * One of: 'status', 'nodes', 'vectors', 'edges', 'category'.
-   */
+  /** The type of job to dispatch reprocessing for. */
   type: z
     .enum(['status', 'nodes', 'vectors', 'edges', 'category'])
     .describe(
-      "The type of the job to dispatch reprocessing for ('status', 'nodes', 'vectors', 'edges', 'category')"
+      'The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category").'
     )
 }
 
 export const ExportDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** The ID of the document to retrieve. */
-  documentId: z.string().describe('The ID of the document to retrieve.'),
+  /** The UUID of the document to retrieve. */
+  documentId: z
+    .string()
+    .uuid()
+    .describe('The UUID of the document to retrieve.'),
 
   /** Output format: "json" for layout or "text" for raw text output. */
   type: z
@@ -137,19 +139,16 @@ export const ExportDocumentRequestSchema = {
     .describe('Output format: "json" for layout or "text" for raw text output.')
 }
 
-/**
- * Schema for the `get` document operation.
- * Validates the `collectionId` and `documentId` parameters.
- */
 export const GetDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  /** The ID of the document to retrieve. */
-  documentId: z.string().describe('The ID of the document to retrieve.')
+
+  /** The UUID of the document to retrieve. */
+  documentId: z
+    .string()
+    .uuid()
+    .describe('The UUID of the document to retrieve.')
 }
 
-/**
- * Allowed job status values.
- */
 export const JobStatusSchema = z.enum([
   'processing',
   'error',
@@ -162,10 +161,6 @@ export const JobStatusSchema = z.enum([
 
 export type JobStatusType = z.infer<typeof JobStatusSchema>
 
-/**
- * Schema for the `list` documents operation payload.
- * Includes collection context plus optional filters and pagination.
- */
 export const GetDocumentsRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -175,14 +170,25 @@ export const GetDocumentsRequestSchema = {
     .optional()
     .describe('A search query string to filter documents.'),
 
-  /** The number of documents to retrieve. */
-  take: z.number().optional().describe('The number of documents to retrieve.'),
+  /** The number of documents to retrieve. Must be a positive integer. */
+  take: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe(
+      'The number of documents to retrieve. Must be a positive integer.'
+    ),
 
-  /** The number of documents to skip for pagination. */
+  /** The number of documents to skip for pagination. Must be a non-negative integer. */
   skip: z
     .number()
+    .int()
+    .nonnegative()
     .optional()
-    .describe('The number of documents to skip for pagination.'),
+    .describe(
+      'The number of documents to skip for pagination. Must be a non-negative integer.'
+    ),
 
   /** Whether to retrieve extended information for the documents. */
   extended: z
@@ -195,22 +201,22 @@ export const GetDocumentsRequestSchema = {
     'Filter by the overall job status.'
   ),
 
-  /** Filter by the job status of layout nodes. */
+  /** Filter by the job status for layout nodes. */
   nodes: JobStatusSchema.optional().describe(
     'Filter by the job status for layout nodes.'
   ),
 
-  /** Filter by the job status for edge processing. */
+  /** Filter by the job status for edges. */
   edges: JobStatusSchema.optional().describe(
     'Filter by the job status for edges.'
   ),
 
-  /** Filter by the job status for vector generation. */
+  /** Filter by the job status for vectors. */
   vectors: JobStatusSchema.optional().describe(
     'Filter by the job status for vectors.'
   ),
 
-  /** Filter by the job status for category assignment. */
+  /** Filter by the job status for category. */
   category: JobStatusSchema.optional().describe(
     'Filter by the job status for category.'
   )
