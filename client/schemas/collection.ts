@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+/**
+ * Core Collection schema: defines essential metadata for a collection, including a human-readable name, classification type, optional tags, detailed description, and high-level instructions for data ingestion, graph construction, prompt formatting, and search key prioritization.
+ */
 export const CollectionCoreSchema = {
   /**
    * A concise, human-readable name for the collection.
@@ -111,6 +114,9 @@ export const CollectionCoreSchema = {
     )
 }
 
+/**
+ * Defines the payload for creating a new collection, including the owning organization’s UUID, optional sub-indexing categories (each with name, type, and extraction instructions), and all core collection metadata fields (name, type, tags, description, and ingestion/search/graph/prompt guidelines).
+ */
 export const CollectionCreateSchema = {
   /**
    * The UUID of the organization that will own this collection.
@@ -190,6 +196,9 @@ export const CollectionCreateSchema = {
   ...CollectionCoreSchema
 }
 
+/**
+ * Payload schema for updating an existing collection, including the collection’s UUID, optional new owner organization UUID, and any core collection metadata fields (name, type, tags, description, and instructions) to modify.
+ */
 export const CollectionUpdateSchema = {
   /**
    * The UUID of the collection to update.
@@ -217,6 +226,9 @@ export const CollectionUpdateSchema = {
   ...CollectionCoreSchema
 }
 
+/**
+ * Request schema for retrieving a collection by its UUID.
+ */
 export const GetCollectionRequestSchema = {
   /**
    * The UUID of the collection to update.
@@ -230,6 +242,9 @@ export const GetCollectionRequestSchema = {
     )
 }
 
+/**
+ * Request schema for listing collections with optional search filter, pagination controls (take, skip), and an extended metadata flag.
+ */
 export const GetCollectionsRequestSchema = {
   /**
    * Optional filter string to match against collection name, description, or tags.

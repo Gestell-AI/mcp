@@ -1,16 +1,15 @@
 import type { GestellToolOutput } from '@client/types'
 import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
 
-/*
- * Invokes an MCP tool for usage outside of chat contexts:
- * 1) Throws if the tool reports an error
- * 2) Tries to JSON.parse the output
- * 3) If parsing fails, returns the raw string
+/**
+ * Invokes a tool on the given MCP client and returns its result.
  *
- * @param client – an initialized MCP Client
- * @param name   – the name of the tool to call
- * @param args   – the arguments object for the tool
- * @returns      – either the parsed JSON (T) or the raw text
+ * @template T - The expected type of the parsed result.
+ * @param client - An initialized MCP Client instance.
+ * @param name - The name of the tool to call.
+ * @param args - A record of arguments to pass to the tool.
+ * @returns A promise that resolves to the tool’s output parsed as type T, or the raw text if JSON parsing fails.
+ * @throws If the tool invocation returns an error, or if the response is empty.
  */
 export default async function runTool<T>(
   client: Client,

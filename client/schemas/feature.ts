@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+/**
+ * Core features schema: defines the UUIDs of the collection and feature category for feature-related operations.
+ */
 export const FeaturesCoreSchema = {
   /**
    * The ID of the collection to query.
@@ -22,6 +25,9 @@ export const FeaturesCoreSchema = {
     )
 }
 
+/**
+ * Request schema for querying features with optional pagination parameters (skip ≥ 0, take ≥ 1).
+ */
 export const FeaturesQueryRequestSchema = {
   ...FeaturesCoreSchema,
 
@@ -52,6 +58,9 @@ export const FeaturesQueryRequestSchema = {
     )
 }
 
+/**
+ * Request schema for exporting features in the specified format ("json" or "csv").
+ */
 export const ExportFeaturesRequestSchema = {
   ...FeaturesCoreSchema,
 

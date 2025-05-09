@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+/**
+ * Core document schema: defines the UUID of the collection for document-related operations.
+ */
 export const DocumentCoreSchema = {
   /** The UUID of the collection associated with the document operation. */
   collectionId: z
@@ -10,6 +13,9 @@ export const DocumentCoreSchema = {
     )
 }
 
+/**
+ * Request schema for uploading a document, including the target collection UUID, document name, optional MIME type, file path, processing instructions, dispatch job flag, and table-processing flag.
+ */
 export const UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -59,6 +65,9 @@ export const UploadDocumentRequestSchema = {
     )
 }
 
+/**
+ * Request schema for updating a document: includes collection and document UUIDs, optional new name and instructions, a reprocessing job flag, and a table-analysis flag.
+ */
 export const UpdateDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -101,6 +110,9 @@ export const UpdateDocumentRequestSchema = {
     )
 }
 
+/**
+ * Request schema for deleting a document: includes the collection UUID and the document UUID to remove.
+ */
 export const DeleteDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -108,6 +120,9 @@ export const DeleteDocumentRequestSchema = {
   documentId: z.string().uuid().describe('The UUID of the document to delete.')
 }
 
+/**
+ * Request schema for reprocessing documents: includes the collection UUID, list of document UUIDs to reprocess, and the reprocessing job type.
+ */
 export const ReprocessDocumentsRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -124,6 +139,9 @@ export const ReprocessDocumentsRequestSchema = {
     )
 }
 
+/**
+ * Request schema for exporting a document: includes the collection UUID, document UUID, and desired output format ("json" or "text").
+ */
 export const ExportDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -139,6 +157,9 @@ export const ExportDocumentRequestSchema = {
     .describe('Output format: "json" for layout or "text" for raw text output.')
 }
 
+/**
+ * Request schema for retrieving a document: includes the collection UUID and document UUID.
+ */
 export const GetDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
@@ -149,6 +170,9 @@ export const GetDocumentRequestSchema = {
     .describe('The UUID of the document to retrieve.')
 }
 
+/**
+ * Enum schema for document job statuses, covering all processing states ("processing", "error", "ready", "cancelled", "unprocessed", "partial", "all").
+ */
 export const JobStatusSchema = z.enum([
   'processing',
   'error',
@@ -161,6 +185,9 @@ export const JobStatusSchema = z.enum([
 
 export type JobStatusType = z.infer<typeof JobStatusSchema>
 
+/**
+ * Request schema for listing documents: includes collection UUID, optional search filter, pagination (take, skip), extended info flag, and filters for overall and specific job statuses (nodes, edges, vectors, category).
+ */
 export const GetDocumentsRequestSchema = {
   ...DocumentCoreSchema,
 

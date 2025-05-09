@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+/**
+ * Core tables schema: defines the UUIDs of the target collection and category for table-related operations.
+ */
 export const TablesCoreSchema = {
   /**
    * The UUID of the collection to query.
@@ -20,6 +23,9 @@ export const TablesCoreSchema = {
     .describe('The UUID of the category whose table data is being requested.')
 }
 
+/**
+ * Tables query schema: extends core tables schema with optional pagination parameters (skip ≥ 0, take ≥ 1).
+ */
 export const TablesQueryRequestSchema = {
   ...TablesCoreSchema,
 
@@ -48,6 +54,9 @@ export const TablesQueryRequestSchema = {
     )
 }
 
+/**
+ * Export table schema: extends core tables schema with the desired output format ("json" or "csv").
+ */
 export const ExportTableRequestSchema = {
   ...TablesCoreSchema,
 

@@ -7,11 +7,12 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
-    "allowJs": false,
+    "allowJs": true,
 
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
-    "noEmit": true,
+    "noEmit": false,
+    "declaration": true,
 
     "strict": true,
     "skipLibCheck": true,
@@ -31,9 +32,11 @@
     }
   },
   "include": [
+    "rollup.config.js",
     "**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

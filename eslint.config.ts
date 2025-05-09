@@ -46,5 +46,5 @@ export default tseslint.config(
       'simple-import-sort/exports': 'warn'
     }
   },
-  { ignores: ['node_modules'] }
+  { ignores: ['node_modules', 'dist'] }
 )

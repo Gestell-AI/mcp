@@ -1,15 +1,17 @@
-import require$$0$3, { join } from 'path';
-import { z, ZodFirstPartyTypeKind, ZodOptional, ZodType } from 'zod';
-import require$$0$4 from 'child_process';
-import require$$0$2 from 'fs';
-import process$1 from 'node:process';
-import { PassThrough } from 'node:stream';
-import { Gestell } from '@gestell/sdk';
-import Fastify from 'fastify';
-import require$$0$5 from 'buffer';
-import require$$1$1 from 'string_decoder';
-import { randomUUID } from 'node:crypto';
-import { config } from 'dotenv';
+'use strict';
+
+var require$$0$3 = require('path');
+var zod = require('zod');
+var require$$0$4 = require('child_process');
+var require$$0$2 = require('fs');
+var process$1 = require('node:process');
+var node_stream = require('node:stream');
+var sdk = require('@gestell/sdk');
+var Fastify = require('fastify');
+var require$$0$5 = require('buffer');
+var require$$1$1 = require('string_decoder');
+var node_crypto = require('node:crypto');
+var dotenv = require('dotenv');
 
 const LATEST_PROTOCOL_VERSION = "2025-03-26";
 const SUPPORTED_PROTOCOL_VERSIONS = [
@@ -22,58 +24,58 @@ const JSONRPC_VERSION = "2.0";
 /**
  * A progress token, used to associate progress notifications with the original request.
  */
-const ProgressTokenSchema = z.union([z.string(), z.number().int()]);
+const ProgressTokenSchema = zod.z.union([zod.z.string(), zod.z.number().int()]);
 /**
  * An opaque token used to represent a cursor for pagination.
  */
-const CursorSchema = z.string();
-const RequestMetaSchema = z
+const CursorSchema = zod.z.string();
+const RequestMetaSchema = zod.z
     .object({
     /**
      * If specified, the caller is requesting out-of-band progress notifications for this request (as represented by notifications/progress). The value of this parameter is an opaque token that will be attached to any subsequent notifications. The receiver is not obligated to provide these notifications.
      */
-    progressToken: z.optional(ProgressTokenSchema),
+    progressToken: zod.z.optional(ProgressTokenSchema),
 })
     .passthrough();
-const BaseRequestParamsSchema = z
+const BaseRequestParamsSchema = zod.z
     .object({
-    _meta: z.optional(RequestMetaSchema),
+    _meta: zod.z.optional(RequestMetaSchema),
 })
     .passthrough();
-const RequestSchema = z.object({
-    method: z.string(),
-    params: z.optional(BaseRequestParamsSchema),
+const RequestSchema = zod.z.object({
+    method: zod.z.string(),
+    params: zod.z.optional(BaseRequestParamsSchema),
 });
-const BaseNotificationParamsSchema = z
+const BaseNotificationParamsSchema = zod.z
     .object({
     /**
      * This parameter name is reserved by MCP to allow clients and servers to attach additional metadata to their notifications.
      */
-    _meta: z.optional(z.object({}).passthrough()),
+    _meta: zod.z.optional(zod.z.object({}).passthrough()),
 })
     .passthrough();
-const NotificationSchema = z.object({
-    method: z.string(),
-    params: z.optional(BaseNotificationParamsSchema),
+const NotificationSchema = zod.z.object({
+    method: zod.z.string(),
+    params: zod.z.optional(BaseNotificationParamsSchema),
 });
-const ResultSchema = z
+const ResultSchema = zod.z
     .object({
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
-    _meta: z.optional(z.object({}).passthrough()),
+    _meta: zod.z.optional(zod.z.object({}).passthrough()),
 })
     .passthrough();
 /**
  * A uniquely identifying ID for a request in JSON-RPC.
  */
-const RequestIdSchema = z.union([z.string(), z.number().int()]);
+const RequestIdSchema = zod.z.union([zod.z.string(), zod.z.number().int()]);
 /**
  * A request that expects a response.
  */
-const JSONRPCRequestSchema = z
+const JSONRPCRequestSchema = zod.z
     .object({
-    jsonrpc: z.literal(JSONRPC_VERSION),
+    jsonrpc: zod.z.literal(JSONRPC_VERSION),
     id: RequestIdSchema,
 })
     .merge(RequestSchema)
@@ -82,9 +84,9 @@ const isJSONRPCRequest = (value) => JSONRPCRequestSchema.safeParse(value).succes
 /**
  * A notification which does not expect a response.
  */
-const JSONRPCNotificationSchema = z
+const JSONRPCNotificationSchema = zod.z
     .object({
-    jsonrpc: z.literal(JSONRPC_VERSION),
+    jsonrpc: zod.z.literal(JSONRPC_VERSION),
 })
     .merge(NotificationSchema)
     .strict();
@@ -92,9 +94,9 @@ const isJSONRPCNotification = (value) => JSONRPCNotificationSchema.safeParse(val
 /**
  * A successful (non-error) response to a request.
  */
-const JSONRPCResponseSchema = z
+const JSONRPCResponseSchema = zod.z
     .object({
-    jsonrpc: z.literal(JSONRPC_VERSION),
+    jsonrpc: zod.z.literal(JSONRPC_VERSION),
     id: RequestIdSchema,
     result: ResultSchema,
 })
@@ -118,28 +120,28 @@ var ErrorCode;
 /**
  * A response to a request that indicates an error occurred.
  */
-const JSONRPCErrorSchema = z
+const JSONRPCErrorSchema = zod.z
     .object({
-    jsonrpc: z.literal(JSONRPC_VERSION),
+    jsonrpc: zod.z.literal(JSONRPC_VERSION),
     id: RequestIdSchema,
-    error: z.object({
+    error: zod.z.object({
         /**
          * The error type that occurred.
          */
-        code: z.number().int(),
+        code: zod.z.number().int(),
         /**
          * A short description of the error. The message SHOULD be limited to a concise single sentence.
          */
-        message: z.string(),
+        message: zod.z.string(),
         /**
          * Additional information about the error. The value of this member is defined by the sender (e.g. detailed error information, nested errors etc.).
          */
-        data: z.optional(z.unknown()),
+        data: zod.z.optional(zod.z.unknown()),
     }),
 })
     .strict();
 const isJSONRPCError = (value) => JSONRPCErrorSchema.safeParse(value).success;
-const JSONRPCMessageSchema = z.union([
+const JSONRPCMessageSchema = zod.z.union([
     JSONRPCRequestSchema,
     JSONRPCNotificationSchema,
     JSONRPCResponseSchema,
@@ -161,7 +163,7 @@ const EmptyResultSchema = ResultSchema.strict();
  * A client MUST NOT attempt to cancel its `initialize` request.
  */
 const CancelledNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/cancelled"),
+    method: zod.z.literal("notifications/cancelled"),
     params: BaseNotificationParamsSchema.extend({
         /**
          * The ID of the request to cancel.
@@ -172,41 +174,41 @@ const CancelledNotificationSchema = NotificationSchema.extend({
         /**
          * An optional string describing the reason for the cancellation. This MAY be logged or presented to the user.
          */
-        reason: z.string().optional(),
+        reason: zod.z.string().optional(),
     }),
 });
 /* Initialization */
 /**
  * Describes the name and version of an MCP implementation.
  */
-const ImplementationSchema = z
+const ImplementationSchema = zod.z
     .object({
-    name: z.string(),
-    version: z.string(),
+    name: zod.z.string(),
+    version: zod.z.string(),
 })
     .passthrough();
 /**
  * Capabilities a client may support. Known capabilities are defined here, in this schema, but this is not a closed set: any client can define its own, additional capabilities.
  */
-const ClientCapabilitiesSchema = z
+const ClientCapabilitiesSchema = zod.z
     .object({
     /**
      * Experimental, non-standard capabilities that the client supports.
      */
-    experimental: z.optional(z.object({}).passthrough()),
+    experimental: zod.z.optional(zod.z.object({}).passthrough()),
     /**
      * Present if the client supports sampling from an LLM.
      */
-    sampling: z.optional(z.object({}).passthrough()),
+    sampling: zod.z.optional(zod.z.object({}).passthrough()),
     /**
      * Present if the client supports listing roots.
      */
-    roots: z.optional(z
+    roots: zod.z.optional(zod.z
         .object({
         /**
          * Whether the client supports issuing notifications for changes to the roots list.
          */
-        listChanged: z.optional(z.boolean()),
+        listChanged: zod.z.optional(zod.z.boolean()),
     })
         .passthrough()),
 })
@@ -215,12 +217,12 @@ const ClientCapabilitiesSchema = z
  * This request is sent from the client to the server when it first connects, asking it to begin initialization.
  */
 const InitializeRequestSchema = RequestSchema.extend({
-    method: z.literal("initialize"),
+    method: zod.z.literal("initialize"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The latest version of the Model Context Protocol that the client supports. The client MAY decide to support older versions as well.
          */
-        protocolVersion: z.string(),
+        protocolVersion: zod.z.string(),
         capabilities: ClientCapabilitiesSchema,
         clientInfo: ImplementationSchema,
     }),
@@ -229,55 +231,55 @@ const isInitializeRequest = (value) => InitializeRequestSchema.safeParse(value).
 /**
  * Capabilities that a server may support. Known capabilities are defined here, in this schema, but this is not a closed set: any server can define its own, additional capabilities.
  */
-const ServerCapabilitiesSchema = z
+const ServerCapabilitiesSchema = zod.z
     .object({
     /**
      * Experimental, non-standard capabilities that the server supports.
      */
-    experimental: z.optional(z.object({}).passthrough()),
+    experimental: zod.z.optional(zod.z.object({}).passthrough()),
     /**
      * Present if the server supports sending log messages to the client.
      */
-    logging: z.optional(z.object({}).passthrough()),
+    logging: zod.z.optional(zod.z.object({}).passthrough()),
     /**
      * Present if the server supports sending completions to the client.
      */
-    completions: z.optional(z.object({}).passthrough()),
+    completions: zod.z.optional(zod.z.object({}).passthrough()),
     /**
      * Present if the server offers any prompt templates.
      */
-    prompts: z.optional(z
+    prompts: zod.z.optional(zod.z
         .object({
         /**
          * Whether this server supports issuing notifications for changes to the prompt list.
          */
-        listChanged: z.optional(z.boolean()),
+        listChanged: zod.z.optional(zod.z.boolean()),
     })
         .passthrough()),
     /**
      * Present if the server offers any resources to read.
      */
-    resources: z.optional(z
+    resources: zod.z.optional(zod.z
         .object({
         /**
          * Whether this server supports clients subscribing to resource updates.
          */
-        subscribe: z.optional(z.boolean()),
+        subscribe: zod.z.optional(zod.z.boolean()),
         /**
          * Whether this server supports issuing notifications for changes to the resource list.
          */
-        listChanged: z.optional(z.boolean()),
+        listChanged: zod.z.optional(zod.z.boolean()),
     })
         .passthrough()),
     /**
      * Present if the server offers any tools to call.
      */
-    tools: z.optional(z
+    tools: zod.z.optional(zod.z
         .object({
         /**
          * Whether this server supports issuing notifications for changes to the tool list.
          */
-        listChanged: z.optional(z.boolean()),
+        listChanged: zod.z.optional(zod.z.boolean()),
     })
         .passthrough()),
 })
@@ -289,7 +291,7 @@ const InitializeResultSchema = ResultSchema.extend({
     /**
      * The version of the Model Context Protocol that the server wants to use. This may not match the version that the client requested. If the client cannot support this version, it MUST disconnect.
      */
-    protocolVersion: z.string(),
+    protocolVersion: zod.z.string(),
     capabilities: ServerCapabilitiesSchema,
     serverInfo: ImplementationSchema,
     /**
@@ -297,39 +299,39 @@ const InitializeResultSchema = ResultSchema.extend({
      *
      * This can be used by clients to improve the LLM's understanding of available tools, resources, etc. It can be thought of like a "hint" to the model. For example, this information MAY be added to the system prompt.
      */
-    instructions: z.optional(z.string()),
+    instructions: zod.z.optional(zod.z.string()),
 });
 /**
  * This notification is sent from the client to the server after initialization has finished.
  */
 const InitializedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/initialized"),
+    method: zod.z.literal("notifications/initialized"),
 });
 /* Ping */
 /**
  * A ping, issued by either the server or the client, to check that the other party is still alive. The receiver must promptly respond, or else may be disconnected.
  */
 const PingRequestSchema = RequestSchema.extend({
-    method: z.literal("ping"),
+    method: zod.z.literal("ping"),
 });
 /* Progress notifications */
-const ProgressSchema = z
+const ProgressSchema = zod.z
     .object({
     /**
      * The progress thus far. This should increase every time progress is made, even if the total is unknown.
      */
-    progress: z.number(),
+    progress: zod.z.number(),
     /**
      * Total number of items to process (or total progress required), if known.
      */
-    total: z.optional(z.number()),
+    total: zod.z.optional(zod.z.number()),
 })
     .passthrough();
 /**
  * An out-of-band notification used to inform the receiver of a progress update for a long-running request.
  */
 const ProgressNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/progress"),
+    method: zod.z.literal("notifications/progress"),
     params: BaseNotificationParamsSchema.merge(ProgressSchema).extend({
         /**
          * The progress token which was given in the initial request, used to associate this notification with the request that is proceeding.
@@ -344,7 +346,7 @@ const PaginatedRequestSchema = RequestSchema.extend({
          * An opaque token representing the current pagination position.
          * If provided, the server should return results starting after this cursor.
          */
-        cursor: z.optional(CursorSchema),
+        cursor: zod.z.optional(CursorSchema),
     }).optional(),
 });
 const PaginatedResultSchema = ResultSchema.extend({
@@ -352,301 +354,301 @@ const PaginatedResultSchema = ResultSchema.extend({
      * An opaque token representing the pagination position after the last returned result.
      * If present, there may be more results available.
      */
-    nextCursor: z.optional(CursorSchema),
+    nextCursor: zod.z.optional(CursorSchema),
 });
 /* Resources */
 /**
  * The contents of a specific resource or sub-resource.
  */
-const ResourceContentsSchema = z
+const ResourceContentsSchema = zod.z
     .object({
     /**
      * The URI of this resource.
      */
-    uri: z.string(),
+    uri: zod.z.string(),
     /**
      * The MIME type of this resource, if known.
      */
-    mimeType: z.optional(z.string()),
+    mimeType: zod.z.optional(zod.z.string()),
 })
     .passthrough();
 const TextResourceContentsSchema = ResourceContentsSchema.extend({
     /**
      * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
      */
-    text: z.string(),
+    text: zod.z.string(),
 });
 const BlobResourceContentsSchema = ResourceContentsSchema.extend({
     /**
      * A base64-encoded string representing the binary data of the item.
      */
-    blob: z.string().base64(),
+    blob: zod.z.string().base64(),
 });
 /**
  * A known resource that the server is capable of reading.
  */
-const ResourceSchema = z
+const ResourceSchema = zod.z
     .object({
     /**
      * The URI of this resource.
      */
-    uri: z.string(),
+    uri: zod.z.string(),
     /**
      * A human-readable name for this resource.
      *
      * This can be used by clients to populate UI elements.
      */
-    name: z.string(),
+    name: zod.z.string(),
     /**
      * A description of what this resource represents.
      *
      * This can be used by clients to improve the LLM's understanding of available resources. It can be thought of like a "hint" to the model.
      */
-    description: z.optional(z.string()),
+    description: zod.z.optional(zod.z.string()),
     /**
      * The MIME type of this resource, if known.
      */
-    mimeType: z.optional(z.string()),
+    mimeType: zod.z.optional(zod.z.string()),
 })
     .passthrough();
 /**
  * A template description for resources available on the server.
  */
-const ResourceTemplateSchema = z
+const ResourceTemplateSchema = zod.z
     .object({
     /**
      * A URI template (according to RFC 6570) that can be used to construct resource URIs.
      */
-    uriTemplate: z.string(),
+    uriTemplate: zod.z.string(),
     /**
      * A human-readable name for the type of resource this template refers to.
      *
      * This can be used by clients to populate UI elements.
      */
-    name: z.string(),
+    name: zod.z.string(),
     /**
      * A description of what this template is for.
      *
      * This can be used by clients to improve the LLM's understanding of available resources. It can be thought of like a "hint" to the model.
      */
-    description: z.optional(z.string()),
+    description: zod.z.optional(zod.z.string()),
     /**
      * The MIME type for all resources that match this template. This should only be included if all resources matching this template have the same type.
      */
-    mimeType: z.optional(z.string()),
+    mimeType: zod.z.optional(zod.z.string()),
 })
     .passthrough();
 /**
  * Sent from the client to request a list of resources the server has.
  */
 const ListResourcesRequestSchema = PaginatedRequestSchema.extend({
-    method: z.literal("resources/list"),
+    method: zod.z.literal("resources/list"),
 });
 /**
  * The server's response to a resources/list request from the client.
  */
 const ListResourcesResultSchema = PaginatedResultSchema.extend({
-    resources: z.array(ResourceSchema),
+    resources: zod.z.array(ResourceSchema),
 });
 /**
  * Sent from the client to request a list of resource templates the server has.
  */
 const ListResourceTemplatesRequestSchema = PaginatedRequestSchema.extend({
-    method: z.literal("resources/templates/list"),
+    method: zod.z.literal("resources/templates/list"),
 });
 /**
  * The server's response to a resources/templates/list request from the client.
  */
 const ListResourceTemplatesResultSchema = PaginatedResultSchema.extend({
-    resourceTemplates: z.array(ResourceTemplateSchema),
+    resourceTemplates: zod.z.array(ResourceTemplateSchema),
 });
 /**
  * Sent from the client to the server, to read a specific resource URI.
  */
 const ReadResourceRequestSchema = RequestSchema.extend({
-    method: z.literal("resources/read"),
+    method: zod.z.literal("resources/read"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The URI of the resource to read. The URI can use any protocol; it is up to the server how to interpret it.
          */
-        uri: z.string(),
+        uri: zod.z.string(),
     }),
 });
 /**
  * The server's response to a resources/read request from the client.
  */
 const ReadResourceResultSchema = ResultSchema.extend({
-    contents: z.array(z.union([TextResourceContentsSchema, BlobResourceContentsSchema])),
+    contents: zod.z.array(zod.z.union([TextResourceContentsSchema, BlobResourceContentsSchema])),
 });
 /**
  * An optional notification from the server to the client, informing it that the list of resources it can read from has changed. This may be issued by servers without any previous subscription from the client.
  */
 const ResourceListChangedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/resources/list_changed"),
+    method: zod.z.literal("notifications/resources/list_changed"),
 });
 /**
  * Sent from the client to request resources/updated notifications from the server whenever a particular resource changes.
  */
 const SubscribeRequestSchema = RequestSchema.extend({
-    method: z.literal("resources/subscribe"),
+    method: zod.z.literal("resources/subscribe"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The URI of the resource to subscribe to. The URI can use any protocol; it is up to the server how to interpret it.
          */
-        uri: z.string(),
+        uri: zod.z.string(),
     }),
 });
 /**
  * Sent from the client to request cancellation of resources/updated notifications from the server. This should follow a previous resources/subscribe request.
  */
 const UnsubscribeRequestSchema = RequestSchema.extend({
-    method: z.literal("resources/unsubscribe"),
+    method: zod.z.literal("resources/unsubscribe"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The URI of the resource to unsubscribe from.
          */
-        uri: z.string(),
+        uri: zod.z.string(),
     }),
 });
 /**
  * A notification from the server to the client, informing it that a resource has changed and may need to be read again. This should only be sent if the client previously sent a resources/subscribe request.
  */
 const ResourceUpdatedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/resources/updated"),
+    method: zod.z.literal("notifications/resources/updated"),
     params: BaseNotificationParamsSchema.extend({
         /**
          * The URI of the resource that has been updated. This might be a sub-resource of the one that the client actually subscribed to.
          */
-        uri: z.string(),
+        uri: zod.z.string(),
     }),
 });
 /* Prompts */
 /**
  * Describes an argument that a prompt can accept.
  */
-const PromptArgumentSchema = z
+const PromptArgumentSchema = zod.z
     .object({
     /**
      * The name of the argument.
      */
-    name: z.string(),
+    name: zod.z.string(),
     /**
      * A human-readable description of the argument.
      */
-    description: z.optional(z.string()),
+    description: zod.z.optional(zod.z.string()),
     /**
      * Whether this argument must be provided.
      */
-    required: z.optional(z.boolean()),
+    required: zod.z.optional(zod.z.boolean()),
 })
     .passthrough();
 /**
  * A prompt or prompt template that the server offers.
  */
-const PromptSchema = z
+const PromptSchema = zod.z
     .object({
     /**
      * The name of the prompt or prompt template.
      */
-    name: z.string(),
+    name: zod.z.string(),
     /**
      * An optional description of what this prompt provides
      */
-    description: z.optional(z.string()),
+    description: zod.z.optional(zod.z.string()),
     /**
      * A list of arguments to use for templating the prompt.
      */
-    arguments: z.optional(z.array(PromptArgumentSchema)),
+    arguments: zod.z.optional(zod.z.array(PromptArgumentSchema)),
 })
     .passthrough();
 /**
  * Sent from the client to request a list of prompts and prompt templates the server has.
  */
 const ListPromptsRequestSchema = PaginatedRequestSchema.extend({
-    method: z.literal("prompts/list"),
+    method: zod.z.literal("prompts/list"),
 });
 /**
  * The server's response to a prompts/list request from the client.
  */
 const ListPromptsResultSchema = PaginatedResultSchema.extend({
-    prompts: z.array(PromptSchema),
+    prompts: zod.z.array(PromptSchema),
 });
 /**
  * Used by the client to get a prompt provided by the server.
  */
 const GetPromptRequestSchema = RequestSchema.extend({
-    method: z.literal("prompts/get"),
+    method: zod.z.literal("prompts/get"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The name of the prompt or prompt template.
          */
-        name: z.string(),
+        name: zod.z.string(),
         /**
          * Arguments to use for templating the prompt.
          */
-        arguments: z.optional(z.record(z.string())),
+        arguments: zod.z.optional(zod.z.record(zod.z.string())),
     }),
 });
 /**
  * Text provided to or from an LLM.
  */
-const TextContentSchema = z
+const TextContentSchema = zod.z
     .object({
-    type: z.literal("text"),
+    type: zod.z.literal("text"),
     /**
      * The text content of the message.
      */
-    text: z.string(),
+    text: zod.z.string(),
 })
     .passthrough();
 /**
  * An image provided to or from an LLM.
  */
-const ImageContentSchema = z
+const ImageContentSchema = zod.z
     .object({
-    type: z.literal("image"),
+    type: zod.z.literal("image"),
     /**
      * The base64-encoded image data.
      */
-    data: z.string().base64(),
+    data: zod.z.string().base64(),
     /**
      * The MIME type of the image. Different providers may support different image types.
      */
-    mimeType: z.string(),
+    mimeType: zod.z.string(),
 })
     .passthrough();
 /**
  * An Audio provided to or from an LLM.
  */
-const AudioContentSchema = z
+const AudioContentSchema = zod.z
     .object({
-    type: z.literal("audio"),
+    type: zod.z.literal("audio"),
     /**
      * The base64-encoded audio data.
      */
-    data: z.string().base64(),
+    data: zod.z.string().base64(),
     /**
      * The MIME type of the audio. Different providers may support different audio types.
      */
-    mimeType: z.string(),
+    mimeType: zod.z.string(),
 })
     .passthrough();
 /**
  * The contents of a resource, embedded into a prompt or tool call result.
  */
-const EmbeddedResourceSchema = z
+const EmbeddedResourceSchema = zod.z
     .object({
-    type: z.literal("resource"),
-    resource: z.union([TextResourceContentsSchema, BlobResourceContentsSchema]),
+    type: zod.z.literal("resource"),
+    resource: zod.z.union([TextResourceContentsSchema, BlobResourceContentsSchema]),
 })
     .passthrough();
 /**
  * Describes a message returned as part of a prompt.
  */
-const PromptMessageSchema = z
+const PromptMessageSchema = zod.z
     .object({
-    role: z.enum(["user", "assistant"]),
-    content: z.union([
+    role: zod.z.enum(["user", "assistant"]),
+    content: zod.z.union([
         TextContentSchema,
         ImageContentSchema,
         AudioContentSchema,
@@ -661,14 +663,14 @@ const GetPromptResultSchema = ResultSchema.extend({
     /**
      * An optional description for the prompt.
      */
-    description: z.optional(z.string()),
-    messages: z.array(PromptMessageSchema),
+    description: zod.z.optional(zod.z.string()),
+    messages: zod.z.array(PromptMessageSchema),
 });
 /**
  * An optional notification from the server to the client, informing it that the list of prompts it offers has changed. This may be issued by servers without any previous subscription from the client.
  */
 const PromptListChangedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/prompts/list_changed"),
+    method: zod.z.literal("notifications/prompts/list_changed"),
 });
 /* Tools */
 /**
@@ -681,18 +683,18 @@ const PromptListChangedNotificationSchema = NotificationSchema.extend({
  * Clients should never make tool use decisions based on ToolAnnotations
  * received from untrusted servers.
  */
-const ToolAnnotationsSchema = z
+const ToolAnnotationsSchema = zod.z
     .object({
     /**
      * A human-readable title for the tool.
      */
-    title: z.optional(z.string()),
+    title: zod.z.optional(zod.z.string()),
     /**
      * If true, the tool does not modify its environment.
      *
      * Default: false
      */
-    readOnlyHint: z.optional(z.boolean()),
+    readOnlyHint: zod.z.optional(zod.z.boolean()),
     /**
      * If true, the tool may perform destructive updates to its environment.
      * If false, the tool performs only additive updates.
@@ -701,7 +703,7 @@ const ToolAnnotationsSchema = z
      *
      * Default: true
      */
-    destructiveHint: z.optional(z.boolean()),
+    destructiveHint: zod.z.optional(zod.z.boolean()),
     /**
      * If true, calling the tool repeatedly with the same arguments
      * will have no additional effect on the its environment.
@@ -710,7 +712,7 @@ const ToolAnnotationsSchema = z
      *
      * Default: false
      */
-    idempotentHint: z.optional(z.boolean()),
+    idempotentHint: zod.z.optional(zod.z.boolean()),
     /**
      * If true, this tool may interact with an "open world" of external
      * entities. If false, the tool's domain of interaction is closed.
@@ -719,83 +721,83 @@ const ToolAnnotationsSchema = z
      *
      * Default: true
      */
-    openWorldHint: z.optional(z.boolean()),
+    openWorldHint: zod.z.optional(zod.z.boolean()),
 })
     .passthrough();
 /**
  * Definition for a tool the client can call.
  */
-const ToolSchema = z
+const ToolSchema = zod.z
     .object({
     /**
      * The name of the tool.
      */
-    name: z.string(),
+    name: zod.z.string(),
     /**
      * A human-readable description of the tool.
      */
-    description: z.optional(z.string()),
+    description: zod.z.optional(zod.z.string()),
     /**
      * A JSON Schema object defining the expected parameters for the tool.
      */
-    inputSchema: z
+    inputSchema: zod.z
         .object({
-        type: z.literal("object"),
-        properties: z.optional(z.object({}).passthrough()),
+        type: zod.z.literal("object"),
+        properties: zod.z.optional(zod.z.object({}).passthrough()),
     })
         .passthrough(),
     /**
      * Optional additional tool information.
      */
-    annotations: z.optional(ToolAnnotationsSchema),
+    annotations: zod.z.optional(ToolAnnotationsSchema),
 })
     .passthrough();
 /**
  * Sent from the client to request a list of tools the server has.
  */
 const ListToolsRequestSchema = PaginatedRequestSchema.extend({
-    method: z.literal("tools/list"),
+    method: zod.z.literal("tools/list"),
 });
 /**
  * The server's response to a tools/list request from the client.
  */
 const ListToolsResultSchema = PaginatedResultSchema.extend({
-    tools: z.array(ToolSchema),
+    tools: zod.z.array(ToolSchema),
 });
 /**
  * The server's response to a tool call.
  */
 const CallToolResultSchema = ResultSchema.extend({
-    content: z.array(z.union([TextContentSchema, ImageContentSchema, AudioContentSchema, EmbeddedResourceSchema])),
-    isError: z.boolean().default(false).optional(),
+    content: zod.z.array(zod.z.union([TextContentSchema, ImageContentSchema, AudioContentSchema, EmbeddedResourceSchema])),
+    isError: zod.z.boolean().default(false).optional(),
 });
 /**
  * CallToolResultSchema extended with backwards compatibility to protocol version 2024-10-07.
  */
 CallToolResultSchema.or(ResultSchema.extend({
-    toolResult: z.unknown(),
+    toolResult: zod.z.unknown(),
 }));
 /**
  * Used by the client to invoke a tool provided by the server.
  */
 const CallToolRequestSchema = RequestSchema.extend({
-    method: z.literal("tools/call"),
+    method: zod.z.literal("tools/call"),
     params: BaseRequestParamsSchema.extend({
-        name: z.string(),
-        arguments: z.optional(z.record(z.unknown())),
+        name: zod.z.string(),
+        arguments: zod.z.optional(zod.z.record(zod.z.unknown())),
     }),
 });
 /**
  * An optional notification from the server to the client, informing it that the list of tools it offers has changed. This may be issued by servers without any previous subscription from the client.
  */
 const ToolListChangedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/tools/list_changed"),
+    method: zod.z.literal("notifications/tools/list_changed"),
 });
 /* Logging */
 /**
  * The severity of a log message.
  */
-const LoggingLevelSchema = z.enum([
+const LoggingLevelSchema = zod.z.enum([
     "debug",
     "info",
     "notice",
@@ -809,7 +811,7 @@ const LoggingLevelSchema = z.enum([
  * A request from the client to the server, to enable or adjust logging.
  */
 const SetLevelRequestSchema = RequestSchema.extend({
-    method: z.literal("logging/setLevel"),
+    method: zod.z.literal("logging/setLevel"),
     params: BaseRequestParamsSchema.extend({
         /**
          * The level of logging that the client wants to receive from the server. The server should send all logs at this level and higher (i.e., more severe) to the client as notifications/logging/message.
@@ -821,7 +823,7 @@ const SetLevelRequestSchema = RequestSchema.extend({
  * Notification of a log message passed from server to client. If no logging/setLevel request has been sent from the client, the server MAY decide which messages to send automatically.
  */
 const LoggingMessageNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/message"),
+    method: zod.z.literal("notifications/message"),
     params: BaseNotificationParamsSchema.extend({
         /**
          * The severity of this log message.
@@ -830,86 +832,86 @@ const LoggingMessageNotificationSchema = NotificationSchema.extend({
         /**
          * An optional name of the logger issuing this message.
          */
-        logger: z.optional(z.string()),
+        logger: zod.z.optional(zod.z.string()),
         /**
          * The data to be logged, such as a string message or an object. Any JSON serializable type is allowed here.
          */
-        data: z.unknown(),
+        data: zod.z.unknown(),
     }),
 });
 /* Sampling */
 /**
  * Hints to use for model selection.
  */
-const ModelHintSchema = z
+const ModelHintSchema = zod.z
     .object({
     /**
      * A hint for a model name.
      */
-    name: z.string().optional(),
+    name: zod.z.string().optional(),
 })
     .passthrough();
 /**
  * The server's preferences for model selection, requested of the client during sampling.
  */
-const ModelPreferencesSchema = z
+const ModelPreferencesSchema = zod.z
     .object({
     /**
      * Optional hints to use for model selection.
      */
-    hints: z.optional(z.array(ModelHintSchema)),
+    hints: zod.z.optional(zod.z.array(ModelHintSchema)),
     /**
      * How much to prioritize cost when selecting a model.
      */
-    costPriority: z.optional(z.number().min(0).max(1)),
+    costPriority: zod.z.optional(zod.z.number().min(0).max(1)),
     /**
      * How much to prioritize sampling speed (latency) when selecting a model.
      */
-    speedPriority: z.optional(z.number().min(0).max(1)),
+    speedPriority: zod.z.optional(zod.z.number().min(0).max(1)),
     /**
      * How much to prioritize intelligence and capabilities when selecting a model.
      */
-    intelligencePriority: z.optional(z.number().min(0).max(1)),
+    intelligencePriority: zod.z.optional(zod.z.number().min(0).max(1)),
 })
     .passthrough();
 /**
  * Describes a message issued to or received from an LLM API.
  */
-const SamplingMessageSchema = z
+const SamplingMessageSchema = zod.z
     .object({
-    role: z.enum(["user", "assistant"]),
-    content: z.union([TextContentSchema, ImageContentSchema, AudioContentSchema]),
+    role: zod.z.enum(["user", "assistant"]),
+    content: zod.z.union([TextContentSchema, ImageContentSchema, AudioContentSchema]),
 })
     .passthrough();
 /**
  * A request from the server to sample an LLM via the client. The client has full discretion over which model to select. The client should also inform the user before beginning sampling, to allow them to inspect the request (human in the loop) and decide whether to approve it.
  */
 const CreateMessageRequestSchema = RequestSchema.extend({
-    method: z.literal("sampling/createMessage"),
+    method: zod.z.literal("sampling/createMessage"),
     params: BaseRequestParamsSchema.extend({
-        messages: z.array(SamplingMessageSchema),
+        messages: zod.z.array(SamplingMessageSchema),
         /**
          * An optional system prompt the server wants to use for sampling. The client MAY modify or omit this prompt.
          */
-        systemPrompt: z.optional(z.string()),
+        systemPrompt: zod.z.optional(zod.z.string()),
         /**
          * A request to include context from one or more MCP servers (including the caller), to be attached to the prompt. The client MAY ignore this request.
          */
-        includeContext: z.optional(z.enum(["none", "thisServer", "allServers"])),
-        temperature: z.optional(z.number()),
+        includeContext: zod.z.optional(zod.z.enum(["none", "thisServer", "allServers"])),
+        temperature: zod.z.optional(zod.z.number()),
         /**
          * The maximum number of tokens to sample, as requested by the server. The client MAY choose to sample fewer tokens than requested.
          */
-        maxTokens: z.number().int(),
-        stopSequences: z.optional(z.array(z.string())),
+        maxTokens: zod.z.number().int(),
+        stopSequences: zod.z.optional(zod.z.array(zod.z.string())),
         /**
          * Optional metadata to pass through to the LLM provider. The format of this metadata is provider-specific.
          */
-        metadata: z.optional(z.object({}).passthrough()),
+        metadata: zod.z.optional(zod.z.object({}).passthrough()),
         /**
          * The server's preferences for which model to select.
          */
-        modelPreferences: z.optional(ModelPreferencesSchema),
+        modelPreferences: zod.z.optional(ModelPreferencesSchema),
     }),
 });
 /**
@@ -919,13 +921,13 @@ const CreateMessageResultSchema = ResultSchema.extend({
     /**
      * The name of the model that generated the message.
      */
-    model: z.string(),
+    model: zod.z.string(),
     /**
      * The reason why sampling stopped.
      */
-    stopReason: z.optional(z.enum(["endTurn", "stopSequence", "maxTokens"]).or(z.string())),
-    role: z.enum(["user", "assistant"]),
-    content: z.discriminatedUnion("type", [
+    stopReason: zod.z.optional(zod.z.enum(["endTurn", "stopSequence", "maxTokens"]).or(zod.z.string())),
+    role: zod.z.enum(["user", "assistant"]),
+    content: zod.z.discriminatedUnion("type", [
         TextContentSchema,
         ImageContentSchema,
         AudioContentSchema
@@ -935,47 +937,47 @@ const CreateMessageResultSchema = ResultSchema.extend({
 /**
  * A reference to a resource or resource template definition.
  */
-const ResourceReferenceSchema = z
+const ResourceReferenceSchema = zod.z
     .object({
-    type: z.literal("ref/resource"),
+    type: zod.z.literal("ref/resource"),
     /**
      * The URI or URI template of the resource.
      */
-    uri: z.string(),
+    uri: zod.z.string(),
 })
     .passthrough();
 /**
  * Identifies a prompt.
  */
-const PromptReferenceSchema = z
+const PromptReferenceSchema = zod.z
     .object({
-    type: z.literal("ref/prompt"),
+    type: zod.z.literal("ref/prompt"),
     /**
      * The name of the prompt or prompt template
      */
-    name: z.string(),
+    name: zod.z.string(),
 })
     .passthrough();
 /**
  * A request from the client to the server, to ask for completion options.
  */
 const CompleteRequestSchema = RequestSchema.extend({
-    method: z.literal("completion/complete"),
+    method: zod.z.literal("completion/complete"),
     params: BaseRequestParamsSchema.extend({
-        ref: z.union([PromptReferenceSchema, ResourceReferenceSchema]),
+        ref: zod.z.union([PromptReferenceSchema, ResourceReferenceSchema]),
         /**
          * The argument's information
          */
-        argument: z
+        argument: zod.z
             .object({
             /**
              * The name of the argument
              */
-            name: z.string(),
+            name: zod.z.string(),
             /**
              * The value of the argument to use for completion matching.
              */
-            value: z.string(),
+            value: zod.z.string(),
         })
             .passthrough(),
     }),
@@ -984,20 +986,20 @@ const CompleteRequestSchema = RequestSchema.extend({
  * The server's response to a completion/complete request
  */
 const CompleteResultSchema = ResultSchema.extend({
-    completion: z
+    completion: zod.z
         .object({
         /**
          * An array of completion values. Must not exceed 100 items.
          */
-        values: z.array(z.string()).max(100),
+        values: zod.z.array(zod.z.string()).max(100),
         /**
          * The total number of completion options available. This can exceed the number of values actually sent in the response.
          */
-        total: z.optional(z.number().int()),
+        total: zod.z.optional(zod.z.number().int()),
         /**
          * Indicates whether there are additional completion options beyond those provided in the current response, even if the exact total is unknown.
          */
-        hasMore: z.optional(z.boolean()),
+        hasMore: zod.z.optional(zod.z.boolean()),
     })
         .passthrough(),
 });
@@ -1005,38 +1007,38 @@ const CompleteResultSchema = ResultSchema.extend({
 /**
  * Represents a root directory or file that the server can operate on.
  */
-const RootSchema = z
+const RootSchema = zod.z
     .object({
     /**
      * The URI identifying the root. This *must* start with file:// for now.
      */
-    uri: z.string().startsWith("file://"),
+    uri: zod.z.string().startsWith("file://"),
     /**
      * An optional name for the root.
      */
-    name: z.optional(z.string()),
+    name: zod.z.optional(zod.z.string()),
 })
     .passthrough();
 /**
  * Sent from the server to request a list of root URIs from the client.
  */
 const ListRootsRequestSchema = RequestSchema.extend({
-    method: z.literal("roots/list"),
+    method: zod.z.literal("roots/list"),
 });
 /**
  * The client's response to a roots/list request from the server.
  */
 const ListRootsResultSchema = ResultSchema.extend({
-    roots: z.array(RootSchema),
+    roots: zod.z.array(RootSchema),
 });
 /**
  * A notification from the client to the server, informing it that the list of roots has changed.
  */
 const RootsListChangedNotificationSchema = NotificationSchema.extend({
-    method: z.literal("notifications/roots/list_changed"),
+    method: zod.z.literal("notifications/roots/list_changed"),
 });
 /* Client messages */
-z.union([
+zod.z.union([
     PingRequestSchema,
     InitializeRequestSchema,
     CompleteRequestSchema,
@@ -1051,24 +1053,24 @@ z.union([
     CallToolRequestSchema,
     ListToolsRequestSchema,
 ]);
-z.union([
+zod.z.union([
     CancelledNotificationSchema,
     ProgressNotificationSchema,
     InitializedNotificationSchema,
     RootsListChangedNotificationSchema,
 ]);
-z.union([
+zod.z.union([
     EmptyResultSchema,
     CreateMessageResultSchema,
     ListRootsResultSchema,
 ]);
 /* Server messages */
-z.union([
+zod.z.union([
     PingRequestSchema,
     CreateMessageRequestSchema,
     ListRootsRequestSchema,
 ]);
-z.union([
+zod.z.union([
     CancelledNotificationSchema,
     ProgressNotificationSchema,
     LoggingMessageNotificationSchema,
@@ -1077,7 +1079,7 @@ z.union([
     ToolListChangedNotificationSchema,
     PromptListChangedNotificationSchema,
 ]);
-z.union([
+zod.z.union([
     EmptyResultSchema,
     InitializeResultSchema,
     CompleteResultSchema,
@@ -2484,7 +2486,7 @@ class StdioClientTransport {
         this._stderrStream = null;
         this._serverParams = server;
         if (server.stderr === "pipe" || server.stderr === "overlapped") {
-            this._stderrStream = new PassThrough();
+            this._stderrStream = new node_stream.PassThrough();
         }
     }
     /**
@@ -2600,7 +2602,7 @@ function isElectron() {
  *                      Defaults to the `dist/entry.js` file relative to this module.
  * @returns A Promise that resolves to a connected MCP `Client` instance ready to issue tool calls.
  */
-async function startTerminalClient(entrypoint = join(import.meta.dir, '..', 'dist', 'entry.js')) {
+async function startTerminalClient(entrypoint = require$$0$3.join(undefined, '..', 'dist', 'entry.js')) {
     const transport = new StdioClientTransport({
         command: 'node',
         args: [entrypoint]
@@ -2898,7 +2900,7 @@ function parseArrayDef(def, refs) {
         type: "array",
     };
     if (def.type?._def &&
-        def.type?._def?.typeName !== ZodFirstPartyTypeKind.ZodAny) {
+        def.type?._def?.typeName !== zod.ZodFirstPartyTypeKind.ZodAny) {
         res.items = parseDef(def.type._def, {
             ...refs,
             currentPath: [...refs.currentPath, "items"],
@@ -3471,7 +3473,7 @@ function parseRecordDef(def, refs) {
         console.warn("Warning: OpenAI may not support records in schemas! Try an array of key-value pairs instead.");
     }
     if (refs.target === "openApi3" &&
-        def.keyType?._def.typeName === ZodFirstPartyTypeKind.ZodEnum) {
+        def.keyType?._def.typeName === zod.ZodFirstPartyTypeKind.ZodEnum) {
         return {
             type: "object",
             required: def.keyType._def.values,
@@ -3495,7 +3497,7 @@ function parseRecordDef(def, refs) {
     if (refs.target === "openApi3") {
         return schema;
     }
-    if (def.keyType?._def.typeName === ZodFirstPartyTypeKind.ZodString &&
+    if (def.keyType?._def.typeName === zod.ZodFirstPartyTypeKind.ZodString &&
         def.keyType._def.checks?.length) {
         const { type, ...keyType } = parseStringDef(def.keyType._def, refs);
         return {
@@ -3503,7 +3505,7 @@ function parseRecordDef(def, refs) {
             propertyNames: keyType,
         };
     }
-    else if (def.keyType?._def.typeName === ZodFirstPartyTypeKind.ZodEnum) {
+    else if (def.keyType?._def.typeName === zod.ZodFirstPartyTypeKind.ZodEnum) {
         return {
             ...schema,
             propertyNames: {
@@ -3511,8 +3513,8 @@ function parseRecordDef(def, refs) {
             },
         };
     }
-    else if (def.keyType?._def.typeName === ZodFirstPartyTypeKind.ZodBranded &&
-        def.keyType._def.type._def.typeName === ZodFirstPartyTypeKind.ZodString &&
+    else if (def.keyType?._def.typeName === zod.ZodFirstPartyTypeKind.ZodBranded &&
+        def.keyType._def.type._def.typeName === zod.ZodFirstPartyTypeKind.ZodString &&
         def.keyType._def.type._def.checks?.length) {
         const { type, ...keyType } = parseBrandedDef(def.keyType._def, refs);
         return {
@@ -3760,7 +3762,7 @@ function parseObjectDef(def, refs) {
         }
         let propOptional = safeIsOptional(propDef);
         if (propOptional && forceOptionalIntoNullable) {
-            if (propDef instanceof ZodOptional) {
+            if (propDef instanceof zod.ZodOptional) {
                 propDef = propDef._def.innerType;
             }
             if (!propDef.isNullable()) {
@@ -3928,73 +3930,73 @@ const parseReadonlyDef = (def, refs) => {
 
 const selectParser = (def, typeName, refs) => {
     switch (typeName) {
-        case ZodFirstPartyTypeKind.ZodString:
+        case zod.ZodFirstPartyTypeKind.ZodString:
             return parseStringDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodNumber:
+        case zod.ZodFirstPartyTypeKind.ZodNumber:
             return parseNumberDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodObject:
+        case zod.ZodFirstPartyTypeKind.ZodObject:
             return parseObjectDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodBigInt:
+        case zod.ZodFirstPartyTypeKind.ZodBigInt:
             return parseBigintDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodBoolean:
+        case zod.ZodFirstPartyTypeKind.ZodBoolean:
             return parseBooleanDef();
-        case ZodFirstPartyTypeKind.ZodDate:
+        case zod.ZodFirstPartyTypeKind.ZodDate:
             return parseDateDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodUndefined:
+        case zod.ZodFirstPartyTypeKind.ZodUndefined:
             return parseUndefinedDef();
-        case ZodFirstPartyTypeKind.ZodNull:
+        case zod.ZodFirstPartyTypeKind.ZodNull:
             return parseNullDef(refs);
-        case ZodFirstPartyTypeKind.ZodArray:
+        case zod.ZodFirstPartyTypeKind.ZodArray:
             return parseArrayDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodUnion:
-        case ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
+        case zod.ZodFirstPartyTypeKind.ZodUnion:
+        case zod.ZodFirstPartyTypeKind.ZodDiscriminatedUnion:
             return parseUnionDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodIntersection:
+        case zod.ZodFirstPartyTypeKind.ZodIntersection:
             return parseIntersectionDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodTuple:
+        case zod.ZodFirstPartyTypeKind.ZodTuple:
             return parseTupleDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodRecord:
+        case zod.ZodFirstPartyTypeKind.ZodRecord:
             return parseRecordDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodLiteral:
+        case zod.ZodFirstPartyTypeKind.ZodLiteral:
             return parseLiteralDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodEnum:
+        case zod.ZodFirstPartyTypeKind.ZodEnum:
             return parseEnumDef(def);
-        case ZodFirstPartyTypeKind.ZodNativeEnum:
+        case zod.ZodFirstPartyTypeKind.ZodNativeEnum:
             return parseNativeEnumDef(def);
-        case ZodFirstPartyTypeKind.ZodNullable:
+        case zod.ZodFirstPartyTypeKind.ZodNullable:
             return parseNullableDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodOptional:
+        case zod.ZodFirstPartyTypeKind.ZodOptional:
             return parseOptionalDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodMap:
+        case zod.ZodFirstPartyTypeKind.ZodMap:
             return parseMapDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodSet:
+        case zod.ZodFirstPartyTypeKind.ZodSet:
             return parseSetDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodLazy:
+        case zod.ZodFirstPartyTypeKind.ZodLazy:
             return () => def.getter()._def;
-        case ZodFirstPartyTypeKind.ZodPromise:
+        case zod.ZodFirstPartyTypeKind.ZodPromise:
             return parsePromiseDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodNaN:
-        case ZodFirstPartyTypeKind.ZodNever:
+        case zod.ZodFirstPartyTypeKind.ZodNaN:
+        case zod.ZodFirstPartyTypeKind.ZodNever:
             return parseNeverDef();
-        case ZodFirstPartyTypeKind.ZodEffects:
+        case zod.ZodFirstPartyTypeKind.ZodEffects:
             return parseEffectsDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodAny:
+        case zod.ZodFirstPartyTypeKind.ZodAny:
             return parseAnyDef();
-        case ZodFirstPartyTypeKind.ZodUnknown:
+        case zod.ZodFirstPartyTypeKind.ZodUnknown:
             return parseUnknownDef();
-        case ZodFirstPartyTypeKind.ZodDefault:
+        case zod.ZodFirstPartyTypeKind.ZodDefault:
             return parseDefaultDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodBranded:
+        case zod.ZodFirstPartyTypeKind.ZodBranded:
             return parseBrandedDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodReadonly:
+        case zod.ZodFirstPartyTypeKind.ZodReadonly:
             return parseReadonlyDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodCatch:
+        case zod.ZodFirstPartyTypeKind.ZodCatch:
             return parseCatchDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodPipeline:
+        case zod.ZodFirstPartyTypeKind.ZodPipeline:
             return parsePipelineDef(def, refs);
-        case ZodFirstPartyTypeKind.ZodFunction:
-        case ZodFirstPartyTypeKind.ZodVoid:
-        case ZodFirstPartyTypeKind.ZodSymbol:
+        case zod.ZodFirstPartyTypeKind.ZodFunction:
+        case zod.ZodFirstPartyTypeKind.ZodVoid:
+        case zod.ZodFirstPartyTypeKind.ZodSymbol:
             return undefined;
         default:
             /* c8 ignore next */
@@ -4137,7 +4139,7 @@ var McpZodTypeKind;
 (function (McpZodTypeKind) {
     McpZodTypeKind["Completable"] = "McpCompletable";
 })(McpZodTypeKind || (McpZodTypeKind = {}));
-class Completable extends ZodType {
+class Completable extends zod.ZodType {
     _parse(input) {
         const { ctx } = this._processInputParams(input);
         const data = ctx.data;
@@ -4538,7 +4540,7 @@ class McpServer {
             if (typeof obj !== "object" || obj === null)
                 return false;
             // Check that at least one property is a ZodType instance
-            return Object.values(obj).some(v => v instanceof ZodType);
+            return Object.values(obj).some(v => v instanceof zod.ZodType);
         };
         let description;
         if (typeof rest[0] === "string") {
@@ -4570,7 +4572,7 @@ class McpServer {
         const cb = rest[0];
         const registeredTool = {
             description,
-            inputSchema: paramsSchema === undefined ? undefined : z.object(paramsSchema),
+            inputSchema: paramsSchema === undefined ? undefined : zod.z.object(paramsSchema),
             annotations,
             callback: cb,
             enabled: true,
@@ -4586,7 +4588,7 @@ class McpServer {
                 if (typeof updates.description !== "undefined")
                     registeredTool.description = updates.description;
                 if (typeof updates.paramsSchema !== "undefined")
-                    registeredTool.inputSchema = z.object(updates.paramsSchema);
+                    registeredTool.inputSchema = zod.z.object(updates.paramsSchema);
                 if (typeof updates.callback !== "undefined")
                     registeredTool.callback = updates.callback;
                 if (typeof updates.annotations !== "undefined")
@@ -4616,7 +4618,7 @@ class McpServer {
         const cb = rest[0];
         const registeredPrompt = {
             description,
-            argsSchema: argsSchema === undefined ? undefined : z.object(argsSchema),
+            argsSchema: argsSchema === undefined ? undefined : zod.z.object(argsSchema),
             callback: cb,
             enabled: true,
             disable: () => registeredPrompt.update({ enabled: false }),
@@ -4631,7 +4633,7 @@ class McpServer {
                 if (typeof updates.description !== "undefined")
                     registeredPrompt.description = updates.description;
                 if (typeof updates.argsSchema !== "undefined")
-                    registeredPrompt.argsSchema = z.object(updates.argsSchema);
+                    registeredPrompt.argsSchema = zod.z.object(updates.argsSchema);
                 if (typeof updates.callback !== "undefined")
                     registeredPrompt.callback = updates.callback;
                 if (typeof updates.enabled !== "undefined")
@@ -4712,7 +4714,7 @@ const CollectionCoreSchema = {
      * • Use Title Case and avoid special characters
      * • Example: “Sales Reports Q2 2025”
      */
-    name: z
+    name: zod.z
         .string()
         .min(1, { message: 'Collection name cannot be empty.' })
         .describe('A concise, human-readable name for the collection (≤50 chars; Title Case; no special symbols). Example: "Sales Reports Q2 2025".'),
@@ -4725,7 +4727,7 @@ const CollectionCoreSchema = {
      *   • features – For storing precomputed feature vectors or embeddings
      * Defaults to `canon`.
      */
-    type: z
+    type: zod.z
         .enum(['frame', 'searchable-frame', 'canon', 'features'])
         .default('canon')
         .describe('Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'),
@@ -4734,8 +4736,8 @@ const CollectionCoreSchema = {
      * • Use short, single-word labels (no spaces)
      * • Example: [ "finance", "Q2", "internal" ]
      */
-    tags: z
-        .array(z.string().min(1), {
+    tags: zod.z
+        .array(zod.z.string().min(1), {
         invalid_type_error: 'Each tag must be a non‐empty string.'
     })
         .optional()
@@ -4745,7 +4747,7 @@ const CollectionCoreSchema = {
      * • Multi-sentence narrative, outlining scope and intended use
      * • Example: “Contains all client invoices from January to March 2025, used for quarterly auditing and trend analysis.”
      */
-    description: z
+    description: zod.z
         .string()
         .optional()
         .describe('Multi-sentence description of purpose, contents, and intended usage (≤500 chars). Example: "Contains all client invoices from Jan–Mar 2025 for auditing."'),
@@ -4755,7 +4757,7 @@ const CollectionCoreSchema = {
      * • Provide any contextual guidelines or constraints
      * • Aim for clear, numbered steps or bullet points
      */
-    instructions: z
+    instructions: zod.z
         .string()
         .optional()
         .describe('High-level ingestion guidelines: outline data sources, preprocessing steps, and field mappings (e.g. "1. Convert PDFs to text…").'),
@@ -4765,7 +4767,7 @@ const CollectionCoreSchema = {
      * • Include rules for relationship extraction
      * • Example: “Link invoices to client nodes by matching client_id field…”
      */
-    graphInstructions: z
+    graphInstructions: zod.z
         .string()
         .optional()
         .describe('Graph generation rules: define node types, edge semantics, and heuristics (e.g. "Link orders to customers by matching customer_id").'),
@@ -4775,7 +4777,7 @@ const CollectionCoreSchema = {
      * • Recommend structure (summary, examples, code snippets)
      * • Example: “Respond in bullet points, providing a brief summary followed by detailed steps.”
      */
-    promptInstructions: z
+    promptInstructions: zod.z
         .string()
         .optional()
         .describe('LLM response guidelines: tone, format, and structure (e.g. "Use bullets, start with a one-sentence summary").'),
@@ -4787,7 +4789,7 @@ const CollectionCoreSchema = {
      *     - author
      *     - publication_date
      */
-    searchInstructions: z
+    searchInstructions: zod.z
         .string()
         .optional()
         .describe('Bullet-point list of ≤5 search keys (one per line). Example:\n- title\n- author\n- publication_date')
@@ -4800,7 +4802,7 @@ const CollectionCreateSchema = {
      * The UUID of the organization that will own this collection.
      * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
      */
-    organizationId: z
+    organizationId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the organization that owns this collection. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'),
@@ -4826,10 +4828,10 @@ const CollectionCreateSchema = {
      * ]
      * ```
      */
-    categories: z
-        .array(z.object({
+    categories: zod.z
+        .array(zod.z.object({
         /** Category name (e.g. “Invoices”, “Products”, “UserActions”) */
-        name: z
+        name: zod.z
             .string()
             .describe('Human-readable category name, e.g. "Invoices", "Products".'),
         /**
@@ -4839,7 +4841,7 @@ const CollectionCreateSchema = {
          * • content — for categorizing raw text in existing nodes
          * • table — for structured, row/column data
          */
-        type: z
+        type: zod.z
             .enum(['concepts', 'features', 'content', 'table'])
             .describe('The data model for this category: "concepts", "features", "content", or "table".'),
         /**
@@ -4847,7 +4849,7 @@ const CollectionCreateSchema = {
          * Describe parsing steps, field mappings, or any preprocessing rules.
          * Example: “Split each invoice into header and line-item records, map invoice_date to ISO format.”
          */
-        instructions: z
+        instructions: zod.z
             .string()
             .describe('Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings).')
     }))
@@ -4865,7 +4867,7 @@ const CollectionUpdateSchema = {
      * The UUID of the collection to update.
      * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
      */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".'),
@@ -4874,7 +4876,7 @@ const CollectionUpdateSchema = {
      * You must have admin rights in both organizations to transfer ownership.
      * Example: “d2719e84-89b0-4c25-a6f2-1a2bef3c9dbe”
      */
-    organizationId: z
+    organizationId: zod.z
         .string()
         .uuid()
         .optional()
@@ -4889,7 +4891,7 @@ const GetCollectionRequestSchema = {
      * The UUID of the collection to update.
      * Example: “3fa85f64-5717-4562-b3fc-2c963f66afa6”
      */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".')
@@ -4902,7 +4904,7 @@ const GetCollectionsRequestSchema = {
      * Optional filter string to match against collection name, description, or tags.
      * Example: "finance Q2" will return collections whose name, description, or tags contain those terms.
      */
-    search: z
+    search: zod.z
         .string()
         .optional()
         .describe('Optional filter string to match name, description, or tags. Example: "finance Q2".'),
@@ -4910,7 +4912,7 @@ const GetCollectionsRequestSchema = {
      * Optional limit on the number of collections to retrieve.
      * Use for pagination sizing. Example: 5
      */
-    take: z
+    take: zod.z
         .number()
         .int()
         .optional()
@@ -4920,7 +4922,7 @@ const GetCollectionsRequestSchema = {
      * Skip this many collections before starting to collect the result set.
      * Example: to fetch page 2 with page size 10, set skip = 10.
      */
-    skip: z
+    skip: zod.z
         .number()
         .int()
         .optional()
@@ -4929,7 +4931,7 @@ const GetCollectionsRequestSchema = {
      * When true, include extended metadata (documents in collection etc.)
      * If false or omitted, only basic metadata (id, name, type) is returned.
      */
-    extended: z
+    extended: zod.z
         .boolean()
         .optional()
         .describe('Optional flag to include extended details (documents in collection etc.).')
@@ -4940,7 +4942,7 @@ const GetCollectionsRequestSchema = {
  */
 const DocumentCoreSchema = {
     /** The UUID of the collection associated with the document operation. */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the collection associated with the document operation.')
@@ -4951,34 +4953,34 @@ const DocumentCoreSchema = {
 const UploadDocumentRequestSchema = {
     ...DocumentCoreSchema,
     /** The name of the document. Must not be empty. */
-    name: z
+    name: zod.z
         .string()
         .min(1)
         .describe('The name of the document. Must not be empty.'),
     /** Optional MIME type of the document (e.g., 'application/pdf'). */
-    type: z
+    type: zod.z
         .string()
         .optional()
         .describe('Optional MIME type of the document (e.g., "application/pdf").'),
     /** The path to the file to upload. Must be a non-empty string representing a valid file path. */
-    file: z
+    file: zod.z
         .string()
         .min(1)
         .describe('The path to the file to upload. Must be a non-empty string representing a valid file path.'),
     /** Optional additional instructions for processing the document. If provided, must not be empty. */
-    instructions: z
+    instructions: zod.z
         .string()
         .min(1)
         .optional()
         .describe('Optional additional instructions for processing the document. If provided, must not be empty.'),
     /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
-    job: z
+    job: zod.z
         .boolean()
         .optional()
         .default(true)
         .describe('Whether to dispatch a processing job. Defaults to true. Set to false to skip.'),
     /** Flag to perform additional table processing and analysis on the document. */
-    tables: z
+    tables: zod.z
         .boolean()
         .describe('Flag to perform additional table processing and analysis on the document.')
 };
@@ -4988,27 +4990,27 @@ const UploadDocumentRequestSchema = {
 const UpdateDocumentRequestSchema = {
     ...DocumentCoreSchema,
     /** The UUID of the document to update. */
-    documentId: z.string().uuid().describe('The UUID of the document to update.'),
+    documentId: zod.z.string().uuid().describe('The UUID of the document to update.'),
     /** The updated name of the document. If provided, must not be empty. */
-    name: z
+    name: zod.z
         .string()
         .min(1)
         .optional()
         .describe('The updated name of the document. If provided, must not be empty.'),
     /** Updated instructions related to the document. If provided, must not be empty. */
-    instructions: z
+    instructions: zod.z
         .string()
         .min(1)
         .optional()
         .describe('Updated instructions related to the document. If provided, must not be empty.'),
     /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch. */
-    job: z
+    job: zod.z
         .boolean()
         .optional()
         .default(false)
         .describe('Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch.'),
     /** Flag to perform additional table processing and analysis on the document. */
-    tables: z
+    tables: zod.z
         .boolean()
         .optional()
         .describe('Flag to perform additional table processing and analysis on the document.')
@@ -5019,7 +5021,7 @@ const UpdateDocumentRequestSchema = {
 const DeleteDocumentRequestSchema = {
     ...DocumentCoreSchema,
     /** The UUID of the document to delete. */
-    documentId: z.string().uuid().describe('The UUID of the document to delete.')
+    documentId: zod.z.string().uuid().describe('The UUID of the document to delete.')
 };
 /**
  * Request schema for reprocessing documents: includes the collection UUID, list of document UUIDs to reprocess, and the reprocessing job type.
@@ -5027,11 +5029,11 @@ const DeleteDocumentRequestSchema = {
 const ReprocessDocumentsRequestSchema = {
     ...DocumentCoreSchema,
     /** An array of UUIDs of the documents to reprocess. */
-    ids: z
-        .array(z.string().uuid())
+    ids: zod.z
+        .array(zod.z.string().uuid())
         .describe('An array of UUIDs of the documents to reprocess.'),
     /** The type of job to dispatch reprocessing for. */
-    type: z
+    type: zod.z
         .enum(['status', 'nodes', 'vectors', 'edges', 'category'])
         .describe('The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category").')
 };
@@ -5041,12 +5043,12 @@ const ReprocessDocumentsRequestSchema = {
 const ExportDocumentRequestSchema = {
     ...DocumentCoreSchema,
     /** The UUID of the document to retrieve. */
-    documentId: z
+    documentId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the document to retrieve.'),
     /** Output format: "json" for layout or "text" for raw text output. */
-    type: z
+    type: zod.z
         .enum(['json', 'text'])
         .describe('Output format: "json" for layout or "text" for raw text output.')
 };
@@ -5056,7 +5058,7 @@ const ExportDocumentRequestSchema = {
 const GetDocumentRequestSchema = {
     ...DocumentCoreSchema,
     /** The UUID of the document to retrieve. */
-    documentId: z
+    documentId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the document to retrieve.')
@@ -5064,7 +5066,7 @@ const GetDocumentRequestSchema = {
 /**
  * Enum schema for document job statuses, covering all processing states ("processing", "error", "ready", "cancelled", "unprocessed", "partial", "all").
  */
-const JobStatusSchema = z.enum([
+const JobStatusSchema = zod.z.enum([
     'processing',
     'error',
     'ready',
@@ -5079,26 +5081,26 @@ const JobStatusSchema = z.enum([
 const GetDocumentsRequestSchema = {
     ...DocumentCoreSchema,
     /** A search query string to filter documents. */
-    search: z
+    search: zod.z
         .string()
         .optional()
         .describe('A search query string to filter documents.'),
     /** The number of documents to retrieve. Must be a positive integer. */
-    take: z
+    take: zod.z
         .number()
         .int()
         .positive()
         .optional()
         .describe('The number of documents to retrieve. Must be a positive integer.'),
     /** The number of documents to skip for pagination. Must be a non-negative integer. */
-    skip: z
+    skip: zod.z
         .number()
         .int()
         .nonnegative()
         .optional()
         .describe('The number of documents to skip for pagination. Must be a non-negative integer.'),
     /** Whether to retrieve extended information for the documents. */
-    extended: z
+    extended: zod.z
         .boolean()
         .optional()
         .describe('Whether to retrieve extended information for the documents.'),
@@ -5122,7 +5124,7 @@ const FeaturesCoreSchema = {
      * The ID of the collection to query.
      * Must be a valid UUID.
      */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The ID of the collection to query. Must be a valid UUID.'),
@@ -5130,7 +5132,7 @@ const FeaturesCoreSchema = {
      * The ID of the category whose features are being requested.
      * Must be a valid UUID.
      */
-    categoryId: z
+    categoryId: zod.z
         .string()
         .uuid()
         .describe('The ID of the category whose features are being requested. Must be a valid UUID.')
@@ -5144,7 +5146,7 @@ const FeaturesQueryRequestSchema = {
      * An optional parameter to skip a specified number of results (for pagination).
      * Must be an integer ≥ 0.
      */
-    skip: z
+    skip: zod.z
         .number()
         .int()
         .min(0)
@@ -5154,7 +5156,7 @@ const FeaturesQueryRequestSchema = {
      * An optional parameter to limit the number of results returned (for pagination).
      * Must be an integer ≥ 1.
      */
-    take: z
+    take: zod.z
         .number()
         .int()
         .min(1)
@@ -5170,7 +5172,7 @@ const ExportFeaturesRequestSchema = {
      * The export format.
      * Allowed values: "json" or "csv".
      */
-    type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
+    type: zod.z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
 };
 
 /**
@@ -5183,7 +5185,7 @@ const GestellCoreSearchSchema = {
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
      */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The ID of the collection to query (UUID)'),
@@ -5191,7 +5193,7 @@ const GestellCoreSearchSchema = {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z
+    categoryId: zod.z
         .string()
         .uuid()
         .optional()
@@ -5200,7 +5202,7 @@ const GestellCoreSearchSchema = {
      * The prompt or query to execute. This is the primary input driving the search.
      * A string that defines what the user is searching for or asking about.
      */
-    prompt: z.string().describe('The prompt or query to execute'),
+    prompt: zod.z.string().describe('The prompt or query to execute'),
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -5208,7 +5210,7 @@ const GestellCoreSearchSchema = {
      * - 'precise': Prioritizes accuracy, potentially increasing computation time.
      * Optional, defaults to 'normal' if not specified.
      */
-    method: z
+    method: zod.z
         .enum(['fast', 'normal', 'precise'])
         .optional()
         .default('normal')
@@ -5220,7 +5222,7 @@ const GestellCoreSearchSchema = {
      * - 'summary': Matches based on document summaries or abstracted content.
      * Optional, defaults to 'phrase' if not specified.
      */
-    type: z
+    type: zod.z
         .enum(['keywords', 'phrase', 'summary'])
         .optional()
         .default('phrase')
@@ -5230,7 +5232,7 @@ const GestellCoreSearchSchema = {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z
+    vectorDepth: zod.z
         .number()
         .int()
         .positive()
@@ -5241,7 +5243,7 @@ const GestellCoreSearchSchema = {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z
+    nodeDepth: zod.z
         .number()
         .int()
         .positive()
@@ -5252,7 +5254,7 @@ const GestellCoreSearchSchema = {
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z
+    maxQueries: zod.z
         .number()
         .int()
         .positive()
@@ -5263,7 +5265,7 @@ const GestellCoreSearchSchema = {
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z
+    maxResults: zod.z
         .number()
         .int()
         .positive()
@@ -5281,7 +5283,7 @@ const GestellSearchSchema = {
      * Defaults to true, meaning content is included unless explicitly set to false.
      * Set to false to reduce payload size when content is not needed.
      */
-    includeContent: z
+    includeContent: zod.z
         .boolean()
         .optional()
         .default(true)
@@ -5291,7 +5293,7 @@ const GestellSearchSchema = {
      * Defaults to false, excluding edges unless explicitly requested.
      * Including edges can significantly increase payload size due to additional relational data.
      */
-    includeEdges: z
+    includeEdges: zod.z
         .boolean()
         .optional()
         .default(false)
@@ -5308,7 +5310,7 @@ const GestellPromptSchema = {
      * If provided, this string replaces the collection’s predefined template, allowing
      * customization of the prompt structure.
      */
-    template: z
+    template: zod.z
         .string()
         .optional()
         .describe('Optional system template to use for the prompt, overrides the existing prompt instructions for the collections'),
@@ -5317,7 +5319,7 @@ const GestellPromptSchema = {
      * Defaults to true, enabling this feature unless explicitly disabled.
      * Chain-of-thought reasoning enhances the model's ability to break down complex queries.
      */
-    cot: z
+    cot: zod.z
         .boolean()
         .optional()
         .default(true)
@@ -5327,20 +5329,20 @@ const GestellPromptSchema = {
      * Each message consists of a role and content. Defaults to an empty array if not provided.
      * Useful for maintaining conversational context or guiding the model’s response.
      */
-    messages: z
-        .array(z.object({
+    messages: zod.z
+        .array(zod.z.object({
         /**
          * The role of the message sender.
          * - 'system': Instructions or context from the system.
          * - 'user': Input or queries from the user.
          * - 'model': Responses or outputs from the model.
          */
-        role: z.enum(['system', 'user', 'model']),
+        role: zod.z.enum(['system', 'user', 'model']),
         /**
          * The content of the message.
          * A string containing the text of the message, relevant to its role.
          */
-        content: z.string()
+        content: zod.z.string()
     }))
         .optional()
         .default([])
@@ -5355,7 +5357,7 @@ const TablesCoreSchema = {
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.
      */
-    collectionId: z
+    collectionId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the collection to query.'),
@@ -5363,7 +5365,7 @@ const TablesCoreSchema = {
      * The UUID of the category whose table data is being requested.
      * Must be a 36-character RFC-4122 string.
      */
-    categoryId: z
+    categoryId: zod.z
         .string()
         .uuid()
         .describe('The UUID of the category whose table data is being requested.')
@@ -5377,7 +5379,7 @@ const TablesQueryRequestSchema = {
      * Number of results to skip (for pagination).
      * Must be an integer ≥ 0 if provided.
      */
-    skip: z
+    skip: zod.z
         .number()
         .min(0)
         .optional()
@@ -5386,7 +5388,7 @@ const TablesQueryRequestSchema = {
      * Maximum number of results to return (for pagination).
      * Must be an integer ≥ 1 if provided.
      */
-    take: z
+    take: zod.z
         .number()
         .min(1)
         .optional()
@@ -5401,7 +5403,7 @@ const ExportTableRequestSchema = {
      * Desired export format.
      * Must be either "json" or "csv".
      */
-    type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
+    type: zod.z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
 };
 
 /**
@@ -5831,7 +5833,7 @@ function registerCollectionSearchTool(server, gestell) {
  *          document, and extraction tools loaded.
  */
 function buildMcpServer(key = process.env.GESTELL_API_KEY || '') {
-    const gestell = new Gestell({ key });
+    const gestell = new sdk.Gestell({ key });
     const server = new McpServer({ name: 'Gestell', version: '1.0.0' });
     // Core Search/Prompt Tools
     registerCollectionSearchTool(server, gestell);
@@ -19512,7 +19514,7 @@ class StreamableHTTPServerTransport {
             else if (hasRequests) {
                 // The default behavior is to use SSE streaming
                 // but in some cases server will return JSON responses
-                const streamId = randomUUID();
+                const streamId = node_crypto.randomUUID();
                 if (!this._enableJsonResponse) {
                     const headers = {
                         "Content-Type": "text/event-stream",
@@ -19729,7 +19731,7 @@ class StreamableHTTPServerTransport {
     }
 }
 
-config();
+dotenv.config();
 // The Gestell API Key
 const API_KEY = process.env.GESTELL_API_KEY || '';
 // The port for remote MCP server (defaults to 3000)
@@ -19885,5 +19887,32 @@ async function startTerminalSession(config = { apiKey: API_KEY }) {
     };
 }
 
-export { CollectionCoreSchema, CollectionCreateSchema, CollectionUpdateSchema, DeleteDocumentRequestSchema, DocumentCoreSchema, ExportDocumentRequestSchema, ExportFeaturesRequestSchema, ExportTableRequestSchema, FeaturesCoreSchema, FeaturesQueryRequestSchema, GestellCoreSearchSchema, GestellPromptSchema, GestellSearchSchema, GetCollectionRequestSchema, GetCollectionsRequestSchema, GetDocumentRequestSchema, GetDocumentsRequestSchema, JobStatusSchema, ReprocessDocumentsRequestSchema, TablesCoreSchema, TablesQueryRequestSchema, UpdateDocumentRequestSchema, UploadDocumentRequestSchema, buildMcpServer, runTool, startRemoteServer, startTerminalClient, startTerminalSession };
-//# sourceMappingURL=library.js.map
+exports.CollectionCoreSchema = CollectionCoreSchema;
+exports.CollectionCreateSchema = CollectionCreateSchema;
+exports.CollectionUpdateSchema = CollectionUpdateSchema;
+exports.DeleteDocumentRequestSchema = DeleteDocumentRequestSchema;
+exports.DocumentCoreSchema = DocumentCoreSchema;
+exports.ExportDocumentRequestSchema = ExportDocumentRequestSchema;
+exports.ExportFeaturesRequestSchema = ExportFeaturesRequestSchema;
+exports.ExportTableRequestSchema = ExportTableRequestSchema;
+exports.FeaturesCoreSchema = FeaturesCoreSchema;
+exports.FeaturesQueryRequestSchema = FeaturesQueryRequestSchema;
+exports.GestellCoreSearchSchema = GestellCoreSearchSchema;
+exports.GestellPromptSchema = GestellPromptSchema;
+exports.GestellSearchSchema = GestellSearchSchema;
+exports.GetCollectionRequestSchema = GetCollectionRequestSchema;
+exports.GetCollectionsRequestSchema = GetCollectionsRequestSchema;
+exports.GetDocumentRequestSchema = GetDocumentRequestSchema;
+exports.GetDocumentsRequestSchema = GetDocumentsRequestSchema;
+exports.JobStatusSchema = JobStatusSchema;
+exports.ReprocessDocumentsRequestSchema = ReprocessDocumentsRequestSchema;
+exports.TablesCoreSchema = TablesCoreSchema;
+exports.TablesQueryRequestSchema = TablesQueryRequestSchema;
+exports.UpdateDocumentRequestSchema = UpdateDocumentRequestSchema;
+exports.UploadDocumentRequestSchema = UploadDocumentRequestSchema;
+exports.buildMcpServer = buildMcpServer;
+exports.runTool = runTool;
+exports.startRemoteServer = startRemoteServer;
+exports.startTerminalClient = startTerminalClient;
+exports.startTerminalSession = startTerminalSession;
+//# sourceMappingURL=library.cjs.js.map

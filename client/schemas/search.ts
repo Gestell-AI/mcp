@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+/**
+ * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
+ * including collectionId (UUID), optional categoryId (UUID), prompt text, search method (fast|normal|precise),
+ * search type (keywords|phrase|summary), vectorDepth, nodeDepth, maxQueries, and maxResults.
+ */
 export const GestellCoreSearchSchema = {
   /**
    * The ID of the collection to query. This must be a UUID.
@@ -101,6 +106,10 @@ export const GestellCoreSearchSchema = {
     .describe('Maximum number of results to return')
 }
 
+/**
+ * Gestell search schema: extends core search parameters with flags to include full content (includeContent)
+ * and edge metadata (includeEdges) in the search response payload.
+ */
 export const GestellSearchSchema = {
   ...GestellCoreSearchSchema,
 
@@ -132,10 +141,8 @@ export const GestellSearchSchema = {
 }
 
 /**
- * GestellPromptSchema:
- * Extends `GestellCoreSearchSchema` with fields specific to prompt generation.
- * This schema is designed for generating prompts or responses, often in the context of
- * conversational or reasoning tasks, with options for templates and chat history.
+ * Gestell prompt schema: extends core search parameters with an optional system template override (template),
+ * a chain-of-thought reasoning flag (cot), and an array of chat history messages (messages) for conversational prompt generation.
  */
 export const GestellPromptSchema = {
   ...GestellCoreSearchSchema,

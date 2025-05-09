@@ -20,8 +20,12 @@ import {
 import { registerCollectionPromptTool } from '@tool/prompt'
 import { registerCollectionSearchTool } from '@tool/search'
 
-/*
- * Gestell core MCP server instance loads all resources based on configured modality (SIMPLE or ADVANCED)
+/**
+ * Creates and configures a Gestell MCP server with all available tools registered.
+ *
+ * @param key - Your Gestell API key. Defaults to the `GESTELL_API_KEY` environment variable.
+ * @returns A fully initialized `McpServer` instance with search, prompt, collection,
+ *          document, and extraction tools loaded.
  */
 export default function buildMcpServer(
   key: string = process.env.GESTELL_API_KEY || ''

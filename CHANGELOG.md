@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.2.2
+
+- Remove `bun build` and switched to `rollup` (experimented with bun and not good for libraries that need type declarations)
+
+- Fixed type declarations and intellisense displays
+
+- Improved intellisense displays
+
 ## 0.2.1
 
 - Updated ESM/CJS Exports
