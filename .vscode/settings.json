@@ -1,0 +1,12 @@
+{
+  "eslint.workingDirectories": [
+      { "directory": ".", "changeProcessCWD": true }
+  ],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bun.lock": true
+  }
+}

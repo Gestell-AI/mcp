@@ -1,0 +1,10 @@
+node_modules
+workflow
+.DS_Store
+
+.vscode
+.env
+.env.sample
+bun.lock
+eslint.config.ts
+README.md
