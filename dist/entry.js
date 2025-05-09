@@ -68635,13 +68635,14 @@ var fastify = import_fastify.default({
 async function startRemoteServer(config2 = {
   apiKey: API_KEY,
   host: HOST,
-  port: PORT
+  port: PORT,
+  auth: REMOTE_AUTH
 }) {
-  const { apiKey, host, port } = config2;
+  const { apiKey, host, port, auth } = config2;
   fastify.post("/mcp", async (request, reply) => {
-    if (REMOTE_AUTH) {
+    if (auth) {
       const authHeader = request.headers.authorization;
-      if (!authHeader || authHeader !== REMOTE_AUTH) {
+      if (!authHeader || authHeader !== auth) {
         return reply.code(401).send({ error: "Unauthorized" });
       }
     }

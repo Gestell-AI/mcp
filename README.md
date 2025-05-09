@@ -1,7 +1,7 @@
 # Gestell MCP SDK
 
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![version](https://img.shields.io/badge/version-0.2.0-blue)
+![version](https://img.shields.io/badge/version-0.2.1-blue)
 
 A full featured MCP SDK for Gestell with multiple modalities
 
@@ -42,21 +42,19 @@ Alternatively, create your own start scripts
 ```typescript
 import { startRemoteServer, startTerminalClient } from '@gestell/mcp'
 
-// Arguments are optional
+
+// Start a remote server
 const apiKey = '...'
 const port = 3000
 const host = 'localhost'
-const mode = 'SIMPLE'
 
-// Start a remote server
 await startRemoteServer({
   apiKey,
   port,
-  host,
-  mode
+  host
 })
 
-// Start a terminal client
+// Start a terminal client (loads configuration from .env)
 const client = await startTerminalClient()
 ```
 

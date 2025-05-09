@@ -29,4 +29,5 @@ export interface GestellTerminalConfig {
 export interface GestellRemoteConfig extends GestellTerminalConfig {
   port?: number
   host?: string
+  auth?: string
 }

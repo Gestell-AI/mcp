@@ -29,15 +29,16 @@ export default async function startRemoteServer(
   config: GestellRemoteConfig = {
     apiKey: API_KEY,
     host: HOST,
-    port: PORT
+    port: PORT,
+    auth: REMOTE_AUTH
   }
 ): Promise<void> {
-  const { apiKey, host, port } = config
+  const { apiKey, host, port, auth } = config
 
   fastify.post('/mcp', async (request: FastifyRequest, reply: FastifyReply) => {
-    if (REMOTE_AUTH) {
+    if (auth) {
       const authHeader = request.headers.authorization
-      if (!authHeader || authHeader !== REMOTE_AUTH) {
+      if (!authHeader || authHeader !== auth) {
         return reply.code(401).send({ error: 'Unauthorized' })
       }
     }

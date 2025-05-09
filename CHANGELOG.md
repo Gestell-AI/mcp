@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.2.1
+
+- Updated ESM/CJS Exports
+
+- Made sure `GESTELL_REMOTE_AUTH` can be changed via scripts
+
 ## 0.2.0
 
 - Added header auth keys for remote server mode

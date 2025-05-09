@@ -1,8 +1,15 @@
 {
   "name": "@gestell/mcp",
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "main": "dist/library.js",
   "module": "dist/library.js",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/library.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "start:terminal": "bun run server/terminal.ts",
     "start:remote": "bun run server/remote.ts",
