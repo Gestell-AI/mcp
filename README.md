@@ -1,7 +1,7 @@
 # Gestell MCP SDK
 
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.0.1-blue)
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/7sUmZuDYQ6cd8WbCiCCnfR/HhgpL3FetZmz1eVLbATvDe/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/7sUmZuDYQ6cd8WbCiCCnfR/HhgpL3FetZmz1eVLbATvDe/tree/master)
 
 A full featured MCP SDK for Gestell with multiple modalities.

@@ -32,7 +32,7 @@ export default function buildMcpServer(
   key: string = process.env.GESTELL_API_KEY || ''
 ): McpServer {
   const gestell = new Gestell({ key })
-  const server = new McpServer({ name: 'Gestell', version: '1.0.0' })
+  const server = new McpServer({ name: 'Gestell', version: '1.0.1' })
 
   // Core Search/Prompt Tools
   registerCollectionSearchTool(server, gestell)
