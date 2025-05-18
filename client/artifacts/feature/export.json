@@ -1,0 +1,35 @@
+{
+  "$ref": "#/definitions/feature.export",
+  "definitions": {
+    "feature.export": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The ID of the collection to query. Must be a valid UUID."
+        },
+        "categoryId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The ID of the category whose features are being requested. Must be a valid UUID."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "json",
+            "csv"
+          ],
+          "description": "The export format: \"json\" or \"csv\"."
+        }
+      },
+      "required": [
+        "collectionId",
+        "categoryId",
+        "format"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

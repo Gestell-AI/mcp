@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers an "updateDocument" tool on the MCP server.
+ * Registers an "document.update" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,7 @@ export function registerUpdateDocumentTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'updateDocument',
+    'document.update',
     UpdateDocumentRequestSchema,
     async ({ collectionId, documentId, name, instructions, job, tables }) => {
       const result = await gestell.document.update({

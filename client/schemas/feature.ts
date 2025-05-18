@@ -68,5 +68,30 @@ export const ExportFeaturesRequestSchema = {
    * The export format.
    * Allowed values: "json" or "csv".
    */
-  type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
+  format: z
+    .enum(['json', 'csv'])
+    .describe('The export format: "json" or "csv".')
+}
+
+/**
+ * Request interface for querying features with optional pagination.
+ */
+export interface FeaturesQueryRequest {
+  /** The ID of the collection to query. Must be a valid UUID. */
+  collectionId: string
+
+  /** The ID of the category whose features are being requested. Must be a valid UUID. */
+  categoryId: string
+
+  /**
+   * An optional parameter to limit the number of results returned (for pagination).
+   * Must be an integer ≥ 1.
+   */
+  take?: number
+
+  /**
+   * An optional parameter to skip a specified number of results (for pagination).
+   * Must be an integer ≥ 0.
+   */
+  skip?: number
 }

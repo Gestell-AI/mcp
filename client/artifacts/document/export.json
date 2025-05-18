@@ -1,0 +1,35 @@
+{
+  "$ref": "#/definitions/document.export",
+  "definitions": {
+    "document.export": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection associated with the document operation."
+        },
+        "documentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the document to retrieve."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "json",
+            "text"
+          ],
+          "description": "Output format: \"json\" for layout or \"text\" for raw text output."
+        }
+      },
+      "required": [
+        "collectionId",
+        "documentId",
+        "type"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

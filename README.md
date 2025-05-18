@@ -1,7 +1,7 @@
 # Gestell MCP SDK
 
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![version](https://img.shields.io/badge/version-0.2.2-blue)
+![version](https://img.shields.io/badge/version-0.3.0-blue)
 
 A full featured MCP SDK for Gestell with multiple modalities
 
@@ -85,4 +85,8 @@ const client = await startTerminalClient()
   - Query
   - Export
 
-Review [comprehensive workflows on usage here](./workflow)
+---
+
+Review [comprehensive demo workflows on usage here](./docs/demos)
+
+Review the [CHANGELOG](./docs/CHANGELOG.md) to keep up to date on all changes

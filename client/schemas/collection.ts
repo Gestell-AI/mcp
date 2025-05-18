@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import type { PiiIdentifierOption } from '@gestell/sdk/types'
+import { PII_IDENTIFIER_OPTIONS } from '@gestell/sdk/types'
 
 /**
  * Core Collection schema: defines essential metadata for a collection, including a human-readable name, classification type, optional tags, detailed description, and high-level instructions for data ingestion, graph construction, prompt formatting, and search key prioritization.
@@ -18,16 +20,42 @@ export const CollectionCoreSchema = {
     ),
 
   /**
+   * Indicates if this collection contains Personally Identifiable Information (PII).
+   * When true, enables additional privacy controls and auditing.
+   */
+  pii: z
+    .boolean()
+    .default(false)
+    .describe(
+      'Indicates if this collection contains Personally Identifiable Information (PII).'
+    ),
+
+  /**
+   * Array of PII controls for this collection.
+   * These identifiers specify what types of PII to look for and handle.
+   */
+  piiControls: z
+    .array(
+      z.enum(
+        PII_IDENTIFIER_OPTIONS as [
+          PiiIdentifierOption,
+          ...PiiIdentifierOption[]
+        ]
+      )
+    )
+    .optional()
+    .default([])
+    .describe('Array of PII control identifiers for this collection.'),
+
+  /**
    * Specifies the classification of this collection.
-   * Allowed values:
-   *   • frame – Ephemeral datasets for one-off or streaming use cases
-   *   • searchable-frame – Optimized for search queries over recent or moving data
-   *   • canon – Default, general-purpose collection for long-term storage and retrieval
-   *   • features – For storing precomputed feature vectors or embeddings
-   * Defaults to `canon`.
+   * - frame: When you only want the OCR outputs
+   * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+   * - canon: Complete canonized collection with best search-based reasoning capabilities
+   * - features: Specialized collection for category extractions of content
    */
   type: z
-    .enum(['frame', 'searchable-frame', 'canon', 'features'])
+    .enum(['frame', 'searchable-frame', 'canon', 'features'] as const)
     .default('canon')
     .describe(
       'Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'
@@ -169,7 +197,7 @@ export const CollectionCreateSchema = {
          * • table — for structured, row/column data
          */
         type: z
-          .enum(['concepts', 'features', 'content', 'table'])
+          .enum(['concepts', 'features', 'content', 'table'] as const)
           .describe(
             'The data model for this category: "concepts", "features", "content", or "table".'
           ),
@@ -183,7 +211,17 @@ export const CollectionCreateSchema = {
           .string()
           .describe(
             'Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings).'
-          )
+          ),
+
+        /**
+         * Whether this category should be indexed as a single entry.
+         *
+         */
+        singleEntry: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe('If true, this category will be indexed as a single entry.')
       })
     )
     .optional()

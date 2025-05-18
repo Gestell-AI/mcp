@@ -1,0 +1,52 @@
+{
+  "$ref": "#/definitions/feature.query",
+  "definitions": {
+    "feature.query": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "ERROR"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "label": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "position",
+              "label",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "status",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

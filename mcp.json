@@ -1,0 +1,145 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "name": "@gestell/mcp",
+  "version": "0.1.0",
+  "description": "Gestell MCP server exposing Prompt, Query, Collection, Document, Table and Feature tools",
+  "homepage": "https://github.com/Gestell-AI/mcp",
+
+  "entry": {
+    "command": "gestell-mcp",
+    "args": [],
+    "workingDirectory": "${projectRoot}",
+    "env": {
+      "GESTELL_MCP_SERVICE_TYPE": "TERMINAL"
+    }
+  },
+
+  "alternateEntries": {
+    "http": {
+      "serverUrl": "http://localhost:3000/mcp",
+      "description": "HTTP endpoint for remote MCP tool calls"
+    }
+  },
+
+  "environment": [
+    {
+      "name": "GESTELL_API_KEY",
+      "description": "API key for authenticating with Gestell services",
+      "required": true
+    },
+    {
+      "name": "GESTELL_MCP_SERVICE_TYPE",
+      "description": "Type of service to run (TERMINAL, HTTP, etc.)",
+      "default": "TERMINAL"
+    },
+    {
+      "name": "GESTELL_MCP_PORT",
+      "description": "Port to run the MCP server on",
+      "default": "3000"
+    },
+    {
+      "name": "GESTELL_MCP_HOST",
+      "description": "Host to bind the MCP server to",
+      "default": "localhost"
+    },
+    {
+      "name": "GESTELL_REMOTE_AUTH",
+      "description": "Authentication token for remote access",
+      "required": false
+    }
+  ],
+
+  "tools": {
+    "prompt": {
+      "title": "Prompt",
+      "description": "Run a single prompt against a Gestell model and stream the response.",
+      "inputSchema": "./client/artifacts/search/prompt.json",
+      "outputSchema": "./client/artifacts/output/search/prompt.json"
+    },
+    "query": {
+      "title": "Search Query",
+      "description": "Perform a reason based search over a collection.",
+      "inputSchema": "./client/artifacts/search/search.json",
+      "outputSchema": "./client/artifacts/output/search/search.json"
+    },
+
+    "collection.get": {
+      "title": "Get Collection",
+      "inputSchema": "./client/artifacts/collection/id.json",
+      "outputSchema": "./client/artifacts/output/collection/id.json"
+    },
+    "collection.list": {
+      "title": "List Collections",
+      "inputSchema": "./client/artifacts/collection/list.json",
+      "outputSchema": "./client/artifacts/output/collection/list.json"
+    },
+    "collection.create": {
+      "title": "Create Collection",
+      "inputSchema": "./client/artifacts/collection/create.json",
+      "outputSchema": "./client/artifacts/output/collection/create.json"
+    },
+    "collection.update": {
+      "title": "Update Collection",
+      "inputSchema": "./client/artifacts/collection/update.json",
+      "outputSchema": "./client/artifacts/output/collection/update.json"
+    },
+
+    "document.get": {
+      "title": "Get Document",
+      "inputSchema": "./client/artifacts/document/id.json",
+      "outputSchema": "./client/artifacts/output/document/id.json"
+    },
+    "document.list": {
+      "title": "List Documents",
+      "inputSchema": "./client/artifacts/document/list.json",
+      "outputSchema": "./client/artifacts/output/document/list.json"
+    },
+    "document.create": {
+      "title": "Upload and Create a Document",
+      "inputSchema": "./client/artifacts/document/create.json",
+      "outputSchema": "./client/artifacts/output/document/create.json"
+    },
+    "document.update": {
+      "title": "Update Document",
+      "inputSchema": "./client/artifacts/document/update.json",
+      "outputSchema": "./client/artifacts/output/document/update.json"
+    },
+    "document.delete": {
+      "title": "Delete Document",
+      "inputSchema": "./client/artifacts/document/delete.json",
+      "outputSchema": "./client/artifacts/output/document/delete.json"
+    },
+    "document.reprocess": {
+      "title": "Reprocess Document",
+      "inputSchema": "./client/artifacts/document/reprocess.json",
+      "outputSchema": "./client/artifacts/output/document/reprocess.json"
+    },
+    "document.export": {
+      "title": "Export Document",
+      "inputSchema": "./client/artifacts/document/export.json",
+      "outputSchema": "./client/artifacts/output/document/export.json"
+    },
+
+    "table.query": {
+      "title": "Query Table",
+      "inputSchema": "./client/artifacts/table/query.json",
+      "outputSchema": "./client/artifacts/output/table/query.json"
+    },
+    "table.export": {
+      "title": "Export Table",
+      "inputSchema": "./client/artifacts/table/export.json",
+      "outputSchema": "./client/artifacts/output/table/export.json"
+    },
+
+    "feature.query": {
+      "title": "Query Features",
+      "inputSchema": "./client/artifacts/feature/query.json",
+      "outputSchema": "./client/artifacts/output/feature/query.json"
+    },
+    "feature.export": {
+      "title": "Export Features",
+      "inputSchema": "./client/artifacts/feature/export.json",
+      "outputSchema": "./client/artifacts/output/feature/export.json"
+    }
+  }
+}

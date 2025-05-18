@@ -25,7 +25,7 @@ export default [
       commonjs(),
       json(),
       typescript({
-        tsconfig: './tsconfig.build.json',
+        tsconfig: './compile/tsconfig.build.json',
         declaration: false, // we'll emit declarations in the second step
         moduleResolution: 'node',
         rootDir: '.',
@@ -34,8 +34,7 @@ export default [
           '@server/*': ['server/*'],
           '@client/*': ['client/*'],
           '@tool/*': ['tool/*'],
-          '@resource/*': ['resource/*'],
-          '@workflow/*': ['workflow/*']
+          '@resource/*': ['resource/*']
         }
       })
     ],
@@ -71,13 +70,12 @@ export default [
             '@server/*': ['server/*'],
             '@client/*': ['client/*'],
             '@tool/*': ['tool/*'],
-            '@resource/*': ['resource/*'],
-            '@workflow/*': ['workflow/*']
+            '@resource/*': ['resource/*']
           },
           preserveSymlinks: true
         },
         respectExternal: true,
-        tsconfig: './tsconfig.build.json'
+        tsconfig: './compile/tsconfig.build.json'
       })
     ],
     output: {

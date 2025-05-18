@@ -27,12 +27,10 @@
       "@server/*": ["server/*"],
       "@tool/*": ["tool/*"],
       "@resource/*": ["resource/*"],
-      "@client/*": ["client/*"],
-      "@workflow/*": ["workflow/*"]
+      "@client/*": ["client/*"]
     }
   },
   "include": [
-    "rollup.config.js",
     "**/*.ts"
   ],
   "exclude": [

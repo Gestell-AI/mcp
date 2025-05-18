@@ -6,7 +6,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "queryTables" tool on the MCP server.
+ * Registers the "table.query" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -16,7 +16,7 @@ export function registerQueryTablesTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'queryTables',
+    'table.query',
     TablesQueryRequestSchema,
     async ({ collectionId, categoryId, skip, take }) => {
       const result = await gestell.query.table({
@@ -39,7 +39,7 @@ export function registerQueryTablesTool(
 }
 
 /**
- * Registers the "exportTable" tool on the MCP server.
+ * Registers the "table.export" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -49,13 +49,13 @@ export function registerExportTableTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'exportTable',
+    'table.export',
     ExportTableRequestSchema,
-    async ({ collectionId, categoryId, type }) => {
+    async ({ collectionId, categoryId, format }) => {
       const result = await gestell.query.tableExport({
         collectionId,
         categoryId,
-        type
+        format
       })
 
       return {

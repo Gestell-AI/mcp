@@ -1,0 +1,26 @@
+{
+  "$ref": "#/definitions/document.id",
+  "definitions": {
+    "document.id": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection associated with the document operation."
+        },
+        "documentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the document to retrieve."
+        }
+      },
+      "required": [
+        "collectionId",
+        "documentId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

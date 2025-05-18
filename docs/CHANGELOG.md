@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 0.3.0
+
+- Added `mcp.json` manifest
+
+- Normalized tool call conventions and synced to sdk
+
+- Added observable schema input/outputs for tools in `client/artifacts`
+
+- Ported observed zod schemas from sdk as seen in `@client/schemas/sdk`
+
 ## 0.2.2
 
 - Remove `bun build` and switched to `rollup` (experimented with bun and not good for libraries that need type declarations)

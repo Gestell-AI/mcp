@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers a "reprocessDocuments" tool on the MCP server.
+ * Registers a "document.reprocess" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,7 @@ export function registerReprocessDocumentsTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'reprocessDocuments',
+    'document.reprocess',
     ReprocessDocumentsRequestSchema,
     async ({ collectionId, ids, type }) => {
       const result = await gestell.job.reprocess({

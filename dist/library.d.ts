@@ -6008,15 +6008,17 @@ declare const ListToolsRequestSchema: z.ZodObject<z.objectUtil.extendShape<z.obj
         cursor: z.ZodOptional<z.ZodString>;
     }>, z.ZodTypeAny, "passthrough"> | undefined;
 }>;
-/**
- * The server's response to a tool call.
- */
-declare const CallToolResultSchema: z.ZodObject<z.objectUtil.extendShape<{
+declare const CallToolResultSchema: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -6357,13 +6359,27 @@ declare const CallToolResultSchema: z.ZodObject<z.objectUtil.extendShape<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -6704,13 +6720,27 @@ declare const CallToolResultSchema: z.ZodObject<z.objectUtil.extendShape<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -7051,17 +7081,1135 @@ declare const CallToolResultSchema: z.ZodObject<z.objectUtil.extendShape<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
-}>, z.ZodTypeAny, "passthrough">>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">>]>;
 /**
  * CallToolResultSchema extended with backwards compatibility to protocol version 2024-10-07.
  */
-declare const CompatibilityCallToolResultSchema: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+declare const CompatibilityCallToolResultSchema: z.ZodUnion<[z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -7402,13 +8550,27 @@ declare const CompatibilityCallToolResultSchema: z.ZodUnion<[z.ZodObject<z.objec
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -7749,13 +8911,27 @@ declare const CompatibilityCallToolResultSchema: z.ZodUnion<[z.ZodObject<z.objec
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -8096,8 +9272,1121 @@ declare const CompatibilityCallToolResultSchema: z.ZodUnion<[z.ZodObject<z.objec
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">>]>, z.ZodObject<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
@@ -20960,12 +23249,17 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
          */
         blob: z.ZodString;
     }>, z.ZodTypeAny, "passthrough">>]>, "many">;
-}>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+}>, z.ZodTypeAny, "passthrough">>, z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -21306,13 +23600,27 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -21653,13 +23961,27 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
 }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
     _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
 }, {
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool does not define an outputSchema, this field MUST be present in the result.
+     */
     content: z.ZodArray<z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"text">;
         /**
@@ -22000,8 +24322,1121 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
             blob: z.ZodString;
         }>, z.ZodTypeAny, "passthrough">>]>;
     }, z.ZodTypeAny, "passthrough">>]>, "many">;
-    isError: z.ZodOptional<z.ZodDefault<z.ZodBoolean>>;
-}>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<z.objectUtil.extendShape<{
+    /**
+     * Structured output must not be provided in an unstructured tool result.
+     */
+    structuredContent: z.ZodOptional<z.ZodNever>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+    /**
+     * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
+     */
+    _meta: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+}, {
+    /**
+     * An object containing structured tool output.
+     *
+     * If the Tool defines an outputSchema, this field MUST be present in the result, and contain a JSON object that matches the schema.
+     */
+    structuredContent: z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>;
+    /**
+     * A list of content objects that represent the result of the tool call.
+     *
+     * If the Tool defines an outputSchema, this field MAY be present in the result.
+     *
+     * Tools may use this field to provide compatibility with older clients that
+     * do not support structured content.
+     *
+     * Clients that support structured content should ignore this field.
+     */
+    content: z.ZodOptional<z.ZodArray<z.ZodUnion<[z.ZodObject<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"text">;
+        /**
+         * The text content of the message.
+         */
+        text: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"image">;
+        /**
+         * The base64-encoded image data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the image. Different providers may support different image types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"audio">;
+        /**
+         * The base64-encoded audio data.
+         */
+        data: z.ZodString;
+        /**
+         * The MIME type of the audio. Different providers may support different audio types.
+         */
+        mimeType: z.ZodString;
+    }, z.ZodTypeAny, "passthrough">>, z.ZodObject<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+        type: z.ZodLiteral<"resource">;
+        resource: z.ZodUnion<[z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * The text of the item. This must only be set if the item can actually be represented as text (not binary data).
+             */
+            text: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>, z.ZodObject<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, "passthrough", z.ZodTypeAny, z.objectOutputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">, z.objectInputType<z.objectUtil.extendShape<{
+            /**
+             * The URI of this resource.
+             */
+            uri: z.ZodString;
+            /**
+             * The MIME type of this resource, if known.
+             */
+            mimeType: z.ZodOptional<z.ZodString>;
+        }, {
+            /**
+             * A base64-encoded string representing the binary data of the item.
+             */
+            blob: z.ZodString;
+        }>, z.ZodTypeAny, "passthrough">>]>;
+    }, z.ZodTypeAny, "passthrough">>]>, "many">>;
+    /**
+     * Whether the tool call ended in an error.
+     *
+     * If not set, this is assumed to be false (the call was successful).
+     */
+    isError: z.ZodOptional<z.ZodBoolean>;
+}>, z.ZodTypeAny, "passthrough">>]>, z.ZodObject<z.objectUtil.extendShape<z.objectUtil.extendShape<{
     /**
      * This result property is reserved by the protocol to allow clients and servers to attach additional metadata to their responses.
      */
@@ -22028,13 +25463,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22168,13 +25625,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22308,13 +25787,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22461,13 +25962,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22601,13 +26124,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22741,13 +26286,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -22894,13 +26461,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -23034,13 +26623,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -23174,13 +26785,35 @@ declare const ServerResultSchema: z.ZodUnion<[z.ZodObject<{
         inputSchema: z.ZodObject<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
             type: z.ZodLiteral<"object">;
             properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         }, z.ZodTypeAny, "passthrough">>;
+        /**
+         * An optional JSON Schema object defining the structure of the tool's output.
+         *
+         * If set, a CallToolResult for this Tool MUST contain a structuredContent field whose contents validate against this schema.
+         * If not set, a CallToolResult for this Tool MUST NOT contain a structuredContent field and MUST contain a content field.
+         */
+        outputSchema: z.ZodOptional<z.ZodObject<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, "passthrough", z.ZodTypeAny, z.objectOutputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">, z.objectInputType<{
+            type: z.ZodLiteral<"object">;
+            properties: z.ZodOptional<z.ZodObject<{}, "passthrough", z.ZodTypeAny, z.objectOutputType<{}, z.ZodTypeAny, "passthrough">, z.objectInputType<{}, z.ZodTypeAny, "passthrough">>>;
+            required: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
+        }, z.ZodTypeAny, "passthrough">>>;
         /**
          * Optional additional tool information.
          */
@@ -23686,6 +27319,8 @@ declare class Client<RequestT extends Request = Request, NotificationT extends N
     private _serverVersion?;
     private _capabilities;
     private _instructions?;
+    private _cachedToolOutputValidators;
+    private _ajv;
     /**
      * Initializes this client with the given name and version information.
      */
@@ -24423,12 +28058,153 @@ declare class Client<RequestT extends Request = Request, NotificationT extends N
                 blob: zod.ZodString;
             }>, zod.ZodTypeAny, "passthrough">>]>;
         }, zod.ZodTypeAny, "passthrough">>]>, "many">;
-        isError: zod.ZodOptional<zod.ZodDefault<zod.ZodBoolean>>;
+        structuredContent: zod.ZodOptional<zod.ZodNever>;
+        isError: zod.ZodOptional<zod.ZodBoolean>;
+    }>, zod.ZodTypeAny, "passthrough"> | zod.objectOutputType<zod.objectUtil.extendShape<{
+        _meta: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+    }, {
+        structuredContent: zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>;
+        content: zod.ZodOptional<zod.ZodArray<zod.ZodUnion<[zod.ZodObject<{
+            type: zod.ZodLiteral<"text">;
+            text: zod.ZodString;
+        }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+            type: zod.ZodLiteral<"text">;
+            text: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+            type: zod.ZodLiteral<"text">;
+            text: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<{
+            type: zod.ZodLiteral<"image">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+            type: zod.ZodLiteral<"image">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+            type: zod.ZodLiteral<"image">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<{
+            type: zod.ZodLiteral<"audio">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+            type: zod.ZodLiteral<"audio">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+            type: zod.ZodLiteral<"audio">;
+            data: zod.ZodString;
+            mimeType: zod.ZodString;
+        }, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<{
+            type: zod.ZodLiteral<"resource">;
+            resource: zod.ZodUnion<[zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>]>;
+        }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+            type: zod.ZodLiteral<"resource">;
+            resource: zod.ZodUnion<[zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>]>;
+        }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+            type: zod.ZodLiteral<"resource">;
+            resource: zod.ZodUnion<[zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                text: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>, zod.ZodObject<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, "passthrough", zod.ZodTypeAny, zod.objectOutputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">, zod.objectInputType<zod.objectUtil.extendShape<{
+                uri: zod.ZodString;
+                mimeType: zod.ZodOptional<zod.ZodString>;
+            }, {
+                blob: zod.ZodString;
+            }>, zod.ZodTypeAny, "passthrough">>]>;
+        }, zod.ZodTypeAny, "passthrough">>]>, "many">>;
+        isError: zod.ZodOptional<zod.ZodBoolean>;
     }>, zod.ZodTypeAny, "passthrough"> | zod.objectOutputType<zod.objectUtil.extendShape<{
         _meta: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
     }, {
         toolResult: zod.ZodUnknown;
     }>, zod.ZodTypeAny, "passthrough">>;
+    private cacheToolOutputSchemas;
+    private getToolOutputValidator;
     listTools(params?: ListToolsRequest["params"], options?: RequestOptions): Promise<zod.objectOutputType<zod.objectUtil.extendShape<zod.objectUtil.extendShape<{
         _meta: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
     }, {
@@ -24440,13 +28216,29 @@ declare class Client<RequestT extends Request = Request, NotificationT extends N
             inputSchema: zod.ZodObject<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">>;
+            outputSchema: zod.ZodOptional<zod.ZodObject<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">>>;
             annotations: zod.ZodOptional<zod.ZodObject<{
                 title: zod.ZodOptional<zod.ZodString>;
                 readOnlyHint: zod.ZodOptional<zod.ZodBoolean>;
@@ -24472,13 +28264,29 @@ declare class Client<RequestT extends Request = Request, NotificationT extends N
             inputSchema: zod.ZodObject<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">>;
+            outputSchema: zod.ZodOptional<zod.ZodObject<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">>>;
             annotations: zod.ZodOptional<zod.ZodObject<{
                 title: zod.ZodOptional<zod.ZodString>;
                 readOnlyHint: zod.ZodOptional<zod.ZodBoolean>;
@@ -24504,13 +28312,29 @@ declare class Client<RequestT extends Request = Request, NotificationT extends N
             inputSchema: zod.ZodObject<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
                 type: zod.ZodLiteral<"object">;
                 properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
             }, zod.ZodTypeAny, "passthrough">>;
+            outputSchema: zod.ZodOptional<zod.ZodObject<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{
+                type: zod.ZodLiteral<"object">;
+                properties: zod.ZodOptional<zod.ZodObject<{}, "passthrough", zod.ZodTypeAny, zod.objectOutputType<{}, zod.ZodTypeAny, "passthrough">, zod.objectInputType<{}, zod.ZodTypeAny, "passthrough">>>;
+                required: zod.ZodOptional<zod.ZodArray<zod.ZodString, "many">>;
+            }, zod.ZodTypeAny, "passthrough">>>;
             annotations: zod.ZodOptional<zod.ZodObject<{
                 title: zod.ZodOptional<zod.ZodString>;
                 readOnlyHint: zod.ZodOptional<zod.ZodBoolean>;
@@ -24787,6 +28611,7 @@ declare class McpServer {
      * Registers a resource `name` with a template pattern and metadata, which will use the given callback to respond to read requests.
      */
     resource(name: string, template: ResourceTemplate, metadata: ResourceMetadata, readCallback: ReadResourceTemplateCallback): RegisteredResourceTemplate;
+    private _createRegisteredTool;
     /**
      * Registers a zero-argument tool `name`, which will run the given function when the client calls it.
      */
@@ -24820,6 +28645,15 @@ declare class McpServer {
      * Registers a tool with description, parameter schema, and annotations.
      */
     tool<Args extends ZodRawShape>(name: string, description: string, paramsSchema: Args, annotations: ToolAnnotations, cb: ToolCallback<Args>): RegisteredTool;
+    /**
+     * Registers a tool with a config object and callback.
+     */
+    registerTool<InputArgs extends ZodRawShape, OutputArgs extends ZodRawShape>(name: string, config: {
+        description?: string;
+        inputSchema?: InputArgs;
+        outputSchema?: OutputArgs;
+        annotations?: ToolAnnotations;
+    }, cb: ToolCallback<InputArgs>): RegisteredTool;
     /**
      * Registers a zero-argument prompt `name`, which will run the given function when the client calls it.
      */
@@ -24894,22 +28728,29 @@ declare class ResourceTemplate {
  * Callback for a tool handler registered with Server.tool().
  *
  * Parameters will include tool arguments, if applicable, as well as other request handler context.
+ *
+ * The callback should return:
+ * - `structuredContent` if the tool has an outputSchema defined
+ * - `content` if the tool does not have an outputSchema
+ * - Both fields are optional but typically one should be provided
  */
 type ToolCallback<Args extends undefined | ZodRawShape = undefined> = Args extends ZodRawShape ? (args: z.objectOutputType<Args, ZodTypeAny>, extra: RequestHandlerExtra<ServerRequest, ServerNotification>) => CallToolResult | Promise<CallToolResult> : (extra: RequestHandlerExtra<ServerRequest, ServerNotification>) => CallToolResult | Promise<CallToolResult>;
 type RegisteredTool = {
     description?: string;
     inputSchema?: AnyZodObject;
+    outputSchema?: AnyZodObject;
     annotations?: ToolAnnotations;
     callback: ToolCallback<undefined | ZodRawShape>;
     enabled: boolean;
     enable(): void;
     disable(): void;
-    update<Args extends ZodRawShape>(updates: {
+    update<InputArgs extends ZodRawShape, OutputArgs extends ZodRawShape>(updates: {
         name?: string | null;
         description?: string;
-        paramsSchema?: Args;
-        callback?: ToolCallback<Args>;
+        paramsSchema?: InputArgs;
+        outputSchema?: OutputArgs;
         annotations?: ToolAnnotations;
+        callback?: ToolCallback<InputArgs>;
         enabled?: boolean;
     }): void;
     remove(): void;
@@ -25077,6 +28918,11 @@ declare function startTerminalSession(config?: GestellTerminalConfig): Promise<{
 }>;
 
 /**
+ * Type used to display every supported PII/PHI label in {@link PII_IDENTIFIER_OPTIONS}.
+ */
+type PiiIdentifierOption = /** Full individual name, e.g., "John Doe". */ 'Name' | /** Location-related data such as addresses or coordinates. */ 'Geographic Data' | /** Dates including birth, death, admission, discharge, etc. */ 'Dates' | /** Telephone numbers, mobile or landline. */ 'Phone Number' | /** Fax numbers for document transmission. */ 'Fax Number' | /** Email addresses used for personal or professional contact. */ 'Email Address' | /** Government-issued Social Security Number. */ 'Social Security Number' | /** Unique medical record identifier assigned by healthcare providers. */ 'Medical Record Number' | /** Identifier for health plan beneficiaries. */ 'Health Plan Beneficiary Number' | /** Financial account numbers like bank or credit accounts. */ 'Account Number' | /** Licenses or certificates, e.g., driver's license, professional license. */ 'Certificate/License Number' | /** Vehicle identification number or related vehicle data. */ 'Vehicle Identifier' | /** Devices or equipment identifiers, e.g., serial numbers. */ 'Device Identifier' | /** Web addresses and URLs. */ 'Web URL' | /** Internet Protocol addresses, e.g., IPv4 or IPv6. */ 'IP Address' | /** Biometric data like fingerprints, retinal scans, voiceprints. */ 'Biometric Identifier' | /** Photograph capturing a person's full face. */ 'Full-face Photograph' | /** System-generated unique codes for identifying entities. */ 'Unique Identifier Code';
+
+/**
  * Core Collection schema: defines essential metadata for a collection, including a human-readable name, classification type, optional tags, detailed description, and high-level instructions for data ingestion, graph construction, prompt formatting, and search key prioritization.
  */
 declare const CollectionCoreSchema: {
@@ -25088,13 +28934,21 @@ declare const CollectionCoreSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**
@@ -25152,13 +29006,21 @@ declare const CollectionCreateSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**
@@ -25247,14 +29109,21 @@ declare const CollectionCreateSchema: {
          * Example: “Split each invoice into header and line-item records, map invoice_date to ISO format.”
          */
         instructions: z.ZodString;
+        /**
+         * Whether this category should be indexed as a single entry.
+         *
+         */
+        singleEntry: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: "content" | "features" | "concepts" | "table";
         instructions: string;
+        singleEntry: boolean;
     }, {
         name: string;
         type: "content" | "features" | "concepts" | "table";
         instructions: string;
+        singleEntry?: boolean | undefined;
     }>, "many">>>;
 };
 /**
@@ -25269,13 +29138,21 @@ declare const CollectionUpdateSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**
@@ -25531,7 +29408,7 @@ declare const ExportFeaturesRequestSchema: {
      * The export format.
      * Allowed values: "json" or "csv".
      */
-    type: z.ZodEnum<["json", "csv"]>;
+    format: z.ZodEnum<["json", "csv"]>;
     /**
      * The ID of the collection to query.
      * Must be a valid UUID.
@@ -25543,6 +29420,25 @@ declare const ExportFeaturesRequestSchema: {
      */
     categoryId: z.ZodString;
 };
+/**
+ * Request interface for querying features with optional pagination.
+ */
+interface FeaturesQueryRequest {
+    /** The ID of the collection to query. Must be a valid UUID. */
+    collectionId: string;
+    /** The ID of the category whose features are being requested. Must be a valid UUID. */
+    categoryId: string;
+    /**
+     * An optional parameter to limit the number of results returned (for pagination).
+     * Must be an integer ≥ 1.
+     */
+    take?: number;
+    /**
+     * An optional parameter to skip a specified number of results (for pagination).
+     * Must be an integer ≥ 0.
+     */
+    skip?: number;
+}
 
 /**
  * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
@@ -25808,6 +29704,11 @@ declare const TablesQueryRequestSchema: {
      */
     take: z.ZodOptional<z.ZodNumber>;
     /**
+     * The prompt to use to filter the table.
+     * Must be a non-empty string if provided.
+     */
+    prompt: z.ZodOptional<z.ZodString>;
+    /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.
      */
@@ -25826,7 +29727,7 @@ declare const ExportTableRequestSchema: {
      * Desired export format.
      * Must be either "json" or "csv".
      */
-    type: z.ZodEnum<["json", "csv"]>;
+    format: z.ZodEnum<["json", "csv"]>;
     /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.
@@ -25856,4 +29757,4 @@ interface GestellToolOutput {
 }
 
 export { CollectionCoreSchema, CollectionCreateSchema, CollectionUpdateSchema, DeleteDocumentRequestSchema, DocumentCoreSchema, ExportDocumentRequestSchema, ExportFeaturesRequestSchema, ExportTableRequestSchema, FeaturesCoreSchema, FeaturesQueryRequestSchema, GestellCoreSearchSchema, GestellPromptSchema, GestellSearchSchema, GetCollectionRequestSchema, GetCollectionsRequestSchema, GetDocumentRequestSchema, GetDocumentsRequestSchema, JobStatusSchema, ReprocessDocumentsRequestSchema, TablesCoreSchema, TablesQueryRequestSchema, UpdateDocumentRequestSchema, UploadDocumentRequestSchema, buildMcpServer, runTool, startRemoteServer, startTerminalClient, startTerminalSession };
-export type { GestellToolOutput, JobStatusType };
+export type { FeaturesQueryRequest, GestellToolOutput, JobStatusType };

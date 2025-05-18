@@ -1,0 +1,105 @@
+{
+  "$ref": "#/definitions/search.prompt",
+  "definitions": {
+    "search.prompt": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The ID of the collection to query (UUID)"
+        },
+        "categoryId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Optional category ID to filter results (UUID)"
+        },
+        "prompt": {
+          "type": "string",
+          "description": "The prompt or query to execute"
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "fast",
+            "normal",
+            "precise"
+          ],
+          "default": "normal",
+          "description": "The search method to use"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "keywords",
+            "phrase",
+            "summary"
+          ],
+          "default": "phrase",
+          "description": "The type of search to perform"
+        },
+        "vectorDepth": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "Depth of vector search"
+        },
+        "nodeDepth": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "Depth of node search"
+        },
+        "maxQueries": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "Maximum number of queries to run"
+        },
+        "maxResults": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "Maximum number of results to return"
+        },
+        "template": {
+          "type": "string",
+          "description": "Optional system template to use for the prompt, overrides the existing prompt instructions for the collections"
+        },
+        "cot": {
+          "type": "boolean",
+          "default": true,
+          "description": "Flag to enable chain-of-thought reasoning"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "system",
+                  "user",
+                  "model"
+                ]
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "role",
+              "content"
+            ],
+            "additionalProperties": false
+          },
+          "default": [],
+          "description": "Chat history messages for context"
+        }
+      },
+      "required": [
+        "collectionId",
+        "prompt"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
