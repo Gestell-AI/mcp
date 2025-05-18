@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.0.1
+
+- Fix cli build output, windows compatibility
+
 ## 1.0.0
 
 - CircleCI Integration

@@ -1,20 +1,22 @@
 # Gestell MCP SDK
 
 ![license](https://img.shields.io/badge/license-MIT-blue)
-![version](https://img.shields.io/badge/version-1.0.0-blue)
+![version](https://img.shields.io/badge/version-1.0.1-blue)
 [![CircleCI](https://dl.circleci.com/status-badge/img/circleci/7sUmZuDYQ6cd8WbCiCCnfR/HhgpL3FetZmz1eVLbATvDe/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/circleci/7sUmZuDYQ6cd8WbCiCCnfR/HhgpL3FetZmz1eVLbATvDe/tree/master)
 
 A full featured MCP SDK for Gestell with multiple modalities.
 
 Make sure to grab your API Key for Gestell [here](https://platform.gestell.ai).
 
-- Review the [Development Guide](./docs/DEV.md) here.
+- **[Windsurf and Cursor Vibe Code Guide](./docs/VIBE.md)**
 
-- Review the [MCP Tool Spec](./docs/SPEC.md) here.
+- **[Windows Setup Guide](./docs/WINDOWS.md)**
 
-- Review the [Cursor and Windsurf Vibe Guide](./docs/VIBE.md) here.
+- **[Development Guide](./docs/DEV.md)**
 
-- Review [comprehensive demo workflows on usage and development here](./docs/demos).
+- **[MCP Tool Spec](./docs/SPEC.md)**
+
+- **[Development Workflows](./docs/demos)**
 
 ## Windsurf Quick Start
 
@@ -72,4 +74,4 @@ gestell-mcp
 
 ---
 
-- Review the [CHANGELOG](./docs/CHANGELOG.md) to keep up to date on all changes.
+- Review the **[CHANGELOG](./docs/CHANGELOG.md)** to keep up to date on all changes.

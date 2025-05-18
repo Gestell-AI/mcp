@@ -17,7 +17,7 @@ export default async function startTerminalClient(
     args: [entrypoint]
   })
 
-  const client = new Client({ name: 'Gestell Client', version: '1.0.0' })
+  const client = new Client({ name: 'Gestell Client', version: '1.0.1' })
   await client.connect(transport)
   return client
 }
