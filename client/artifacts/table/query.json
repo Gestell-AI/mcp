@@ -1,0 +1,41 @@
+{
+  "$ref": "#/definitions/table.query",
+  "definitions": {
+    "table.query": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection to query."
+        },
+        "categoryId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the category whose table data is being requested."
+        },
+        "skip": {
+          "type": "number",
+          "minimum": 0,
+          "description": "An optional parameter to skip a specified number of results (for pagination); must be at least 0."
+        },
+        "take": {
+          "type": "number",
+          "minimum": 1,
+          "description": "An optional parameter to limit the number of results returned (for pagination); must be at least 1."
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The prompt to use to filter the table"
+        }
+      },
+      "required": [
+        "collectionId",
+        "categoryId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

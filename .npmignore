@@ -1,13 +1,16 @@
 node_modules
-workflow
 .DS_Store
 *.tgz
 
 .vscode
 .env
-.env.sample
 bun.lock
 eslint.config.ts
 tsconfig.json
-tsconfig.build.json
-rollup.config.js
+
+docs
+compile
+
+tool
+server
+client

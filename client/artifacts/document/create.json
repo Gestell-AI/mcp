@@ -1,0 +1,51 @@
+{
+  "$ref": "#/definitions/document.create",
+  "definitions": {
+    "document.create": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection associated with the document operation."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of the document. Must not be empty."
+        },
+        "type": {
+          "type": "string",
+          "description": "Optional MIME type of the document (e.g., \"application/pdf\")."
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The path to the file to upload. Must be a non-empty string representing a valid file path."
+        },
+        "instructions": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional additional instructions for processing the document. If provided, must not be empty."
+        },
+        "job": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to dispatch a processing job. Defaults to true. Set to false to skip."
+        },
+        "tables": {
+          "type": "boolean",
+          "description": "Flag to perform additional table processing and analysis on the document."
+        }
+      },
+      "required": [
+        "collectionId",
+        "name",
+        "file",
+        "tables"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

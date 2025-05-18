@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "createCollection" tool on the MCP server.
+ * Registers the "collection.create" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,7 @@ export function registerCollectionCreateTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'createCollection',
+    'collection.create',
     CollectionCreateSchema,
     async ({
       organizationId,
@@ -21,6 +21,8 @@ export function registerCollectionCreateTool(
       type,
       tags,
       description,
+      pii,
+      piiControls,
       instructions,
       graphInstructions,
       promptInstructions,
@@ -33,6 +35,8 @@ export function registerCollectionCreateTool(
         type,
         tags,
         description,
+        pii,
+        piiControls,
         instructions,
         graphInstructions,
         promptInstructions,

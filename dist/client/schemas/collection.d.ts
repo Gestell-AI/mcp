@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { PiiIdentifierOption } from '@gestell/sdk/types';
 /**
  * Core Collection schema: defines essential metadata for a collection, including a human-readable name, classification type, optional tags, detailed description, and high-level instructions for data ingestion, graph construction, prompt formatting, and search key prioritization.
  */
@@ -11,13 +12,21 @@ export declare const CollectionCoreSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**
@@ -75,13 +84,21 @@ export declare const CollectionCreateSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**
@@ -170,14 +187,21 @@ export declare const CollectionCreateSchema: {
          * Example: “Split each invoice into header and line-item records, map invoice_date to ISO format.”
          */
         instructions: z.ZodString;
+        /**
+         * Whether this category should be indexed as a single entry.
+         *
+         */
+        singleEntry: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
         name: string;
         type: "content" | "features" | "concepts" | "table";
         instructions: string;
+        singleEntry: boolean;
     }, {
         name: string;
         type: "content" | "features" | "concepts" | "table";
         instructions: string;
+        singleEntry?: boolean | undefined;
     }>, "many">>>;
 };
 /**
@@ -192,13 +216,21 @@ export declare const CollectionUpdateSchema: {
      */
     name: z.ZodString;
     /**
+     * Indicates if this collection contains Personally Identifiable Information (PII).
+     * When true, enables additional privacy controls and auditing.
+     */
+    pii: z.ZodDefault<z.ZodBoolean>;
+    /**
+     * Array of PII controls for this collection.
+     * These identifiers specify what types of PII to look for and handle.
+     */
+    piiControls: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodEnum<[PiiIdentifierOption, ...PiiIdentifierOption[]]>, "many">>>;
+    /**
      * Specifies the classification of this collection.
-     * Allowed values:
-     *   • frame – Ephemeral datasets for one-off or streaming use cases
-     *   • searchable-frame – Optimized for search queries over recent or moving data
-     *   • canon – Default, general-purpose collection for long-term storage and retrieval
-     *   • features – For storing precomputed feature vectors or embeddings
-     * Defaults to `canon`.
+     * - frame: When you only want the OCR outputs
+     * - searchable-frame: Lighter version of canonized collections for search-based reasoning
+     * - canon: Complete canonized collection with best search-based reasoning capabilities
+     * - features: Specialized collection for category extractions of content
      */
     type: z.ZodDefault<z.ZodEnum<["frame", "searchable-frame", "canon", "features"]>>;
     /**

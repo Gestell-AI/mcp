@@ -1,0 +1,26 @@
+{
+  "$ref": "#/definitions/document.delete",
+  "definitions": {
+    "document.delete": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection associated with the document operation."
+        },
+        "documentId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the document to delete."
+        }
+      },
+      "required": [
+        "collectionId",
+        "documentId"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

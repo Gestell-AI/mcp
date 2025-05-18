@@ -29,6 +29,11 @@ export declare const TablesQueryRequestSchema: {
      */
     take: z.ZodOptional<z.ZodNumber>;
     /**
+     * The prompt to use to filter the table.
+     * Must be a non-empty string if provided.
+     */
+    prompt: z.ZodOptional<z.ZodString>;
+    /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.
      */
@@ -47,7 +52,7 @@ export declare const ExportTableRequestSchema: {
      * Desired export format.
      * Must be either "json" or "csv".
      */
-    type: z.ZodEnum<["json", "csv"]>;
+    format: z.ZodEnum<["json", "csv"]>;
     /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.

@@ -51,7 +51,17 @@ export const TablesQueryRequestSchema = {
     .optional()
     .describe(
       'An optional parameter to limit the number of results returned (for pagination); must be at least 1.'
-    )
+    ),
+
+  /**
+   * The prompt to use to filter the table.
+   * Must be a non-empty string if provided.
+   */
+  prompt: z
+    .string()
+    .min(1)
+    .optional()
+    .describe('The prompt to use to filter the table')
 }
 
 /**
@@ -64,5 +74,7 @@ export const ExportTableRequestSchema = {
    * Desired export format.
    * Must be either "json" or "csv".
    */
-  type: z.enum(['json', 'csv']).describe('The export format: "json" or "csv".')
+  format: z
+    .enum(['json', 'csv'])
+    .describe('The export format: "json" or "csv".')
 }

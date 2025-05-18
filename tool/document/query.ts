@@ -6,7 +6,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "getDocument" and "listDocuments" tools on the MCP server.
+ * Registers the "document.get" and "document.list" tools on the MCP server.
  *
  * @param server - MCP server instance to register the tools on.
  * @param gestell - Gestell SDK instance.
@@ -16,7 +16,7 @@ export function registerDocumentQueryTools(
   gestell: Gestell
 ): void {
   server.tool(
-    'getDocument',
+    'document.get',
     GetDocumentRequestSchema,
     async ({ collectionId, documentId }) => {
       const result = await gestell.document.get({ collectionId, documentId })
@@ -31,7 +31,7 @@ export function registerDocumentQueryTools(
     }
   )
 
-  server.tool('listDocuments', GetDocumentsRequestSchema, async (payload) => {
+  server.tool('document.list', GetDocumentsRequestSchema, async (payload) => {
     const results = await gestell.document.list(payload)
     return {
       content: [

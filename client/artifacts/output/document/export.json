@@ -1,0 +1,192 @@
+{
+  "$ref": "#/definitions/document.export",
+  "definitions": {
+    "document.export": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ]
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "title"
+                  },
+                  {
+                    "type": "string",
+                    "const": "subtitle"
+                  },
+                  {
+                    "type": "string",
+                    "const": "list"
+                  },
+                  {
+                    "type": "string",
+                    "const": "text"
+                  },
+                  {
+                    "type": "string",
+                    "const": "table"
+                  },
+                  {
+                    "type": "string",
+                    "const": "image"
+                  },
+                  {
+                    "type": "string",
+                    "const": "csv"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "content": {
+                "type": "string"
+              },
+              "index": {
+                "type": "number"
+              },
+              "page": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "position",
+              "type",
+              "content",
+              "index",
+              "page"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "start": {
+                "type": "string"
+              },
+              "end": {
+                "type": "string"
+              },
+              "narrator": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "index",
+              "start",
+              "end",
+              "narrator",
+              "description",
+              "content"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "$ref": "#/definitions/document.export/anyOf/0/items/properties/position"
+              },
+              "description": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "position",
+              "description",
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number"
+              },
+              "start": {
+                "type": "string"
+              },
+              "end": {
+                "type": "string"
+              },
+              "audio": {
+                "type": "string"
+              },
+              "narration": {
+                "type": "string"
+              },
+              "narrator": {
+                "type": "string"
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/document.export/anyOf/2/items"
+                }
+              }
+            },
+            "required": [
+              "index",
+              "start",
+              "end",
+              "audio",
+              "narration",
+              "narrator",
+              "objects"
+            ],
+            "additionalProperties": false
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

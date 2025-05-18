@@ -1,0 +1,397 @@
+{
+  "$ref": "#/definitions/document.list",
+  "definitions": {
+    "document.list": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "ERROR"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "result": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "collectionId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "layoutType": {
+                "type": "string",
+                "enum": [
+                  "document",
+                  "photo",
+                  "audio",
+                  "video"
+                ]
+              },
+              "layoutNodes": {
+                "type": "number"
+              },
+              "tables": {
+                "type": "boolean"
+              },
+              "instructions": {
+                "type": "string"
+              },
+              "job": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "collectionId": {
+                    "type": "string"
+                  },
+                  "documentId": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "processing",
+                      "error",
+                      "ready",
+                      "cancelled",
+                      "unprocessed",
+                      "partial",
+                      "all"
+                    ]
+                  },
+                  "nodes": {
+                    "$ref": "#/definitions/document.list/properties/result/items/properties/job/properties/status"
+                  },
+                  "edges": {
+                    "$ref": "#/definitions/document.list/properties/result/items/properties/job/properties/status"
+                  },
+                  "vectors": {
+                    "$ref": "#/definitions/document.list/properties/result/items/properties/job/properties/status"
+                  },
+                  "category": {
+                    "$ref": "#/definitions/document.list/properties/result/items/properties/job/properties/status"
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "document": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "collectionId": {
+                        "type": "string"
+                      },
+                      "dateCreated": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "dateUpdated": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "layoutType": {
+                        "$ref": "#/definitions/document.list/properties/result/items/properties/layoutType"
+                      },
+                      "layoutNodes": {
+                        "type": "number"
+                      },
+                      "instructions": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "collectionId",
+                      "dateCreated",
+                      "dateUpdated",
+                      "name",
+                      "type",
+                      "layoutType",
+                      "layoutNodes",
+                      "instructions"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "dateCreated": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "dateUpdated": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "id",
+                  "collectionId",
+                  "documentId",
+                  "status",
+                  "nodes",
+                  "edges",
+                  "vectors",
+                  "category",
+                  "message",
+                  "dateCreated",
+                  "dateUpdated"
+                ],
+                "additionalProperties": false
+              },
+              "layout": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "position": {
+                          "type": "array",
+                          "minItems": 4,
+                          "maxItems": 4,
+                          "items": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "number"
+                            }
+                          ]
+                        },
+                        "type": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "const": "title"
+                            },
+                            {
+                              "type": "string",
+                              "const": "subtitle"
+                            },
+                            {
+                              "type": "string",
+                              "const": "list"
+                            },
+                            {
+                              "type": "string",
+                              "const": "text"
+                            },
+                            {
+                              "type": "string",
+                              "const": "table"
+                            },
+                            {
+                              "type": "string",
+                              "const": "image"
+                            },
+                            {
+                              "type": "string",
+                              "const": "csv"
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "content": {
+                          "type": "string"
+                        },
+                        "index": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "position",
+                        "type",
+                        "content",
+                        "index",
+                        "page"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "position": {
+                          "$ref": "#/definitions/document.list/properties/result/items/properties/layout/anyOf/0/items/properties/position"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "position",
+                        "description",
+                        "type"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "number"
+                        },
+                        "start": {
+                          "type": "string"
+                        },
+                        "end": {
+                          "type": "string"
+                        },
+                        "audio": {
+                          "type": "string"
+                        },
+                        "narration": {
+                          "type": "string"
+                        },
+                        "narrator": {
+                          "type": "string"
+                        },
+                        "objects": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/definitions/document.list/properties/result/items/properties/layout/anyOf/1/items"
+                          }
+                        }
+                      },
+                      "required": [
+                        "index",
+                        "start",
+                        "end",
+                        "audio",
+                        "narration",
+                        "narrator",
+                        "objects"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "index": {
+                          "type": "number"
+                        },
+                        "start": {
+                          "type": "string"
+                        },
+                        "end": {
+                          "type": "string"
+                        },
+                        "narrator": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "content": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "index",
+                        "start",
+                        "end",
+                        "narrator",
+                        "description",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                ]
+              },
+              "metadata": {
+                "type": "object",
+                "properties": {
+                  "size": {
+                    "type": "number"
+                  },
+                  "pages": {
+                    "type": "number"
+                  },
+                  "length": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "size",
+                  "pages",
+                  "length"
+                ],
+                "additionalProperties": false
+              },
+              "dateCreated": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "dateUpdated": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "collectionId",
+              "name",
+              "type",
+              "layoutType",
+              "layoutNodes",
+              "tables",
+              "instructions",
+              "dateCreated",
+              "dateUpdated"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "status",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}
