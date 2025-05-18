@@ -1,0 +1,50 @@
+{
+  "$ref": "#/definitions/document.upload",
+  "definitions": {
+    "document.upload": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The UUID of the collection associated with the document operation."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., \".pdf\")."
+        },
+        "type": {
+          "type": "string",
+          "description": "Optional MIME type of the document (e.g., \"application/pdf\")."
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine"
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string."
+        },
+        "job": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to dispatch a processing job. Defaults to true. Set to false to skip processing."
+        },
+        "tables": {
+          "type": "boolean",
+          "description": "Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data."
+        }
+      },
+      "required": [
+        "collectionId",
+        "name",
+        "file",
+        "tables"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

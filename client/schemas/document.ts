@@ -19,11 +19,13 @@ export const DocumentCoreSchema = {
 export const UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
 
-  /** The name of the document. Must not be empty. */
+  /** The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
   name: z
     .string()
     .min(1)
-    .describe('The name of the document. Must not be empty.'),
+    .describe(
+      'The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'
+    ),
 
   /** Optional MIME type of the document (e.g., 'application/pdf'). */
   type: z
@@ -31,21 +33,20 @@ export const UploadDocumentRequestSchema = {
     .optional()
     .describe('Optional MIME type of the document (e.g., "application/pdf").'),
 
-  /** The path to the file to upload. Must be a non-empty string representing a valid file path. */
+  /** The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine. */
   file: z
     .string()
     .min(1)
     .describe(
-      'The path to the file to upload. Must be a non-empty string representing a valid file path.'
+      'The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine'
     ),
 
-  /** Optional additional instructions for processing the document. If provided, must not be empty. */
+  /** Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string. */
   instructions: z
     .string()
-    .min(1)
     .optional()
     .describe(
-      'Optional additional instructions for processing the document. If provided, must not be empty.'
+      'Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string.'
     ),
 
   /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
@@ -54,14 +55,14 @@ export const UploadDocumentRequestSchema = {
     .optional()
     .default(true)
     .describe(
-      'Whether to dispatch a processing job. Defaults to true. Set to false to skip.'
+      'Whether to dispatch a processing job. Defaults to true. Set to false to skip processing.'
     ),
 
-  /** Flag to perform additional table processing and analysis on the document. */
+  /** Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data. */
   tables: z
     .boolean()
     .describe(
-      'Flag to perform additional table processing and analysis on the document.'
+      'Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.'
     )
 }
 
@@ -74,13 +75,13 @@ export const UpdateDocumentRequestSchema = {
   /** The UUID of the document to update. */
   documentId: z.string().uuid().describe('The UUID of the document to update.'),
 
-  /** The updated name of the document. If provided, must not be empty. */
+  /** The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
   name: z
     .string()
     .min(1)
     .optional()
     .describe(
-      'The updated name of the document. If provided, must not be empty.'
+      'The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'
     ),
 
   /** Updated instructions related to the document. If provided, must not be empty. */
@@ -92,13 +93,13 @@ export const UpdateDocumentRequestSchema = {
       'Updated instructions related to the document. If provided, must not be empty.'
     ),
 
-  /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch. */
+  /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job. */
   job: z
     .boolean()
     .optional()
     .default(false)
     .describe(
-      'Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch.'
+      'Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job.'
     ),
 
   /** Flag to perform additional table processing and analysis on the document. */
@@ -106,7 +107,7 @@ export const UpdateDocumentRequestSchema = {
     .boolean()
     .optional()
     .describe(
-      'Flag to perform additional table processing and analysis on the document.'
+      'Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.'
     )
 }
 
@@ -131,11 +132,11 @@ export const ReprocessDocumentsRequestSchema = {
     .array(z.string().uuid())
     .describe('An array of UUIDs of the documents to reprocess.'),
 
-  /** The type of job to dispatch reprocessing for. */
+  /** The type of job to dispatch reprocessing for. Default to "status" to do a full reprocessing job. */
   type: z
     .enum(['status', 'nodes', 'vectors', 'edges', 'category'])
     .describe(
-      'The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category").'
+      'The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category"). Default to status to do a full reprocessing job.'
     )
 }
 

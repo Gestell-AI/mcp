@@ -71854,7 +71854,7 @@ var CollectionCoreSchema = {
   name: z.string().min(1, { message: "Collection name cannot be empty." }).describe('A concise, human-readable name for the collection (≤50 chars; Title Case; no special symbols). Example: "Sales Reports Q2 2025".'),
   pii: z.boolean().default(false).describe("Indicates if this collection contains Personally Identifiable Information (PII)."),
   piiControls: z.array(z.enum(import_types5.PII_IDENTIFIER_OPTIONS)).optional().default([]).describe("Array of PII control identifiers for this collection."),
-  type: z.enum(["frame", "searchable-frame", "canon", "features"]).default("canon").describe('Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'),
+  type: z.enum(["frame", "searchable-frame", "canon", "features"]).default("canon").describe('Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); Always default to "canon" unless directed otherwise by the user.'),
   tags: z.array(z.string().min(1), {
     invalid_type_error: "Each tag must be a non‐empty string."
   }).optional().describe('Array of short keyword tags (single words, no spaces). Example: ["finance","Q2","internal"].'),
@@ -71872,9 +71872,9 @@ var CollectionCreateSchema = {
   categories: z.array(z.object({
     name: z.string().describe('Human-readable category name, e.g. "Invoices", "Products".'),
     type: z.enum(["concepts", "features", "content", "table"]).describe('The data model for this category: "concepts", "features", "content", or "table".'),
-    instructions: z.string().describe("Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings)."),
-    singleEntry: z.boolean().optional().default(false).describe("If true, this category will be indexed as a single entry.")
-  })).optional().default([]).describe("List of zero or more categories for sub-indexing. Leave as [] if you do not need additional facets."),
+    instructions: z.string().describe("Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings). For features describe what needs to be extracted from the document. For tables, clearly describe each column and what the column is extracting."),
+    singleEntry: z.boolean().optional().default(false).describe("If true, this category will only create one entry per document.")
+  })).optional().default([]).describe("List of categories for indexing. Leave as [] unless the user specifies they need additional indexing via categories. Avoid concepts and content unless specified and prioritize indexing via features and table."),
   ...CollectionCoreSchema
 };
 var CollectionUpdateSchema = {
@@ -71897,20 +71897,20 @@ var DocumentCoreSchema = {
 };
 var UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  name: z.string().min(1).describe("The name of the document. Must not be empty."),
+  name: z.string().min(1).describe('The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
   type: z.string().optional().describe('Optional MIME type of the document (e.g., "application/pdf").'),
-  file: z.string().min(1).describe("The path to the file to upload. Must be a non-empty string representing a valid file path."),
-  instructions: z.string().min(1).optional().describe("Optional additional instructions for processing the document. If provided, must not be empty."),
-  job: z.boolean().optional().default(true).describe("Whether to dispatch a processing job. Defaults to true. Set to false to skip."),
-  tables: z.boolean().describe("Flag to perform additional table processing and analysis on the document.")
+  file: z.string().min(1).describe("The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine"),
+  instructions: z.string().optional().describe("Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string."),
+  job: z.boolean().optional().default(true).describe("Whether to dispatch a processing job. Defaults to true. Set to false to skip processing."),
+  tables: z.boolean().describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
 };
 var UpdateDocumentRequestSchema = {
   ...DocumentCoreSchema,
   documentId: z.string().uuid().describe("The UUID of the document to update."),
-  name: z.string().min(1).optional().describe("The updated name of the document. If provided, must not be empty."),
+  name: z.string().min(1).optional().describe('The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
   instructions: z.string().min(1).optional().describe("Updated instructions related to the document. If provided, must not be empty."),
-  job: z.boolean().optional().default(false).describe("Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch."),
-  tables: z.boolean().optional().describe("Flag to perform additional table processing and analysis on the document.")
+  job: z.boolean().optional().default(false).describe("Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job."),
+  tables: z.boolean().optional().describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
 };
 var DeleteDocumentRequestSchema = {
   ...DocumentCoreSchema,
@@ -71919,7 +71919,7 @@ var DeleteDocumentRequestSchema = {
 var ReprocessDocumentsRequestSchema = {
   ...DocumentCoreSchema,
   ids: z.array(z.string().uuid()).describe("An array of UUIDs of the documents to reprocess."),
-  type: z.enum(["status", "nodes", "vectors", "edges", "category"]).describe('The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category").')
+  type: z.enum(["status", "nodes", "vectors", "edges", "category"]).describe('The type of the job to dispatch reprocessing for ("status", "nodes", "vectors", "edges", "category"). Default to status to do a full reprocessing job.')
 };
 var ExportDocumentRequestSchema = {
   ...DocumentCoreSchema,
@@ -71964,6 +71964,16 @@ var FeaturesQueryRequestSchema = {
 var ExportFeaturesRequestSchema = {
   ...FeaturesCoreSchema,
   format: z.enum(["json", "csv"]).describe('The export format: "json" or "csv".')
+};
+// client/schemas/organization.ts
+var GetOrganizationRequestSchema = {
+  organizationId: z.string().uuid().describe("Unique identifier for the organization")
+};
+var GetOrganizationsRequestSchema = {
+  search: z.string().optional().describe("Search term to filter organizations by name"),
+  take: z.number().int().positive().default(10).describe("Maximum number of organizations to return per page"),
+  skip: z.number().int().min(0).default(0).describe("Number of organizations to skip for pagination"),
+  extended: z.boolean().default(false).describe("Include extended organization details in the response")
 };
 // client/schemas/search.ts
 var GestellCoreSearchSchema = {
@@ -72220,7 +72230,7 @@ function registerUpdateDocumentTool(server, gestell) {
 
 // tool/document/upload.ts
 function registerUploadDocumentTool(server, gestell) {
-  server.tool("document.upload", "Upload and create a document in a collection", UploadDocumentRequestSchema, async ({ collectionId, name, type, file, instructions, job, tables }) => {
+  server.tool("uploadDocument", "Upload and create a document in a collection", UploadDocumentRequestSchema, async ({ collectionId, name, type, file, instructions, job, tables }) => {
     const result = await gestell.document.upload({
       collectionId,
       name,
@@ -72309,6 +72319,32 @@ function registerExportTableTool(server, gestell) {
         {
           type: "text",
           text: JSON.stringify(result)
+        }
+      ]
+    };
+  });
+}
+
+// tool/organization/query.ts
+function registerOrganizationQueryTools(server, gestell) {
+  server.tool("getOrganization", "Get an organization by its UUID", GetOrganizationRequestSchema, async ({ organizationId }) => {
+    const result = await gestell.organization.get(organizationId);
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(result)
+        }
+      ]
+    };
+  });
+  server.tool("listOrganizations", "List all organizations you are a member of", GetOrganizationsRequestSchema, async (payload) => {
+    const results = await gestell.organization.list(payload);
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(results)
         }
       ]
     };
@@ -72409,6 +72445,7 @@ function buildMcpServer(key = process.env.GESTELL_API_KEY || "") {
   const server = new McpServer({ name: "Gestell", version: "1.0.0" });
   registerCollectionSearchTool(server, gestell);
   registerCollectionPromptTool(server, gestell);
+  registerOrganizationQueryTools(server, gestell);
   registerCollectionQueryTools(server, gestell);
   registerCollectionCreateTool(server, gestell);
   registerCollectionUpdateTool(server, gestell);

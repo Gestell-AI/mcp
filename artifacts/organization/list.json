@@ -1,0 +1,33 @@
+{
+  "$ref": "#/definitions/organization.list",
+  "definitions": {
+    "organization.list": {
+      "type": "object",
+      "properties": {
+        "search": {
+          "type": "string",
+          "description": "Search term to filter organizations by name"
+        },
+        "take": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "default": 10,
+          "description": "Maximum number of organizations to return per page"
+        },
+        "skip": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Number of organizations to skip for pagination"
+        },
+        "extended": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include extended organization details in the response"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

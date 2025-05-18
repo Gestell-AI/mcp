@@ -188,8 +188,7 @@ export declare const CollectionCreateSchema: {
          */
         instructions: z.ZodString;
         /**
-         * Whether this category should be indexed as a single entry.
-         *
+         * If true, this category will only create one entry per document.
          */
         singleEntry: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {

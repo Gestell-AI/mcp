@@ -29110,8 +29110,7 @@ declare const CollectionCreateSchema: {
          */
         instructions: z.ZodString;
         /**
-         * Whether this category should be indexed as a single entry.
-         *
+         * If true, this category will only create one entry per document.
          */
         singleEntry: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     }, "strip", z.ZodTypeAny, {
@@ -29257,17 +29256,17 @@ declare const DocumentCoreSchema: {
  * Request schema for uploading a document, including the target collection UUID, document name, optional MIME type, file path, processing instructions, dispatch job flag, and table-processing flag.
  */
 declare const UploadDocumentRequestSchema: {
-    /** The name of the document. Must not be empty. */
+    /** The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
     name: z.ZodString;
     /** Optional MIME type of the document (e.g., 'application/pdf'). */
     type: z.ZodOptional<z.ZodString>;
-    /** The path to the file to upload. Must be a non-empty string representing a valid file path. */
+    /** The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine. */
     file: z.ZodString;
-    /** Optional additional instructions for processing the document. If provided, must not be empty. */
+    /** Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string. */
     instructions: z.ZodOptional<z.ZodString>;
     /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
-    /** Flag to perform additional table processing and analysis on the document. */
+    /** Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data. */
     tables: z.ZodBoolean;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
@@ -29278,11 +29277,11 @@ declare const UploadDocumentRequestSchema: {
 declare const UpdateDocumentRequestSchema: {
     /** The UUID of the document to update. */
     documentId: z.ZodString;
-    /** The updated name of the document. If provided, must not be empty. */
+    /** The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
     name: z.ZodOptional<z.ZodString>;
     /** Updated instructions related to the document. If provided, must not be empty. */
     instructions: z.ZodOptional<z.ZodString>;
-    /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch. */
+    /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Flag to perform additional table processing and analysis on the document. */
     tables: z.ZodOptional<z.ZodBoolean>;
@@ -29304,7 +29303,7 @@ declare const DeleteDocumentRequestSchema: {
 declare const ReprocessDocumentsRequestSchema: {
     /** An array of UUIDs of the documents to reprocess. */
     ids: z.ZodArray<z.ZodString, "many">;
-    /** The type of job to dispatch reprocessing for. */
+    /** The type of job to dispatch reprocessing for. Default to "status" to do a full reprocessing job. */
     type: z.ZodEnum<["status", "nodes", "vectors", "edges", "category"]>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
@@ -29439,6 +29438,44 @@ interface FeaturesQueryRequest {
      */
     skip?: number;
 }
+
+/**
+ * Schema for validating get organization requests.
+ * Validates that the request contains a valid organization ID.
+ */
+declare const GetOrganizationRequestSchema: {
+    /**
+     * The unique identifier of the organization to retrieve.
+     * @example "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+     */
+    organizationId: z.ZodString;
+};
+/**
+ * Schema for validating list organizations requests.
+ * Supports filtering by search term and pagination.
+ */
+declare const GetOrganizationsRequestSchema: {
+    /**
+     * Optional search term to filter organizations by name
+     * @example "acme"
+     */
+    search: z.ZodOptional<z.ZodString>;
+    /**
+     * Maximum number of organizations to return (default: 10)
+     * @example 10
+     */
+    take: z.ZodDefault<z.ZodNumber>;
+    /**
+     * Number of organizations to skip for pagination (default: 0)
+     * @example 0
+     */
+    skip: z.ZodDefault<z.ZodNumber>;
+    /**
+     * Whether to include extended organization details (default: false)
+     * @example false
+     */
+    extended: z.ZodDefault<z.ZodBoolean>;
+};
 
 /**
  * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
@@ -29756,5 +29793,5 @@ interface GestellToolOutput {
     text: string;
 }
 
-export { CollectionCoreSchema, CollectionCreateSchema, CollectionUpdateSchema, DeleteDocumentRequestSchema, DocumentCoreSchema, ExportDocumentRequestSchema, ExportFeaturesRequestSchema, ExportTableRequestSchema, FeaturesCoreSchema, FeaturesQueryRequestSchema, GestellCoreSearchSchema, GestellPromptSchema, GestellSearchSchema, GetCollectionRequestSchema, GetCollectionsRequestSchema, GetDocumentRequestSchema, GetDocumentsRequestSchema, JobStatusSchema, ReprocessDocumentsRequestSchema, TablesCoreSchema, TablesQueryRequestSchema, UpdateDocumentRequestSchema, UploadDocumentRequestSchema, buildMcpServer, runTool, startRemoteServer, startTerminalClient, startTerminalSession };
+export { CollectionCoreSchema, CollectionCreateSchema, CollectionUpdateSchema, DeleteDocumentRequestSchema, DocumentCoreSchema, ExportDocumentRequestSchema, ExportFeaturesRequestSchema, ExportTableRequestSchema, FeaturesCoreSchema, FeaturesQueryRequestSchema, GestellCoreSearchSchema, GestellPromptSchema, GestellSearchSchema, GetCollectionRequestSchema, GetCollectionsRequestSchema, GetDocumentRequestSchema, GetDocumentsRequestSchema, GetOrganizationRequestSchema, GetOrganizationsRequestSchema, JobStatusSchema, ReprocessDocumentsRequestSchema, TablesCoreSchema, TablesQueryRequestSchema, UpdateDocumentRequestSchema, UploadDocumentRequestSchema, buildMcpServer, runTool, startRemoteServer, startTerminalClient, startTerminalSession };
 export type { FeaturesQueryRequest, GestellToolOutput, JobStatusType };

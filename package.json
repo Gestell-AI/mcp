@@ -1,6 +1,6 @@
 {
   "name": "@gestell/mcp",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "type": "module",
   "main": "dist/library.cjs.js",
   "module": "dist/library.js",
@@ -19,8 +19,8 @@
     "build:lib": "rollup -c compile/rollup.config.js",
     "build:cli": "bun build server/entry.ts --target node --outfile ./dist/entry.js",
     "build:types": "tsc --project compile/tsconfig.build.json",
-    "build:schemas": "bun run client/artifacts/generate.ts",
-    "build": "rm -rf dist && npm run build:lib && npm run build:cli && npm run build:types"
+    "build:schemas": "bun run compile/generate.ts",
+    "build": "rm -rf dist && npm run build:lib && npm run build:cli && npm run build:types && bun run build:schemas"
   },
   "bin": {
     "gestell-mcp": "./dist/entry.js"

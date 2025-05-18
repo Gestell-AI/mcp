@@ -1,0 +1,624 @@
+{
+  "$ref": "#/definitions/document.id",
+  "definitions": {
+    "document.id": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "OK",
+            "ERROR"
+          ],
+          "description": "Indicates whether the request succeeded or failed."
+        },
+        "message": {
+          "type": "string",
+          "description": "Optional human-readable message with additional information or error details."
+        },
+        "result": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique identifier for the document."
+                },
+                "collectionId": {
+                  "type": "string",
+                  "description": "Identifier of the parent collection."
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Human-readable name of the document (e.g., filename)."
+                },
+                "type": {
+                  "type": "string",
+                  "description": "MIME type or custom type label of the document."
+                },
+                "layoutType": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "document",
+                      "description": "Standard paginated document (e.g., PDF, Word)."
+                    },
+                    {
+                      "type": "string",
+                      "const": "photo",
+                      "description": "Single-image input (e.g., JPG, PNG)."
+                    },
+                    {
+                      "type": "string",
+                      "const": "audio",
+                      "description": "Audio file input for transcription or segmentation."
+                    },
+                    {
+                      "type": "string",
+                      "const": "video",
+                      "description": "Video file input for frame and audio-layout processing."
+                    }
+                  ],
+                  "description": "The layout parsing strategy applied to this document."
+                },
+                "layoutNodes": {
+                  "type": "number",
+                  "description": "Number of layout nodes generated during parsing."
+                },
+                "tables": {
+                  "type": "boolean",
+                  "description": "Whether the document contains tables to be parsed."
+                },
+                "instructions": {
+                  "type": "string",
+                  "description": "Custom instructions or notes for processing this document."
+                },
+                "job": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Unique identifier for the job."
+                    },
+                    "collectionId": {
+                      "type": "string",
+                      "description": "Identifier of the parent collection."
+                    },
+                    "documentId": {
+                      "type": "string",
+                      "description": "Identifier of the target document."
+                    },
+                    "status": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "processing",
+                          "description": "Currently in progress."
+                        },
+                        {
+                          "type": "string",
+                          "const": "error",
+                          "description": "Encountered an error."
+                        },
+                        {
+                          "type": "string",
+                          "const": "ready",
+                          "description": "Completed successfully."
+                        },
+                        {
+                          "type": "string",
+                          "const": "cancelled",
+                          "description": "Manually cancelled."
+                        },
+                        {
+                          "type": "string",
+                          "const": "unprocessed",
+                          "description": "Not yet started."
+                        },
+                        {
+                          "type": "string",
+                          "const": "partial",
+                          "description": "Partially completed."
+                        },
+                        {
+                          "type": "string",
+                          "const": "all",
+                          "description": "All steps completed."
+                        }
+                      ],
+                      "description": "Overall job status. Must be \"ready\" for the document to be considered processed at any level."
+                    },
+                    "nodes": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/0"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/1"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/2"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/3"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/4"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/5"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/6"
+                        }
+                      ],
+                      "description": "Status of the node extraction step."
+                    },
+                    "edges": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/0"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/1"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/2"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/3"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/4"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/5"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/6"
+                        }
+                      ],
+                      "description": "Status of the edge linking step."
+                    },
+                    "vectors": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/0"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/1"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/2"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/3"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/4"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/5"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/6"
+                        }
+                      ],
+                      "description": "Status of the vector generation step."
+                    },
+                    "category": {
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/0"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/1"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/2"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/3"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/4"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/5"
+                        },
+                        {
+                          "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/job/properties/status/anyOf/6"
+                        }
+                      ],
+                      "description": "Status of the category assignment step. If the collection has any categories defined, this must be \"ready\" for the document to be fully processed."
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable message or error details."
+                    },
+                    "document": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "description": "Document identifier."
+                        },
+                        "collectionId": {
+                          "type": "string",
+                          "description": "Collection identifier."
+                        },
+                        "dateCreated": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Creation timestamp."
+                        },
+                        "dateUpdated": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "Last update timestamp."
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Document name or filename."
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "MIME type or custom type label."
+                        },
+                        "layoutType": {
+                          "anyOf": [
+                            {
+                              "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layoutType/anyOf/0"
+                            },
+                            {
+                              "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layoutType/anyOf/1"
+                            },
+                            {
+                              "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layoutType/anyOf/2"
+                            },
+                            {
+                              "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layoutType/anyOf/3"
+                            }
+                          ],
+                          "description": "Layout parsing strategy used."
+                        },
+                        "layoutNodes": {
+                          "type": "number",
+                          "description": "Number of layout nodes generated."
+                        },
+                        "instructions": {
+                          "type": "string",
+                          "description": "Custom instructions for processing."
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "collectionId",
+                        "dateCreated",
+                        "dateUpdated",
+                        "name",
+                        "type",
+                        "layoutType",
+                        "layoutNodes",
+                        "instructions"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Optional snapshot of the document metadata at job creation."
+                    },
+                    "dateCreated": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp when the job was created."
+                    },
+                    "dateUpdated": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Timestamp when the job was last updated."
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "collectionId",
+                    "documentId",
+                    "status",
+                    "nodes",
+                    "edges",
+                    "vectors",
+                    "category",
+                    "message",
+                    "dateCreated",
+                    "dateUpdated"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Optional processing job associated with this document."
+                },
+                "layout": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "array",
+                            "minItems": 4,
+                            "maxItems": 4,
+                            "items": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "number"
+                              }
+                            ],
+                            "description": "Bounding box of the element."
+                          },
+                          "type": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "const": "title"
+                              },
+                              {
+                                "type": "string",
+                                "const": "subtitle"
+                              },
+                              {
+                                "type": "string",
+                                "const": "list"
+                              },
+                              {
+                                "type": "string",
+                                "const": "text"
+                              },
+                              {
+                                "type": "string",
+                                "const": "table"
+                              },
+                              {
+                                "type": "string",
+                                "const": "image"
+                              },
+                              {
+                                "type": "string",
+                                "const": "csv"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ],
+                            "description": "Element kind:\n- `title`\n- `subtitle`\n- `list`\n- `text`\n- `table`\n- `image`\n- `csv`\n- or any custom tag"
+                          },
+                          "content": {
+                            "type": "string",
+                            "description": "Raw text or data content of the element."
+                          },
+                          "index": {
+                            "type": "number",
+                            "description": "Zero-based index of this element in the document flow."
+                          },
+                          "page": {
+                            "type": "number",
+                            "description": "One-based page number where this element appears."
+                          }
+                        },
+                        "required": [
+                          "position",
+                          "type",
+                          "content",
+                          "index",
+                          "page"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Parsed layout element with ordering and pagination metadata."
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "array",
+                            "minItems": 4,
+                            "maxItems": 4,
+                            "items": [
+                              {
+                                "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layout/anyOf/0/items/properties/position/items/0"
+                              },
+                              {
+                                "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layout/anyOf/0/items/properties/position/items/1"
+                              },
+                              {
+                                "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layout/anyOf/0/items/properties/position/items/2"
+                              },
+                              {
+                                "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layout/anyOf/0/items/properties/position/items/3"
+                              }
+                            ],
+                            "description": "Bounding box of the region."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Description of the visual content (objects or scene)."
+                          },
+                          "type": {
+                            "type": "string",
+                            "description": "Optional detected type or label for the region."
+                          }
+                        },
+                        "required": [
+                          "position",
+                          "description",
+                          "type"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Parsed region from a single image."
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "number",
+                            "description": "Zero-based segment index."
+                          },
+                          "start": {
+                            "type": "string",
+                            "description": "Start time as ISO 8601 or `HH:MM:SS` format."
+                          },
+                          "end": {
+                            "type": "string",
+                            "description": "End time as ISO 8601 or `HH:MM:SS` format."
+                          },
+                          "audio": {
+                            "type": "string",
+                            "description": "Transcribed or extracted audio content."
+                          },
+                          "narration": {
+                            "type": "string",
+                            "description": "Narration or descriptive text."
+                          },
+                          "narrator": {
+                            "type": "string",
+                            "description": "Speaker or narrator identifier."
+                          },
+                          "objects": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/definitions/document.id/properties/result/anyOf/0/properties/layout/anyOf/1/items"
+                            },
+                            "description": "Visual regions detected within the video frame."
+                          }
+                        },
+                        "required": [
+                          "index",
+                          "start",
+                          "end",
+                          "audio",
+                          "narration",
+                          "narrator",
+                          "objects"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Parsed segment from a video file."
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "number",
+                            "description": "Zero-based segment index."
+                          },
+                          "start": {
+                            "type": "string",
+                            "description": "Start time as ISO 8601 or `HH:MM:SS` format."
+                          },
+                          "end": {
+                            "type": "string",
+                            "description": "End time as ISO 8601 or `HH:MM:SS` format."
+                          },
+                          "narrator": {
+                            "type": "string",
+                            "description": "Speaker or narrator identifier."
+                          },
+                          "description": {
+                            "type": "string",
+                            "description": "Description or non-verbal context for the segment."
+                          },
+                          "content": {
+                            "type": "string",
+                            "description": "Transcribed text content of the audio segment."
+                          }
+                        },
+                        "required": [
+                          "index",
+                          "start",
+                          "end",
+                          "narrator",
+                          "description",
+                          "content"
+                        ],
+                        "additionalProperties": false,
+                        "description": "Parsed segment from an audio file."
+                      }
+                    }
+                  ],
+                  "description": "Parsed layout structure, varying by `layoutType`:\n- `DocumentLayout[]` for text/image based documents\n- `PhotoLayout[]` for images\n- `VideoLayout[]` for videos\n- `AudioLayout[]` for audio"
+                },
+                "metadata": {
+                  "type": "object",
+                  "properties": {
+                    "size": {
+                      "type": "number",
+                      "description": "File size in bytes."
+                    },
+                    "pages": {
+                      "type": "number",
+                      "description": "Number of pages (for paginated documents)."
+                    },
+                    "length": {
+                      "type": "number",
+                      "description": "Duration in seconds (for audio/video)."
+                    }
+                  },
+                  "required": [
+                    "size",
+                    "pages",
+                    "length"
+                  ],
+                  "additionalProperties": false,
+                  "description": "File metadata for the document.\n- `size`: file size in bytes\n- `pages`: number of pages (if applicable)\n- `length`: duration in seconds (for audio/video)"
+                },
+                "dateCreated": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when the document was created."
+                },
+                "dateUpdated": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp when the document was last updated."
+                }
+              },
+              "required": [
+                "id",
+                "collectionId",
+                "name",
+                "type",
+                "layoutType",
+                "layoutNodes",
+                "tables",
+                "instructions",
+                "dateCreated",
+                "dateUpdated"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "result"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

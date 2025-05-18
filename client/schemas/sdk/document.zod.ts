@@ -9,16 +9,39 @@ import {
   videoLayoutSchema
 } from './layout.zod'
 
+/**
+ * Represents a document stored within a collection, including its processing
+ * job, layout details, and file metadata.
+ */
 export const documentSchema = z.object({
-  id: z.string(),
-  collectionId: z.string(),
-  name: z.string(),
-  type: z.string(),
-  layoutType: layoutTypeSchema,
-  layoutNodes: z.number(),
-  tables: z.boolean(),
-  instructions: z.string(),
-  job: jobSchema.optional(),
+  id: z.string().describe('Unique identifier for the document.'),
+  collectionId: z.string().describe('Identifier of the parent collection.'),
+  name: z
+    .string()
+    .describe('Human-readable name of the document (e.g., filename).'),
+  type: z.string().describe('MIME type or custom type label of the document.'),
+  layoutType: layoutTypeSchema.describe(
+    'The layout parsing strategy applied to this document.'
+  ),
+  layoutNodes: z
+    .number()
+    .describe('Number of layout nodes generated during parsing.'),
+  tables: z
+    .boolean()
+    .describe('Whether the document contains tables to be parsed.'),
+  instructions: z
+    .string()
+    .describe('Custom instructions or notes for processing this document.'),
+  job: jobSchema
+    .optional()
+    .describe('Optional processing job associated with this document.'),
+  /**
+   * Parsed layout structure, varying by `layoutType`:
+   * - `DocumentLayout[]` for text/image based documents
+   * - `PhotoLayout[]` for images
+   * - `VideoLayout[]` for videos
+   * - `AudioLayout[]` for audio
+   */
   layout: z
     .union([
       z.array(documentLayoutSchema),
@@ -26,14 +49,29 @@ export const documentSchema = z.object({
       z.array(videoLayoutSchema),
       z.array(audioLayoutSchema)
     ])
-    .optional(),
+    .optional().describe(`Parsed layout structure, varying by \`layoutType\`:
+- \`DocumentLayout[]\` for text/image based documents
+- \`PhotoLayout[]\` for images
+- \`VideoLayout[]\` for videos
+- \`AudioLayout[]\` for audio`),
+  /**
+   * File metadata for the document.
+   * - `size`: file size in bytes
+   * - `pages`: number of pages (if applicable)
+   * - `length`: duration in seconds (for audio/video)
+   */
   metadata: z
     .object({
-      size: z.number(),
-      pages: z.number(),
-      length: z.number()
+      size: z.number().describe('File size in bytes.'),
+      pages: z.number().describe('Number of pages (for paginated documents).'),
+      length: z.number().describe('Duration in seconds (for audio/video).')
     })
-    .optional(),
-  dateCreated: z.date(),
-  dateUpdated: z.date()
+    .optional().describe(`File metadata for the document.
+- \`size\`: file size in bytes
+- \`pages\`: number of pages (if applicable)
+- \`length\`: duration in seconds (for audio/video)`),
+  dateCreated: z.date().describe('Timestamp when the document was created.'),
+  dateUpdated: z
+    .date()
+    .describe('Timestamp when the document was last updated.')
 })

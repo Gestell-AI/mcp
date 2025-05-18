@@ -1,0 +1,233 @@
+{
+  "$ref": "#/definitions/document.export",
+  "definitions": {
+    "document.export": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "description": "Bounding box of the element."
+              },
+              "type": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "const": "title"
+                  },
+                  {
+                    "type": "string",
+                    "const": "subtitle"
+                  },
+                  {
+                    "type": "string",
+                    "const": "list"
+                  },
+                  {
+                    "type": "string",
+                    "const": "text"
+                  },
+                  {
+                    "type": "string",
+                    "const": "table"
+                  },
+                  {
+                    "type": "string",
+                    "const": "image"
+                  },
+                  {
+                    "type": "string",
+                    "const": "csv"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ],
+                "description": "Element kind:\n- `title`\n- `subtitle`\n- `list`\n- `text`\n- `table`\n- `image`\n- `csv`\n- or any custom tag"
+              },
+              "content": {
+                "type": "string",
+                "description": "Raw text or data content of the element."
+              },
+              "index": {
+                "type": "number",
+                "description": "Zero-based index of this element in the document flow."
+              },
+              "page": {
+                "type": "number",
+                "description": "One-based page number where this element appears."
+              }
+            },
+            "required": [
+              "position",
+              "type",
+              "content",
+              "index",
+              "page"
+            ],
+            "additionalProperties": false,
+            "description": "Parsed layout element with ordering and pagination metadata."
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number",
+                "description": "Zero-based segment index."
+              },
+              "start": {
+                "type": "string",
+                "description": "Start time as ISO 8601 or `HH:MM:SS` format."
+              },
+              "end": {
+                "type": "string",
+                "description": "End time as ISO 8601 or `HH:MM:SS` format."
+              },
+              "narrator": {
+                "type": "string",
+                "description": "Speaker or narrator identifier."
+              },
+              "description": {
+                "type": "string",
+                "description": "Description or non-verbal context for the segment."
+              },
+              "content": {
+                "type": "string",
+                "description": "Transcribed text content of the audio segment."
+              }
+            },
+            "required": [
+              "index",
+              "start",
+              "end",
+              "narrator",
+              "description",
+              "content"
+            ],
+            "additionalProperties": false,
+            "description": "Parsed segment from an audio file."
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": [
+                  {
+                    "$ref": "#/definitions/document.export/anyOf/0/items/properties/position/items/0"
+                  },
+                  {
+                    "$ref": "#/definitions/document.export/anyOf/0/items/properties/position/items/1"
+                  },
+                  {
+                    "$ref": "#/definitions/document.export/anyOf/0/items/properties/position/items/2"
+                  },
+                  {
+                    "$ref": "#/definitions/document.export/anyOf/0/items/properties/position/items/3"
+                  }
+                ],
+                "description": "Bounding box of the region."
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the visual content (objects or scene)."
+              },
+              "type": {
+                "type": "string",
+                "description": "Optional detected type or label for the region."
+              }
+            },
+            "required": [
+              "position",
+              "description",
+              "type"
+            ],
+            "additionalProperties": false,
+            "description": "Parsed region from a single image."
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "index": {
+                "type": "number",
+                "description": "Zero-based segment index."
+              },
+              "start": {
+                "type": "string",
+                "description": "Start time as ISO 8601 or `HH:MM:SS` format."
+              },
+              "end": {
+                "type": "string",
+                "description": "End time as ISO 8601 or `HH:MM:SS` format."
+              },
+              "audio": {
+                "type": "string",
+                "description": "Transcribed or extracted audio content."
+              },
+              "narration": {
+                "type": "string",
+                "description": "Narration or descriptive text."
+              },
+              "narrator": {
+                "type": "string",
+                "description": "Speaker or narrator identifier."
+              },
+              "objects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/document.export/anyOf/2/items"
+                },
+                "description": "Visual regions detected within the video frame."
+              }
+            },
+            "required": [
+              "index",
+              "start",
+              "end",
+              "audio",
+              "narration",
+              "narrator",
+              "objects"
+            ],
+            "additionalProperties": false,
+            "description": "Parsed segment from a video file."
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

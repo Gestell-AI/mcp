@@ -58,7 +58,7 @@ export const CollectionCoreSchema = {
     .enum(['frame', 'searchable-frame', 'canon', 'features'] as const)
     .default('canon')
     .describe(
-      'Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); defaults to "canon".'
+      'Classification of the collection. One of "frame" (ephemeral), "searchable-frame" (search-optimized), "canon" (default long-term), or "features" (embeddings store); Always default to "canon" unless directed otherwise by the user.'
     ),
 
   /**
@@ -210,24 +210,25 @@ export const CollectionCreateSchema = {
         instructions: z
           .string()
           .describe(
-            'Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings).'
+            'Extraction or indexing guidelines for items in this category (e.g. parsing rules, field mappings). For features describe what needs to be extracted from the document. For tables, clearly describe each column and what the column is extracting.'
           ),
 
         /**
-         * Whether this category should be indexed as a single entry.
-         *
+         * If true, this category will only create one entry per document.
          */
         singleEntry: z
           .boolean()
           .optional()
           .default(false)
-          .describe('If true, this category will be indexed as a single entry.')
+          .describe(
+            'If true, this category will only create one entry per document.'
+          )
       })
     )
     .optional()
     .default([])
     .describe(
-      'List of zero or more categories for sub-indexing. Leave as [] if you do not need additional facets.'
+      'List of categories for indexing. Leave as [] unless the user specifies they need additional indexing via categories. Avoid concepts and content unless specified and prioritize indexing via features and table.'
     ),
 
   // Reuse all of the core collection fields (name, type, tags, descriptions, instructions, etc.)

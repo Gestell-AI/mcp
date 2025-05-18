@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.5.0
+
+- Context improvements for agent flows
+
+- Added get and list organizations tool calls
+
+- Added Windsurf and Cursor Integration stubs
+
 ## 0.4.0
 
 - Fixed tool name conventions to be compliant with Windsurf and Cursor

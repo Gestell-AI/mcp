@@ -17,6 +17,7 @@ import {
   registerExportTableTool,
   registerQueryTablesTool
 } from '@tool/extraction/table'
+import { registerOrganizationQueryTools } from '@tool/organization/query'
 import { registerCollectionPromptTool } from '@tool/prompt'
 import { registerCollectionSearchTool } from '@tool/search'
 
@@ -38,6 +39,7 @@ export default function buildMcpServer(
   registerCollectionPromptTool(server, gestell)
 
   // Collection Tools
+  registerOrganizationQueryTools(server, gestell)
   registerCollectionQueryTools(server, gestell)
   registerCollectionCreateTool(server, gestell)
   registerCollectionUpdateTool(server, gestell)

@@ -2,47 +2,100 @@
 import { z } from 'zod'
 import { layoutTypeSchema } from './layout.zod'
 
-export const jobTypeSchema = z.union([
-  z.literal('status'),
-  z.literal('nodes'),
-  z.literal('vectors'),
-  z.literal('edges'),
-  z.literal('category')
-])
+/**
+ * Types of processing steps available for a job.
+ *
+ * Completion requirements by collection type:
+ * - frame: Only 'status' needs to be 'ready'
+ * - searchable-frame: 'status', 'nodes', and 'vectors' must be 'ready'
+ * - canon: 'status', 'nodes', 'vectors', and 'edges' must be 'ready'
+ *
+ * If the collection has any categories defined, the 'category' status must also be 'ready' for the document to be considered fully processed.
+ */
+export const jobTypeSchema = z
+  .union([
+    z
+      .literal('status')
+      .describe('The OCR job status. Must be "ready" for any collection type.'),
+    z
+      .literal('nodes')
+      .describe(
+        'Canonization and node extraction step. Required for searchable-frame and canon collections.'
+      ),
+    z
+      .literal('vectors')
+      .describe(
+        'Vector generation step. Required for searchable-frame and canon collections.'
+      ),
+    z
+      .literal('edges')
+      .describe('Edge linking step. Required for canon collections.'),
+    z
+      .literal('category')
+      .describe(
+        'Category assignment step. Required if the collection has any categories defined.'
+      )
+  ])
+  .describe(
+    'Types of processing steps available for a job. Completion requirements vary by collection type and whether categories are defined.'
+  )
 
-export const jobStatusSchema = z.union([
-  z.literal('processing'),
-  z.literal('error'),
-  z.literal('ready'),
-  z.literal('cancelled'),
-  z.literal('unprocessed'),
-  z.literal('partial'),
-  z.literal('all')
-])
+/**
+ * Possible states of a processing step or job.
+ */
+export const jobStatusSchema = z
+  .union([
+    z.literal('processing').describe('Currently in progress.'),
+    z.literal('error').describe('Encountered an error.'),
+    z.literal('ready').describe('Completed successfully.'),
+    z.literal('cancelled').describe('Manually cancelled.'),
+    z.literal('unprocessed').describe('Not yet started.'),
+    z.literal('partial').describe('Partially completed.'),
+    z.literal('all').describe('All steps completed.')
+  ])
+  .describe('Possible states of a processing step or job.')
 
-export const jobSchema = z.object({
-  id: z.string(),
-  collectionId: z.string(),
-  documentId: z.string(),
-  status: jobStatusSchema,
-  nodes: jobStatusSchema,
-  edges: jobStatusSchema,
-  vectors: jobStatusSchema,
-  category: jobStatusSchema,
-  message: z.string(),
-  document: z
-    .object({
-      id: z.string(),
-      collectionId: z.string(),
-      dateCreated: z.date(),
-      dateUpdated: z.date(),
-      name: z.string(),
-      type: z.string(),
-      layoutType: layoutTypeSchema,
-      layoutNodes: z.number(),
-      instructions: z.string()
-    })
-    .optional(),
-  dateCreated: z.date(),
-  dateUpdated: z.date()
-})
+/**
+ * Represents a processing job for a specific document within a collection.
+ *
+ * The completion status depends on the collection type and whether categories are defined:
+ * - frame: Only 'status' must be 'ready'
+ * - searchable-frame: 'status', 'nodes', and 'vectors' must be 'ready'
+ * - canon: 'status', 'nodes', 'vectors', and 'edges' must be 'ready'
+ * - If categories are defined, 'category' must also be 'ready' for the document to be fully processed
+ */
+export const jobSchema = z
+  .object({
+    id: z.string().describe('Unique identifier for the job.'),
+    collectionId: z.string().describe('Identifier of the parent collection.'),
+    documentId: z.string().describe('Identifier of the target document.'),
+    status: jobStatusSchema.describe(
+      'Overall job status. Must be "ready" for the document to be considered processed at any level.'
+    ),
+    nodes: jobStatusSchema.describe('Status of the node extraction step.'),
+    edges: jobStatusSchema.describe('Status of the edge linking step.'),
+    vectors: jobStatusSchema.describe('Status of the vector generation step.'),
+    category: jobStatusSchema.describe(
+      'Status of the category assignment step. If the collection has any categories defined, this must be "ready" for the document to be fully processed.'
+    ),
+    message: z.string().describe('Human-readable message or error details.'),
+    document: z
+      .object({
+        id: z.string().describe('Document identifier.'),
+        collectionId: z.string().describe('Collection identifier.'),
+        dateCreated: z.date().describe('Creation timestamp.'),
+        dateUpdated: z.date().describe('Last update timestamp.'),
+        name: z.string().describe('Document name or filename.'),
+        type: z.string().describe('MIME type or custom type label.'),
+        layoutType: layoutTypeSchema.describe('Layout parsing strategy used.'),
+        layoutNodes: z.number().describe('Number of layout nodes generated.'),
+        instructions: z.string().describe('Custom instructions for processing.')
+      })
+      .optional()
+      .describe('Optional snapshot of the document metadata at job creation.'),
+    dateCreated: z.date().describe('Timestamp when the job was created.'),
+    dateUpdated: z.date().describe('Timestamp when the job was last updated.')
+  })
+  .describe(
+    'Represents a processing job for a specific document within a collection.'
+  )

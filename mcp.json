@@ -52,109 +52,105 @@
   "tools": {
     "promptCollection": {
       "title": "Prompt Collection",
-      "description": "Run a single prompt against a Collection and stream the response.",
-      "inputSchema": "./client/artifacts/search/prompt.json",
-      "outputSchema": "./client/artifacts/output/search/prompt.json"
+      "inputSchema": "./artifacts/search/prompt.json",
+      "outputSchema": "./artifacts/output/search/prompt.json"
     },
     "searchCollection": {
       "title": "Search Collection",
-      "description": "Perform a reason based search over a Collection.",
-      "inputSchema": "./client/artifacts/search/search.json",
-      "outputSchema": "./client/artifacts/output/search/search.json"
+      "inputSchema": "./artifacts/search/search.json",
+      "outputSchema": "./artifacts/output/search/search.json"
+    },
+
+    "getOrganization": {
+      "title": "Get Organization",
+      "inputSchema": "./artifacts/organization/get.json",
+      "outputSchema": "./artifacts/output/organization/get.json"
+    },
+    "listOrganizations": {
+      "title": "List Organizations",
+      "inputSchema": "./artifacts/organization/list.json",
+      "outputSchema": "./artifacts/output/organization/list.json"
     },
 
     "getCollection": {
       "title": "Get Collection",
-      "description": "Retrieves a collection from the Gestell Platform by its ID",
-      "inputSchema": "./client/artifacts/collection/id.json",
-      "outputSchema": "./client/artifacts/output/collection/id.json"
+      "inputSchema": "./artifacts/collection/id.json",
+      "outputSchema": "./artifacts/output/collection/id.json"
     },
     "listCollections": {
       "title": "List Collections",
       "description": "Lists collections in the Gestell Platform",
-      "inputSchema": "./client/artifacts/collection/list.json",
-      "outputSchema": "./client/artifacts/output/collection/list.json"
+      "inputSchema": "./artifacts/collection/list.json",
+      "outputSchema": "./artifacts/output/collection/list.json"
     },
     "createCollection": {
       "title": "Create Collection",
-      "description": "Creates a new collection with the specified metadata, including name, type, and optional PII controls. Collections organize documents and define how they should be processed and queried.",
-      "inputSchema": "./client/artifacts/collection/create.json",
-      "outputSchema": "./client/artifacts/output/collection/create.json"
+      "inputSchema": "./artifacts/collection/create.json",
+      "outputSchema": "./artifacts/output/collection/create.json"
     },
     "updateCollection": {
       "title": "Update Collection",
       "description": "Updates a collection in the Gestell Platform",
-      "inputSchema": "./client/artifacts/collection/update.json",
-      "outputSchema": "./client/artifacts/output/collection/update.json"
+      "inputSchema": "./artifacts/collection/update.json",
+      "outputSchema": "./artifacts/output/collection/update.json"
     },
 
     "getDocument": {
       "title": "Get Document",
-      "description": "Retrieves a document from a collection by its ID.",
-      "inputSchema": "./client/artifacts/document/id.json",
-      "outputSchema": "./client/artifacts/output/document/id.json"
+      "inputSchema": "./artifacts/document/id.json",
+      "outputSchema": "./artifacts/output/document/id.json"
     },
     "listDocuments": {
       "title": "List Documents",
-      "description": "Lists documents in a collection",
-      "inputSchema": "./client/artifacts/document/list.json",
-      "outputSchema": "./client/artifacts/output/document/list.json"
+      "inputSchema": "./artifacts/document/list.json",
+      "outputSchema": "./artifacts/output/document/list.json"
     },
-    "createDocument": {
+    "uploadDocument": {
       "title": "Upload and Create a Document",
-      "description": "Uploads a document to a collection and creates it.",
-      "inputSchema": "./client/artifacts/document/create.json",
-      "outputSchema": "./client/artifacts/output/document/create.json"
+      "inputSchema": "./artifacts/document/upload.json",
+      "outputSchema": "./artifacts/output/document/upload.json"
     },
     "updateDocument": {
       "title": "Update Document",
-      "description": "Updates a document in a collection",
-      "inputSchema": "./client/artifacts/document/update.json",
-      "outputSchema": "./client/artifacts/output/document/update.json"
+      "inputSchema": "./artifacts/document/update.json",
+      "outputSchema": "./artifacts/output/document/update.json"
     },
     "deleteDocument": {
       "title": "Delete Document",
-      "description": "Deletes a document from a collection",
-      "inputSchema": "./client/artifacts/document/delete.json",
-      "outputSchema": "./client/artifacts/output/document/delete.json"
+      "inputSchema": "./artifacts/document/delete.json",
+      "outputSchema": "./artifacts/output/document/delete.json"
     },
     "reprocessDocument": {
       "title": "Reprocess Document",
-      "description": "Reprocesses a document in a collection",
-      "inputSchema": "./client/artifacts/document/reprocess.json",
-      "outputSchema": "./client/artifacts/output/document/reprocess.json"
+      "inputSchema": "./artifacts/document/reprocess.json",
+      "outputSchema": "./artifacts/output/document/reprocess.json"
     },
     "exportDocument": {
       "title": "Export Document",
-      "description": "Exports a document from a collection to json layout or text",
-      "inputSchema": "./client/artifacts/document/export.json",
-      "outputSchema": "./client/artifacts/output/document/export.json"
+      "inputSchema": "./artifacts/document/export.json",
+      "outputSchema": "./artifacts/output/document/export.json"
     },
 
     "queryTable": {
       "title": "Query Table",
-      "description": "Queries a table from a category in a collection",
-      "inputSchema": "./client/artifacts/table/query.json",
-      "outputSchema": "./client/artifacts/output/table/query.json"
+      "inputSchema": "./artifacts/table/query.json",
+      "outputSchema": "./artifacts/output/table/query.json"
     },
     "exportTable": {
       "title": "Export Table",
-      "description": "Exports a table from a category in a collection to json or csv",
-      "inputSchema": "./client/artifacts/table/export.json",
-      "outputSchema": "./client/artifacts/output/table/export.json"
+      "inputSchema": "./artifacts/table/export.json",
+      "outputSchema": "./artifacts/output/table/export.json"
     },
 
     "queryFeature": {
       "title": "Query Features",
-      "description": "Queries features from a category in a collection",
-      "inputSchema": "./client/artifacts/feature/query.json",
-      "outputSchema": "./client/artifacts/output/feature/query.json"
+      "inputSchema": "./artifacts/feature/query.json",
+      "outputSchema": "./artifacts/output/feature/query.json"
     },
     "exportFeature": {
       "title": "Export Features",
-      "description": "Exports features from a category in a collection to json or csv",
-      "inputSchema": "./client/artifacts/feature/export.json",
-      "outputSchema": "./client/artifacts/output/feature/export.json"
+      "inputSchema": "./artifacts/feature/export.json",
+      "outputSchema": "./artifacts/output/feature/export.json"
     }
   }
 }

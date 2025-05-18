@@ -3,76 +3,171 @@ import { z } from 'zod'
 import { documentSchema } from './document.zod'
 import { organizationListResultSchema } from './organization.zod'
 
+/**
+ * Supported collection types to choose from
+ */
 export const collectionTypeSchema = z.union([
-  z.literal('frame'),
-  z.literal('searchable-frame'),
-  z.literal('canon'),
-  z.literal('features')
+  z.literal('frame').describe('When you only want the OCR outputs.'),
+  z
+    .literal('searchable-frame')
+    .describe(
+      'Lighter version of canonized collections that are for search based reasoning.'
+    ),
+  z
+    .literal('canon')
+    .describe(
+      'Complete canonized collection that has the best search based reasoning capabilities.'
+    ),
+  z
+    .literal('features')
+    .describe('Specialized collection for category extractions of content.')
 ])
 
+/**
+ * Classification of PII/PHI, select the one model and type most optimal for your use case
+ */
 export const piiTypeSchema = z.union([
-  z.literal('generic'),
-  z.literal('legal'),
-  z.literal('medical')
+  z
+    .literal('generic')
+    .describe(
+      'Standard personal data without specialized legal or health context.'
+    ),
+  z
+    .literal('legal')
+    .describe(
+      'Information with legal or regulatory implications (e.g., SSN, license numbers).'
+    ),
+  z
+    .literal('medical')
+    .describe(
+      'Protected health information subject to medical privacy regulations.'
+    )
 ])
 
+/**
+ * Supported categories for organizing content in collections.
+ */
 export const categoryTypeSchema = z.union([
-  z.literal('content'),
-  z.literal('concepts'),
-  z.literal('features'),
-  z.literal('table')
+  z
+    .literal('content')
+    .describe('Filter content based on the category instructions'),
+  z
+    .literal('concepts')
+    .describe(
+      'Conceptualized versions of content. Useful for read heavy contexts'
+    ),
+  z.literal('features').describe('Feature extraction of labels.'),
+  z.literal('table').describe('Structured tabular data with rows and columns.')
 ])
 
+/**
+ * Type used to display every supported PII/PHI label.
+ */
 export const piiIdentifierOptionSchema = z.union([
-  z.literal('Name'),
-  z.literal('Geographic Data'),
-  z.literal('Dates'),
-  z.literal('Phone Number'),
-  z.literal('Fax Number'),
-  z.literal('Email Address'),
-  z.literal('Social Security Number'),
-  z.literal('Medical Record Number'),
-  z.literal('Health Plan Beneficiary Number'),
-  z.literal('Account Number'),
-  z.literal('Certificate/License Number'),
-  z.literal('Vehicle Identifier'),
-  z.literal('Device Identifier'),
-  z.literal('Web URL'),
-  z.literal('IP Address'),
-  z.literal('Biometric Identifier'),
-  z.literal('Full-face Photograph'),
-  z.literal('Unique Identifier Code')
+  z.literal('Name').describe('Full individual name, e.g., "John Doe".'),
+  z
+    .literal('Geographic Data')
+    .describe('Location-related data such as addresses or coordinates.'),
+  z
+    .literal('Dates')
+    .describe('Dates including birth, death, admission, discharge, etc.'),
+  z.literal('Phone Number').describe('Telephone numbers, mobile or landline.'),
+  z.literal('Fax Number').describe('Fax numbers for document transmission.'),
+  z
+    .literal('Email Address')
+    .describe('Email addresses used for personal or professional contact.'),
+  z
+    .literal('Social Security Number')
+    .describe('Government-issued Social Security Number.'),
+  z
+    .literal('Medical Record Number')
+    .describe(
+      'Unique medical record identifier assigned by healthcare providers.'
+    ),
+  z
+    .literal('Health Plan Beneficiary Number')
+    .describe('Identifier for health plan beneficiaries.'),
+  z
+    .literal('Account Number')
+    .describe('Financial account numbers like bank or credit accounts.'),
+  z
+    .literal('Certificate/License Number')
+    .describe(
+      "Licenses or certificates, e.g., driver's license, professional license."
+    ),
+  z
+    .literal('Vehicle Identifier')
+    .describe('Vehicle identification number or related vehicle data.'),
+  z
+    .literal('Device Identifier')
+    .describe('Devices or equipment identifiers, e.g., serial numbers.'),
+  z.literal('Web URL').describe('Web addresses and URLs.'),
+  z
+    .literal('IP Address')
+    .describe('Internet Protocol addresses, e.g., IPv4 or IPv6.'),
+  z
+    .literal('Biometric Identifier')
+    .describe('Biometric data like fingerprints, retinal scans, voiceprints.'),
+  z
+    .literal('Full-face Photograph')
+    .describe("Photograph capturing a person's full face."),
+  z
+    .literal('Unique Identifier Code')
+    .describe('System-generated unique codes for identifying entities.')
 ])
 
+/**
+ * Represents a category grouping within a collection.
+ */
 export const categorySchema = z.object({
-  id: z.string(),
-  collectionId: z.string(),
-  name: z.string(),
-  type: categoryTypeSchema,
-  instructions: z.string(),
-  singleEntry: z.boolean(),
-  dateCreated: z.date(),
-  dateUpdated: z.date()
+  id: z.string().describe('Unique identifier for the category.'),
+  collectionId: z.string().describe('Identifier of the parent collection.'),
+  name: z.string().describe('Display name of the category.'),
+  type: categoryTypeSchema.describe('The type of the category'),
+  instructions: z
+    .string()
+    .describe('Free-form instructions for this category.'),
+  singleEntry: z
+    .boolean()
+    .describe('If true, only a single entry is allowed per document.'),
+  dateCreated: z.date().describe('Timestamp when the category was created.'),
+  dateUpdated: z
+    .date()
+    .describe('Timestamp when the category was last updated.')
 })
 
+/**
+ * Aggregate statistics for a collection's content and processing status.
+ */
 export const collectionStatsSchema = z.object({
-  docs: z.number(),
-  size: z.number(),
-  nodes: z.number(),
-  status: z.object({
-    documents: z.number(),
-    nodes: z.number(),
-    edges: z.number(),
-    vectors: z.number(),
-    category: z.number()
-  })
+  docs: z.number().describe('Total number of indexed documents.'),
+  size: z.number().describe('Total disk/storage size in bytes.'),
+  nodes: z.number().describe('Total number of graph nodes.'),
+  status: z
+    .object({
+      documents: z.number().describe('Count of processed documents.'),
+      nodes: z.number().describe('Count of processed nodes.'),
+      edges: z.number().describe('Count of processed edges.'),
+      vectors: z.number().describe('Count of generated vectors.'),
+      category: z.number().describe('Count of processed categories.')
+    })
+    .describe('Breakdown of processing statuses.')
 })
 
+/**
+ * Payload for creating a new category.
+ */
 export const createCategoryPayloadSchema = z.object({
-  name: z.string(),
-  type: categoryTypeSchema,
-  instructions: z.string(),
-  singleEntry: z.boolean()
+  name: z.string().describe('Display name for the new category.'),
+  type: categoryTypeSchema.describe('The type for the new category.'),
+  instructions: z
+    .string()
+    .describe(
+      'Free-form instructions for the new category, markdown is recommended.'
+    ),
+  singleEntry: z
+    .boolean()
+    .describe('If true, only a single entry is allowed per document.')
 })
 
 export const collectionSchema = z.object({
