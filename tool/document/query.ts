@@ -17,6 +17,7 @@ export function registerDocumentQueryTools(
 ): void {
   server.tool(
     'document.get',
+    'Get a document from a collection',
     GetDocumentRequestSchema,
     async ({ collectionId, documentId }) => {
       const result = await gestell.document.get({ collectionId, documentId })
@@ -31,15 +32,20 @@ export function registerDocumentQueryTools(
     }
   )
 
-  server.tool('document.list', GetDocumentsRequestSchema, async (payload) => {
-    const results = await gestell.document.list(payload)
-    return {
-      content: [
-        {
-          type: 'text',
-          text: JSON.stringify(results)
-        }
-      ]
+  server.tool(
+    'document.list',
+    'List documents in a collection',
+    GetDocumentsRequestSchema,
+    async (payload) => {
+      const results = await gestell.document.list(payload)
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(results)
+          }
+        ]
+      }
     }
-  })
+  )
 }

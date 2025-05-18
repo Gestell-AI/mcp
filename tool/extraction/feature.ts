@@ -17,6 +17,7 @@ export function registerQueryFeaturesTool(
 ): void {
   server.tool(
     'feature.query',
+    'Query features from a category in a collection',
     FeaturesQueryRequestSchema,
     async ({ collectionId, categoryId, skip, take }) => {
       const result = await gestell.query.features({
@@ -50,6 +51,7 @@ export function registerExportFeaturesTool(
 ): void {
   server.tool(
     'feature.export',
+    'Export features from a category in a collection to json or csv',
     ExportFeaturesRequestSchema,
     async ({ collectionId, categoryId, format }) => {
       const result = await gestell.query.featuresExport({

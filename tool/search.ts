@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers a "searchCollection" tool on an MCP server.
+ * Registers a "search" tool on an MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,8 @@ export function registerCollectionSearchTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'searchCollection',
+    'search',
+    'Perform comprehensive search based reasoning over a Collection',
     GestellSearchSchema,
     async ({
       collectionId,

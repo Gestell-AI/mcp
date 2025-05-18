@@ -14,6 +14,7 @@ export function registerUploadDocumentTool(
 ): void {
   server.tool(
     'document.upload',
+    'Upload and create a document in a collection',
     UploadDocumentRequestSchema,
     async ({ collectionId, name, type, file, instructions, job, tables }) => {
       const result = await gestell.document.upload({

@@ -14,6 +14,7 @@ export function registerReprocessDocumentsTool(
 ): void {
   server.tool(
     'document.reprocess',
+    'Reprocess documents in a collection',
     ReprocessDocumentsRequestSchema,
     async ({ collectionId, ids, type }) => {
       const result = await gestell.job.reprocess({

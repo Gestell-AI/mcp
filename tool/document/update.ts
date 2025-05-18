@@ -14,6 +14,7 @@ export function registerUpdateDocumentTool(
 ): void {
   server.tool(
     'document.update',
+    'Update a document in a collection',
     UpdateDocumentRequestSchema,
     async ({ collectionId, documentId, name, instructions, job, tables }) => {
       const result = await gestell.document.update({

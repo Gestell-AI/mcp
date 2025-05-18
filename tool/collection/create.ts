@@ -14,6 +14,7 @@ export function registerCollectionCreateTool(
 ): void {
   server.tool(
     'collection.create',
+    'Create a collection',
     CollectionCreateSchema,
     async ({
       organizationId,
