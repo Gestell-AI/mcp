@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.0.0
+
+- CircleCI Integration
+
+- Vibe Code Agent Workflow Sample
+
 ## 0.5.0
 
 - Context improvements for agent flows

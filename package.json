@@ -1,6 +1,6 @@
 {
   "name": "@gestell/mcp",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist/library.cjs.js",
   "module": "dist/library.js",
@@ -20,7 +20,9 @@
     "build:cli": "bun build server/entry.ts --target node --outfile ./dist/entry.js",
     "build:types": "tsc --project compile/tsconfig.build.json",
     "build:schemas": "bun run compile/generate.ts",
-    "build": "rm -rf dist && npm run build:lib && npm run build:cli && npm run build:types && bun run build:schemas"
+    "build": "rm -rf dist && npm run build:lib && npm run build:cli && npm run build:types && bun run build:schemas",
+    "test": "bun test --timeout 120000 --coverage --coverage-reporter=text --coverage-reporter=lcov",
+    "test:submit": "cat ./coverage/lcov.info | coveralls"
   },
   "bin": {
     "gestell-mcp": "./dist/entry.js"

@@ -1,0 +1,25 @@
+version: 2.1
+orbs:
+  node: circleci/node@5
+jobs:
+  build-node:
+    # Build node project with Bun
+    executor: node/default
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies with Bun
+          command: curl -fsSL https://bun.sh/install | bash
+      - run:
+          name: Add Bun to PATH (if needed)
+          command: echo 'export PATH="$HOME/.bun/bin:$PATH"' >> $BASH_ENV
+      - run:
+          name: Install dependencies
+          command: bun install
+      - run:
+          name: Run build with Bun
+          command: bun run build
+workflows:
+  build-test:
+    jobs:
+      - build-node
