@@ -72008,7 +72008,7 @@ var ExportTableRequestSchema = {
 };
 // tool/collection/create.ts
 function registerCollectionCreateTool(server, gestell) {
-  server.tool("collection.create", "Create a collection", CollectionCreateSchema, async ({
+  server.tool("createCollection", "Create a collection", CollectionCreateSchema, async ({
     organizationId,
     name,
     type,
@@ -72049,7 +72049,7 @@ function registerCollectionCreateTool(server, gestell) {
 
 // tool/collection/query.ts
 function registerCollectionQueryTools(server, gestell) {
-  server.tool("collection.get", "Get a collection", GetCollectionRequestSchema, async ({ collectionId }) => {
+  server.tool("getCollection", "Get a collection by its UUID", GetCollectionRequestSchema, async ({ collectionId }) => {
     const result = await gestell.collection.get(collectionId);
     return {
       content: [
@@ -72060,7 +72060,7 @@ function registerCollectionQueryTools(server, gestell) {
       ]
     };
   });
-  server.tool("collection.list", "List collections", GetCollectionsRequestSchema, async (payload) => {
+  server.tool("listCollections", "List all collections you are a member of", GetCollectionsRequestSchema, async (payload) => {
     const results = await gestell.collection.list(payload);
     return {
       content: [
@@ -72075,7 +72075,7 @@ function registerCollectionQueryTools(server, gestell) {
 
 // tool/collection/update.ts
 function registerCollectionUpdateTool(server, gestell) {
-  server.tool("collection.update", "Update a collection", CollectionUpdateSchema, async ({
+  server.tool("updateCollection", "Update a collection", CollectionUpdateSchema, async ({
     collectionId,
     organizationId,
     name,
@@ -72116,7 +72116,7 @@ function registerCollectionUpdateTool(server, gestell) {
 
 // tool/document/delete.ts
 function registerDeleteDocumentTool(server, gestell) {
-  server.tool("document.delete", "Delete a document from a collection", DeleteDocumentRequestSchema, async ({ collectionId, documentId }) => {
+  server.tool("deleteDocument", "Delete a document from a collection by its UUID", DeleteDocumentRequestSchema, async ({ collectionId, documentId }) => {
     const result = await gestell.document.delete({
       collectionId,
       documentId
@@ -72134,7 +72134,7 @@ function registerDeleteDocumentTool(server, gestell) {
 
 // tool/document/export.ts
 function registerExportDocumentTool(server, gestell) {
-  server.tool("document.export", "Exports a document from a collection to json layout or text", ExportDocumentRequestSchema, async ({ collectionId, documentId, type }) => {
+  server.tool("exportDocument", "Exports a document from a collection to json layout or text", ExportDocumentRequestSchema, async ({ collectionId, documentId, type }) => {
     const result = await gestell.document.export({
       collectionId,
       documentId,
@@ -72153,7 +72153,7 @@ function registerExportDocumentTool(server, gestell) {
 
 // tool/document/query.ts
 function registerDocumentQueryTools(server, gestell) {
-  server.tool("document.get", "Get a document from a collection", GetDocumentRequestSchema, async ({ collectionId, documentId }) => {
+  server.tool("getDocument", "Get a document from a collection by its UUID", GetDocumentRequestSchema, async ({ collectionId, documentId }) => {
     const result = await gestell.document.get({ collectionId, documentId });
     return {
       content: [
@@ -72164,7 +72164,7 @@ function registerDocumentQueryTools(server, gestell) {
       ]
     };
   });
-  server.tool("document.list", "List documents in a collection", GetDocumentsRequestSchema, async (payload) => {
+  server.tool("listDocuments", "List documents in a collection", GetDocumentsRequestSchema, async (payload) => {
     const results = await gestell.document.list(payload);
     return {
       content: [
@@ -72179,7 +72179,7 @@ function registerDocumentQueryTools(server, gestell) {
 
 // tool/document/reprocess.ts
 function registerReprocessDocumentsTool(server, gestell) {
-  server.tool("document.reprocess", "Reprocess documents in a collection", ReprocessDocumentsRequestSchema, async ({ collectionId, ids, type }) => {
+  server.tool("reprocessDocument", "Reprocess documents in a collection by their UUIDs", ReprocessDocumentsRequestSchema, async ({ collectionId, ids, type }) => {
     const result = await gestell.job.reprocess({
       collectionId,
       ids,
@@ -72198,7 +72198,7 @@ function registerReprocessDocumentsTool(server, gestell) {
 
 // tool/document/update.ts
 function registerUpdateDocumentTool(server, gestell) {
-  server.tool("document.update", "Update a document in a collection", UpdateDocumentRequestSchema, async ({ collectionId, documentId, name, instructions, job, tables }) => {
+  server.tool("updateDocument", "Update a document in a collection", UpdateDocumentRequestSchema, async ({ collectionId, documentId, name, instructions, job, tables }) => {
     const result = await gestell.document.update({
       collectionId,
       documentId,
@@ -72243,7 +72243,7 @@ function registerUploadDocumentTool(server, gestell) {
 
 // tool/extraction/feature.ts
 function registerQueryFeaturesTool(server, gestell) {
-  server.tool("feature.query", "Query features from a category in a collection", FeaturesQueryRequestSchema, async ({ collectionId, categoryId, skip, take }) => {
+  server.tool("queryFeature", "Query features from a category in a collection", FeaturesQueryRequestSchema, async ({ collectionId, categoryId, skip, take }) => {
     const result = await gestell.query.features({
       collectionId,
       categoryId,
@@ -72261,7 +72261,7 @@ function registerQueryFeaturesTool(server, gestell) {
   });
 }
 function registerExportFeaturesTool(server, gestell) {
-  server.tool("feature.export", "Export features from a category in a collection to json or csv", ExportFeaturesRequestSchema, async ({ collectionId, categoryId, format }) => {
+  server.tool("exportFeature", "Export features from a category in a collection to json or csv", ExportFeaturesRequestSchema, async ({ collectionId, categoryId, format }) => {
     const result = await gestell.query.featuresExport({
       collectionId,
       categoryId,
@@ -72280,7 +72280,7 @@ function registerExportFeaturesTool(server, gestell) {
 
 // tool/extraction/table.ts
 function registerQueryTablesTool(server, gestell) {
-  server.tool("table.query", "Query table from a category in a collection", TablesQueryRequestSchema, async ({ collectionId, categoryId, skip, take }) => {
+  server.tool("queryTable", "Query table from a category in a collection", TablesQueryRequestSchema, async ({ collectionId, categoryId, skip, take }) => {
     const result = await gestell.query.table({
       collectionId,
       categoryId,
@@ -72298,7 +72298,7 @@ function registerQueryTablesTool(server, gestell) {
   });
 }
 function registerExportTableTool(server, gestell) {
-  server.tool("table.export", "Export table from a category in a collection to json or csv", ExportTableRequestSchema, async ({ collectionId, categoryId, format }) => {
+  server.tool("exportTable", "Export table from a category in a collection to json or csv", ExportTableRequestSchema, async ({ collectionId, categoryId, format }) => {
     const result = await gestell.query.tableExport({
       collectionId,
       categoryId,
@@ -72317,7 +72317,7 @@ function registerExportTableTool(server, gestell) {
 
 // tool/prompt.ts
 function registerCollectionPromptTool(server, gestell) {
-  server.tool("prompt", "Perform search based reasoning, and have the Gestell agent respond to a prompt", GestellPromptSchema, async ({
+  server.tool("promptCollection", "Perform search based reasoning on a collection, and have the Gestell agent respond to a prompt", GestellPromptSchema, async ({
     collectionId,
     categoryId,
     prompt,
@@ -72366,7 +72366,7 @@ function registerCollectionPromptTool(server, gestell) {
 
 // tool/search.ts
 function registerCollectionSearchTool(server, gestell) {
-  server.tool("search", "Perform comprehensive search based reasoning over a Collection", GestellSearchSchema, async ({
+  server.tool("searchCollection", "Perform search based reasoning over a Collection", GestellSearchSchema, async ({
     collectionId,
     categoryId,
     prompt,

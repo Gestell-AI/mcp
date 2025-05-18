@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "collection.update" tool on the MCP server.
+ * Registers the "updateCollection" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,7 @@ export function registerCollectionUpdateTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'collection.update',
+    'updateCollection',
     'Update a collection',
     CollectionUpdateSchema,
     async ({

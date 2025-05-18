@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers a "prompt" tool on the MCP server.
+ * Registers a "promptCollection" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,8 +13,8 @@ export function registerCollectionPromptTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'prompt',
-    'Perform search based reasoning, and have the Gestell agent respond to a prompt',
+    'promptCollection',
+    'Perform search based reasoning on a collection, and have the Gestell agent respond to a prompt',
     GestellPromptSchema,
     async ({
       collectionId,

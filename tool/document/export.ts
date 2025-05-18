@@ -3,7 +3,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "document.export" tool on the MCP server.
+ * Registers the "exportDocument" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -13,7 +13,7 @@ export function registerExportDocumentTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'document.export',
+    'exportDocument',
     'Exports a document from a collection to json layout or text',
     ExportDocumentRequestSchema,
     async ({ collectionId, documentId, type }) => {
