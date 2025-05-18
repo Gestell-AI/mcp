@@ -6,7 +6,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "feature.query" tool on the MCP server.
+ * Registers the "queryFeature" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -16,7 +16,7 @@ export function registerQueryFeaturesTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'feature.query',
+    'queryFeature',
     'Query features from a category in a collection',
     FeaturesQueryRequestSchema,
     async ({ collectionId, categoryId, skip, take }) => {
@@ -40,7 +40,7 @@ export function registerQueryFeaturesTool(
 }
 
 /**
- * Registers the "feature.export" tool on the MCP server.
+ * Registers the "exportFeature" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
@@ -50,7 +50,7 @@ export function registerExportFeaturesTool(
   gestell: Gestell
 ): void {
   server.tool(
-    'feature.export',
+    'exportFeature',
     'Export features from a category in a collection to json or csv',
     ExportFeaturesRequestSchema,
     async ({ collectionId, categoryId, format }) => {

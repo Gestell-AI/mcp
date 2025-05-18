@@ -1,14 +1,14 @@
 import type Gestell from '@gestell/sdk';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 /**
- * Registers the "feature.query" tool on the MCP server.
+ * Registers the "queryFeature" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.
  */
 export declare function registerQueryFeaturesTool(server: McpServer, gestell: Gestell): void;
 /**
- * Registers the "feature.export" tool on the MCP server.
+ * Registers the "exportFeature" tool on the MCP server.
  *
  * @param server - MCP server instance to register the tool on.
  * @param gestell - Gestell SDK instance.

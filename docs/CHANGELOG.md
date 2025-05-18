@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.4.0
+
+- Fixed tool name conventions to be compliant with Windsurf and Cursor
+
 ## 0.3.1
 
 - Improved Windsurf and Cursor UX

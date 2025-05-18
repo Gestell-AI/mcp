@@ -6,7 +6,7 @@ import type Gestell from '@gestell/sdk'
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 
 /**
- * Registers the "collection.get" and "collection.list" tools on the MCP server.
+ * Registers the "getCollection" and "listCollections" tools on the MCP server.
  *
  * @param server - MCP server instance to register the tools on.
  * @param gestell - Gestell SDK instance.
@@ -16,8 +16,8 @@ export function registerCollectionQueryTools(
   gestell: Gestell
 ): void {
   server.tool(
-    'collection.get',
-    'Get a collection',
+    'getCollection',
+    'Get a collection by its UUID',
     GetCollectionRequestSchema,
     async ({ collectionId }) => {
       const result = await gestell.collection.get(collectionId)
@@ -33,8 +33,8 @@ export function registerCollectionQueryTools(
   )
 
   server.tool(
-    'collection.list',
-    'List collections',
+    'listCollections',
+    'List all collections you are a member of',
     GetCollectionsRequestSchema,
     async (payload) => {
       const results = await gestell.collection.list(payload)
