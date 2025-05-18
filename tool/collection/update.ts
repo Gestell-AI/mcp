@@ -14,6 +14,7 @@ export function registerCollectionUpdateTool(
 ): void {
   server.tool(
     'collection.update',
+    'Update a collection',
     CollectionUpdateSchema,
     async ({
       collectionId,

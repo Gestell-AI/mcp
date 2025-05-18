@@ -17,6 +17,7 @@ export function registerQueryTablesTool(
 ): void {
   server.tool(
     'table.query',
+    'Query table from a category in a collection',
     TablesQueryRequestSchema,
     async ({ collectionId, categoryId, skip, take }) => {
       const result = await gestell.query.table({
@@ -50,6 +51,7 @@ export function registerExportTableTool(
 ): void {
   server.tool(
     'table.export',
+    'Export table from a category in a collection to json or csv',
     ExportTableRequestSchema,
     async ({ collectionId, categoryId, format }) => {
       const result = await gestell.query.tableExport({

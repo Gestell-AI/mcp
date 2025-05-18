@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.3.1
+
+- Improved Windsurf and Cursor UX
+
+- Cleaned up build artifacts
+
 ## 0.3.0
 
 - Added `mcp.json` manifest

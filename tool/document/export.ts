@@ -14,6 +14,7 @@ export function registerExportDocumentTool(
 ): void {
   server.tool(
     'document.export',
+    'Exports a document from a collection to json layout or text',
     ExportDocumentRequestSchema,
     async ({ collectionId, documentId, type }) => {
       const result = await gestell.document.export({

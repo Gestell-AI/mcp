@@ -14,6 +14,7 @@ export function registerDeleteDocumentTool(
 ): void {
   server.tool(
     'document.delete',
+    'Delete a document from a collection',
     DeleteDocumentRequestSchema,
     async ({ collectionId, documentId }) => {
       const result = await gestell.document.delete({

@@ -17,6 +17,7 @@ export function registerCollectionQueryTools(
 ): void {
   server.tool(
     'collection.get',
+    'Get a collection',
     GetCollectionRequestSchema,
     async ({ collectionId }) => {
       const result = await gestell.collection.get(collectionId)
@@ -33,6 +34,7 @@ export function registerCollectionQueryTools(
 
   server.tool(
     'collection.list',
+    'List collections',
     GetCollectionsRequestSchema,
     async (payload) => {
       const results = await gestell.collection.list(payload)
