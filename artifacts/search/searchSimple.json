@@ -1,0 +1,25 @@
+{
+  "$ref": "#/definitions/search.searchSimple",
+  "definitions": {
+    "search.searchSimple": {
+      "type": "object",
+      "properties": {
+        "collectionId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The ID of the collection to query (UUID)"
+        },
+        "prompt": {
+          "type": "string",
+          "description": "The prompt or query to search, should be a short, simple, and direct question or statement"
+        }
+      },
+      "required": [
+        "collectionId",
+        "prompt"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

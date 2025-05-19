@@ -1,4 +1,16 @@
 import { z } from 'zod';
+export declare const GestellSearchSimpleSchema: {
+    /**
+     * The ID of the collection to query. This must be a UUID.
+     * Required field that identifies the target collection for the search operation.
+     */
+    collectionId: z.ZodString;
+    /**
+     * The prompt or query to search,
+     * should be a short, simple, and direct question or statement
+     */
+    prompt: z.ZodString;
+};
 /**
  * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
  * including collectionId (UUID), optional categoryId (UUID), prompt text, search method (fast|normal|precise),
@@ -6,20 +18,10 @@ import { z } from 'zod';
  */
 export declare const GestellCoreSearchSchema: {
     /**
-     * The ID of the collection to query. This must be a UUID.
-     * Required field that identifies the target collection for the search operation.
-     */
-    collectionId: z.ZodString;
-    /**
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
     categoryId: z.ZodOptional<z.ZodString>;
-    /**
-     * The prompt or query to execute. This is the primary input driving the search.
-     * A string that defines what the user is searching for or asking about.
-     */
-    prompt: z.ZodString;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -60,6 +62,16 @@ export declare const GestellCoreSearchSchema: {
      * impacting response payload size and processing time.
      */
     maxResults: z.ZodOptional<z.ZodNumber>;
+    /**
+     * The ID of the collection to query. This must be a UUID.
+     * Required field that identifies the target collection for the search operation.
+     */
+    collectionId: z.ZodString;
+    /**
+     * The prompt or query to search,
+     * should be a short, simple, and direct question or statement
+     */
+    prompt: z.ZodString;
 };
 /**
  * Gestell search schema: extends core search parameters with flags to include full content (includeContent)
@@ -79,20 +91,10 @@ export declare const GestellSearchSchema: {
      */
     includeEdges: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /**
-     * The ID of the collection to query. This must be a UUID.
-     * Required field that identifies the target collection for the search operation.
-     */
-    collectionId: z.ZodString;
-    /**
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
     categoryId: z.ZodOptional<z.ZodString>;
-    /**
-     * The prompt or query to execute. This is the primary input driving the search.
-     * A string that defines what the user is searching for or asking about.
-     */
-    prompt: z.ZodString;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -133,6 +135,16 @@ export declare const GestellSearchSchema: {
      * impacting response payload size and processing time.
      */
     maxResults: z.ZodOptional<z.ZodNumber>;
+    /**
+     * The ID of the collection to query. This must be a UUID.
+     * Required field that identifies the target collection for the search operation.
+     */
+    collectionId: z.ZodString;
+    /**
+     * The prompt or query to search,
+     * should be a short, simple, and direct question or statement
+     */
+    prompt: z.ZodString;
 };
 /**
  * Gestell prompt schema: extends core search parameters with an optional system template override (template),
@@ -177,20 +189,10 @@ export declare const GestellPromptSchema: {
         content: string;
     }>, "many">>>;
     /**
-     * The ID of the collection to query. This must be a UUID.
-     * Required field that identifies the target collection for the search operation.
-     */
-    collectionId: z.ZodString;
-    /**
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
     categoryId: z.ZodOptional<z.ZodString>;
-    /**
-     * The prompt or query to execute. This is the primary input driving the search.
-     * A string that defines what the user is searching for or asking about.
-     */
-    prompt: z.ZodString;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -231,4 +233,14 @@ export declare const GestellPromptSchema: {
      * impacting response payload size and processing time.
      */
     maxResults: z.ZodOptional<z.ZodNumber>;
+    /**
+     * The ID of the collection to query. This must be a UUID.
+     * Required field that identifies the target collection for the search operation.
+     */
+    collectionId: z.ZodString;
+    /**
+     * The prompt or query to search,
+     * should be a short, simple, and direct question or statement
+     */
+    prompt: z.ZodString;
 };

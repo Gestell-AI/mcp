@@ -1,6 +1,6 @@
 {
   "name": "@gestell/mcp",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "type": "module",
   "main": "dist/library.cjs.js",
   "module": "dist/library.js",
@@ -19,7 +19,7 @@
     "build:lib": "rollup -c compile/rollup.config.js",
     "build:cli": "bun build server/entry.ts --external thread-stream --external pino --target node --outfile ./dist/entry.js",
     "build:types": "tsc --project compile/tsconfig.build.json",
-    "build:schemas": "bun run compile/generate.ts",
+    "build:schemas": "bun run compile/schemas.ts",
     "build": "rm -rf dist && npm run build:lib && npm run build:cli && npm run build:types && bun run build:schemas",
     "test": "bun test --timeout 120000 --coverage --coverage-reporter=text --coverage-reporter=lcov",
     "test:submit": "cat ./coverage/lcov.info | coveralls"

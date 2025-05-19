@@ -67757,10 +67757,13 @@ var GetOrganizationsRequestSchema = {
   extended: z.boolean().default(false).describe("Include extended organization details in the response")
 };
 // client/schemas/search.ts
-var GestellCoreSearchSchema = {
+var GestellSearchSimpleSchema = {
   collectionId: z.string().uuid().describe("The ID of the collection to query (UUID)"),
+  prompt: z.string().describe("The prompt or query to search, should be a short, simple, and direct question or statement")
+};
+var GestellCoreSearchSchema = {
+  ...GestellSearchSimpleSchema,
   categoryId: z.string().uuid().optional().describe("Optional category ID to filter results (UUID)"),
-  prompt: z.string().describe("The prompt or query to execute"),
   method: z.enum(["fast", "normal", "precise"]).optional().default("normal").describe("The search method to use"),
   type: z.enum(["keywords", "phrase", "summary"]).optional().default("phrase").describe("The type of search to perform"),
   vectorDepth: z.number().int().positive().optional().describe("Depth of vector search"),
@@ -68179,6 +68182,28 @@ function registerCollectionPromptTool(server, gestell) {
       ]
     };
   });
+  server.tool("promptCollectionSimple", "Perform search based reasoning on a collection, and have the Gestell agent respond to a prompt", GestellSearchSimpleSchema, async ({ collectionId, prompt }) => {
+    const response = await gestell.query.prompt({
+      collectionId,
+      prompt
+    });
+    const stream = response.getReader();
+    let text = "";
+    while (true) {
+      const { done, value } = await stream.read();
+      if (done)
+        break;
+      text += value;
+    }
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(text)
+        }
+      ]
+    };
+  });
 }
 
 // tool/search.ts
@@ -68208,6 +68233,20 @@ function registerCollectionSearchTool(server, gestell) {
       maxResults,
       includeContent,
       includeEdges
+    });
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(payload)
+        }
+      ]
+    };
+  });
+  server.tool("searchCollectionSimple", "Perform search based reasoning over a Collection", GestellSearchSimpleSchema, async ({ collectionId, prompt }) => {
+    const payload = await gestell.query.search({
+      collectionId,
+      prompt
     });
     return {
       content: [

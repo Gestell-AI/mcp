@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.0
+
+- searchCollectionSimple and promptCollectionSimple added to make sure agents do not input bad inputs and/or hallucinate
+
 ## 1.0.1
 
 - Fix cli build output, windows compatibility

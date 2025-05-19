@@ -60,6 +60,16 @@
       "inputSchema": "./artifacts/search/search.json",
       "outputSchema": "./artifacts/output/search/search.json"
     },
+    "searchCollectionSimple": {
+      "title": "Search Collection Simple",
+      "inputSchema": "./artifacts/search/searchSimple.json",
+      "outputSchema": "./artifacts/output/search/searchSimple.json"
+    },
+    "promptCollectionSimple": {
+      "title": "Prompt Collection Simple",
+      "inputSchema": "./artifacts/search/promptSimple.json",
+      "outputSchema": "./artifacts/output/search/promptSimple.json"
+    },
 
     "getOrganization": {
       "title": "Get Organization",

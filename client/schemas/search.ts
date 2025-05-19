@@ -1,11 +1,6 @@
 import { z } from 'zod'
 
-/**
- * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
- * including collectionId (UUID), optional categoryId (UUID), prompt text, search method (fast|normal|precise),
- * search type (keywords|phrase|summary), vectorDepth, nodeDepth, maxQueries, and maxResults.
- */
-export const GestellCoreSearchSchema = {
+export const GestellSearchSimpleSchema = {
   /**
    * The ID of the collection to query. This must be a UUID.
    * Required field that identifies the target collection for the search operation.
@@ -16,6 +11,24 @@ export const GestellCoreSearchSchema = {
     .describe('The ID of the collection to query (UUID)'),
 
   /**
+   * The prompt or query to search,
+   * should be a short, simple, and direct question or statement
+   */
+  prompt: z
+    .string()
+    .describe(
+      'The prompt or query to search, should be a short, simple, and direct question or statement'
+    )
+}
+
+/**
+ * Core search schema for Gestell: defines required and optional parameters for performing a search on a collection,
+ * including collectionId (UUID), optional categoryId (UUID), prompt text, search method (fast|normal|precise),
+ * search type (keywords|phrase|summary), vectorDepth, nodeDepth, maxQueries, and maxResults.
+ */
+export const GestellCoreSearchSchema = {
+  ...GestellSearchSimpleSchema,
+  /**
    * Optional category ID to filter the search results. If provided, it must be a UUID.
    * Used to narrow down the scope of the search within the specified collection.
    */
@@ -24,12 +37,6 @@ export const GestellCoreSearchSchema = {
     .uuid()
     .optional()
     .describe('Optional category ID to filter results (UUID)'),
-
-  /**
-   * The prompt or query to execute. This is the primary input driving the search.
-   * A string that defines what the user is searching for or asking about.
-   */
-  prompt: z.string().describe('The prompt or query to execute'),
 
   /**
    * The search method to use, balancing accuracy and speed.

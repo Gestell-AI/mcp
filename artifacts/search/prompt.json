@@ -9,14 +9,14 @@
           "format": "uuid",
           "description": "The ID of the collection to query (UUID)"
         },
+        "prompt": {
+          "type": "string",
+          "description": "The prompt or query to search, should be a short, simple, and direct question or statement"
+        },
         "categoryId": {
           "type": "string",
           "format": "uuid",
           "description": "Optional category ID to filter results (UUID)"
-        },
-        "prompt": {
-          "type": "string",
-          "description": "The prompt or query to execute"
         },
         "method": {
           "type": "string",

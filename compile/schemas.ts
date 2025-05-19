@@ -44,7 +44,8 @@ import {
 } from '@client/schemas/sdk/query/search.zod'
 import {
   GestellPromptSchema,
-  GestellSearchSchema
+  GestellSearchSchema,
+  GestellSearchSimpleSchema
 } from '@client/schemas/search'
 import {
   ExportTableRequestSchema,
@@ -85,7 +86,9 @@ async function generateInputSchemas() {
     },
     search: {
       prompt: GestellPromptSchema,
-      search: GestellSearchSchema
+      search: GestellSearchSchema,
+      promptSimple: GestellSearchSimpleSchema,
+      searchSimple: GestellSearchSimpleSchema
     },
     table: {
       export: ExportTableRequestSchema,
@@ -141,7 +144,9 @@ async function generateOutputSchemas() {
     },
     search: {
       prompt: promptQueryResponseSchema,
-      search: searchQueryResponseSchema
+      search: searchQueryResponseSchema,
+      promptSimple: promptQueryResponseSchema,
+      searchSimple: searchQueryResponseSchema
     },
     table: {
       export: exportTableResponseSchema,
