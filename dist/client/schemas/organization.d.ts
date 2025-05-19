@@ -19,7 +19,7 @@ export declare const GetOrganizationsRequestSchema: {
      * Optional search term to filter organizations by name
      * @example "acme"
      */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Maximum number of organizations to return (default: 10)
      * @example 10

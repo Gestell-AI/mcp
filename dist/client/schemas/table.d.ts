@@ -22,17 +22,17 @@ export declare const TablesQueryRequestSchema: {
      * Number of results to skip (for pagination).
      * Must be an integer ≥ 0 if provided.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Maximum number of results to return (for pagination).
      * Must be an integer ≥ 1 if provided.
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The prompt to use to filter the table.
      * Must be a non-empty string if provided.
      */
-    prompt: z.ZodOptional<z.ZodString>;
+    prompt: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.

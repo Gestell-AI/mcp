@@ -29226,23 +29226,23 @@ declare const GetCollectionsRequestSchema: {
      * Optional filter string to match against collection name, description, or tags.
      * Example: "finance Q2" will return collections whose name, description, or tags contain those terms.
      */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Optional limit on the number of collections to retrieve.
      * Use for pagination sizing. Example: 5
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional offset for pagination.
      * Skip this many collections before starting to collect the result set.
      * Example: to fetch page 2 with page size 10, set skip = 10.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * When true, include extended metadata (documents in collection etc.)
      * If false or omitted, only basic metadata (id, name, type) is returned.
      */
-    extended: z.ZodOptional<z.ZodBoolean>;
+    extended: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 };
 
 /**
@@ -29259,15 +29259,15 @@ declare const UploadDocumentRequestSchema: {
     /** The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
     name: z.ZodString;
     /** Optional MIME type of the document (e.g., 'application/pdf'). */
-    type: z.ZodOptional<z.ZodString>;
+    type: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine. */
     file: z.ZodString;
     /** Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string. */
-    instructions: z.ZodOptional<z.ZodString>;
+    instructions: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data. */
-    tables: z.ZodBoolean;
+    tables: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };
@@ -29278,13 +29278,13 @@ declare const UpdateDocumentRequestSchema: {
     /** The UUID of the document to update. */
     documentId: z.ZodString;
     /** The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
-    name: z.ZodOptional<z.ZodString>;
+    name: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Updated instructions related to the document. If provided, must not be empty. */
-    instructions: z.ZodOptional<z.ZodString>;
+    instructions: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Flag to perform additional table processing and analysis on the document. */
-    tables: z.ZodOptional<z.ZodBoolean>;
+    tables: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };
@@ -29338,23 +29338,23 @@ type JobStatusType = z.infer<typeof JobStatusSchema>;
  */
 declare const GetDocumentsRequestSchema: {
     /** A search query string to filter documents. */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** The number of documents to retrieve. Must be a positive integer. */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /** The number of documents to skip for pagination. Must be a non-negative integer. */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /** Whether to retrieve extended information for the documents. */
-    extended: z.ZodOptional<z.ZodBoolean>;
+    extended: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Filter by the overall job status. */
-    status: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    status: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for layout nodes. */
-    nodes: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    nodes: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for edges. */
-    edges: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    edges: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for vectors. */
-    vectors: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    vectors: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for category. */
-    category: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    category: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };
@@ -29382,12 +29382,12 @@ declare const FeaturesQueryRequestSchema: {
      * An optional parameter to skip a specified number of results (for pagination).
      * Must be an integer ≥ 0.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * An optional parameter to limit the number of results returned (for pagination).
      * Must be an integer ≥ 1.
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query.
      * Must be a valid UUID.
@@ -29419,25 +29419,6 @@ declare const ExportFeaturesRequestSchema: {
      */
     categoryId: z.ZodString;
 };
-/**
- * Request interface for querying features with optional pagination.
- */
-interface FeaturesQueryRequest {
-    /** The ID of the collection to query. Must be a valid UUID. */
-    collectionId: string;
-    /** The ID of the category whose features are being requested. Must be a valid UUID. */
-    categoryId: string;
-    /**
-     * An optional parameter to limit the number of results returned (for pagination).
-     * Must be an integer ≥ 1.
-     */
-    take?: number;
-    /**
-     * An optional parameter to skip a specified number of results (for pagination).
-     * Must be an integer ≥ 0.
-     */
-    skip?: number;
-}
 
 /**
  * Schema for validating get organization requests.
@@ -29459,7 +29440,7 @@ declare const GetOrganizationsRequestSchema: {
      * Optional search term to filter organizations by name
      * @example "acme"
      */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Maximum number of organizations to return (default: 10)
      * @example 10
@@ -29499,7 +29480,7 @@ declare const GestellCoreSearchSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -29521,25 +29502,25 @@ declare const GestellCoreSearchSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
@@ -29572,7 +29553,7 @@ declare const GestellSearchSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -29594,25 +29575,25 @@ declare const GestellSearchSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
@@ -29634,7 +29615,7 @@ declare const GestellPromptSchema: {
      * If provided, this string replaces the collection’s predefined template, allowing
      * customization of the prompt structure.
      */
-    template: z.ZodOptional<z.ZodString>;
+    template: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Flag to enable chain-of-thought reasoning in prompt generation.
      * Defaults to true, enabling this feature unless explicitly disabled.
@@ -29670,7 +29651,7 @@ declare const GestellPromptSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -29692,25 +29673,25 @@ declare const GestellPromptSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
@@ -29746,17 +29727,17 @@ declare const TablesQueryRequestSchema: {
      * Number of results to skip (for pagination).
      * Must be an integer ≥ 0 if provided.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Maximum number of results to return (for pagination).
      * Must be an integer ≥ 1 if provided.
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The prompt to use to filter the table.
      * Must be a non-empty string if provided.
      */
-    prompt: z.ZodOptional<z.ZodString>;
+    prompt: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The UUID of the collection to query.
      * Must be a 36-character RFC-4122 string.
@@ -29806,4 +29787,4 @@ interface GestellToolOutput {
 }
 
 export { CollectionCoreSchema, CollectionCreateSchema, CollectionUpdateSchema, DeleteDocumentRequestSchema, DocumentCoreSchema, ExportDocumentRequestSchema, ExportFeaturesRequestSchema, ExportTableRequestSchema, FeaturesCoreSchema, FeaturesQueryRequestSchema, GestellCoreSearchSchema, GestellPromptSchema, GestellSearchSchema, GestellSearchSimpleSchema, GetCollectionRequestSchema, GetCollectionsRequestSchema, GetDocumentRequestSchema, GetDocumentsRequestSchema, GetOrganizationRequestSchema, GetOrganizationsRequestSchema, JobStatusSchema, ReprocessDocumentsRequestSchema, TablesCoreSchema, TablesQueryRequestSchema, UpdateDocumentRequestSchema, UploadDocumentRequestSchema, buildMcpServer, runTool, startRemoteServer, startTerminalClient, startTerminalSession };
-export type { FeaturesQueryRequest, GestellToolOutput, JobStatusType };
+export type { GestellToolOutput, JobStatusType };

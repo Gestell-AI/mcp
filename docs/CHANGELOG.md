@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 1.2.0
+
+- Improve how bad inputs from agents are handled
+
+- Added explicit defaults for all request schemas
+
 ## 1.1.0
 
 - searchCollectionSimple and promptCollectionSimple added to make sure agents do not input bad inputs and/or hallucinate

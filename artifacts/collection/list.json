@@ -6,18 +6,22 @@
       "properties": {
         "search": {
           "type": "string",
+          "default": "",
           "description": "Optional filter string to match name, description, or tags. Example: \"finance Q2\"."
         },
         "take": {
           "type": "integer",
+          "default": 10,
           "description": "Optional maximum number of collections to return. Example: 5."
         },
         "skip": {
           "type": "integer",
+          "default": 0,
           "description": "Optional number of collections to skip (pagination offset). Example: 10."
         },
         "extended": {
           "type": "boolean",
+          "default": false,
           "description": "Optional flag to include extended details (documents in collection etc.)."
         }
       },

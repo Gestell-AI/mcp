@@ -304,21 +304,21 @@ export declare const GetCollectionsRequestSchema: {
      * Optional filter string to match against collection name, description, or tags.
      * Example: "finance Q2" will return collections whose name, description, or tags contain those terms.
      */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Optional limit on the number of collections to retrieve.
      * Use for pagination sizing. Example: 5
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional offset for pagination.
      * Skip this many collections before starting to collect the result set.
      * Example: to fetch page 2 with page size 10, set skip = 10.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * When true, include extended metadata (documents in collection etc.)
      * If false or omitted, only basic metadata (id, name, type) is returned.
      */
-    extended: z.ZodOptional<z.ZodBoolean>;
+    extended: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 };

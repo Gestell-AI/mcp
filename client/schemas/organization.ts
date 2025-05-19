@@ -27,6 +27,7 @@ export const GetOrganizationsRequestSchema = {
   search: z
     .string()
     .optional()
+    .default('')
     .describe('Search term to filter organizations by name'),
 
   /**
@@ -36,7 +37,6 @@ export const GetOrganizationsRequestSchema = {
   take: z
     .number()
     .int()
-    .positive()
     .default(10)
     .describe('Maximum number of organizations to return per page'),
 
@@ -47,7 +47,6 @@ export const GetOrganizationsRequestSchema = {
   skip: z
     .number()
     .int()
-    .min(0)
     .default(0)
     .describe('Number of organizations to skip for pagination'),
 

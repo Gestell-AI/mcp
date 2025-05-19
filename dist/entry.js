@@ -67667,10 +67667,10 @@ var GetCollectionRequestSchema = {
   collectionId: z.string().uuid().describe('The UUID of the collection to update. Example: "3fa85f64-5717-4562-b3fc-2c963f66afa6".')
 };
 var GetCollectionsRequestSchema = {
-  search: z.string().optional().describe('Optional filter string to match name, description, or tags. Example: "finance Q2".'),
-  take: z.number().int().optional().describe("Optional maximum number of collections to return. Example: 5."),
-  skip: z.number().int().optional().describe("Optional number of collections to skip (pagination offset). Example: 10."),
-  extended: z.boolean().optional().describe("Optional flag to include extended details (documents in collection etc.).")
+  search: z.string().optional().default("").describe('Optional filter string to match name, description, or tags. Example: "finance Q2".'),
+  take: z.number().int().optional().default(10).describe("Optional maximum number of collections to return. Example: 5."),
+  skip: z.number().int().optional().default(0).describe("Optional number of collections to skip (pagination offset). Example: 10."),
+  extended: z.boolean().optional().default(false).describe("Optional flag to include extended details (documents in collection etc.).")
 };
 // client/schemas/document.ts
 var DocumentCoreSchema = {
@@ -67678,20 +67678,20 @@ var DocumentCoreSchema = {
 };
 var UploadDocumentRequestSchema = {
   ...DocumentCoreSchema,
-  name: z.string().min(1).describe('The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
-  type: z.string().optional().describe('Optional MIME type of the document (e.g., "application/pdf").'),
-  file: z.string().min(1).describe("The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine"),
-  instructions: z.string().optional().describe("Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string."),
+  name: z.string().describe('The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
+  type: z.string().optional().default("").describe('Optional MIME type of the document (e.g., "application/pdf").'),
+  file: z.string().describe("The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine"),
+  instructions: z.string().optional().default("").describe("Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string."),
   job: z.boolean().optional().default(true).describe("Whether to dispatch a processing job. Defaults to true. Set to false to skip processing."),
-  tables: z.boolean().describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
+  tables: z.boolean().optional().default(false).describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
 };
 var UpdateDocumentRequestSchema = {
   ...DocumentCoreSchema,
   documentId: z.string().uuid().describe("The UUID of the document to update."),
-  name: z.string().min(1).optional().describe('The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
-  instructions: z.string().min(1).optional().describe("Updated instructions related to the document. If provided, must not be empty."),
+  name: z.string().optional().default("").describe('The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'),
+  instructions: z.string().optional().default("").describe("Updated instructions related to the document. If provided, must not be empty."),
   job: z.boolean().optional().default(false).describe("Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job."),
-  tables: z.boolean().optional().describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
+  tables: z.boolean().optional().default(false).describe("Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.")
 };
 var DeleteDocumentRequestSchema = {
   ...DocumentCoreSchema,
@@ -67722,15 +67722,15 @@ var JobStatusSchema = z.enum([
 ]);
 var GetDocumentsRequestSchema = {
   ...DocumentCoreSchema,
-  search: z.string().optional().describe("A search query string to filter documents."),
-  take: z.number().int().positive().optional().describe("The number of documents to retrieve. Must be a positive integer."),
-  skip: z.number().int().nonnegative().optional().describe("The number of documents to skip for pagination. Must be a non-negative integer."),
-  extended: z.boolean().optional().describe("Whether to retrieve extended information for the documents."),
-  status: JobStatusSchema.optional().describe("Filter by the overall job status."),
-  nodes: JobStatusSchema.optional().describe("Filter by the job status for layout nodes."),
-  edges: JobStatusSchema.optional().describe("Filter by the job status for edges."),
-  vectors: JobStatusSchema.optional().describe("Filter by the job status for vectors."),
-  category: JobStatusSchema.optional().describe("Filter by the job status for category.")
+  search: z.string().optional().default("").describe("A search query string to filter documents."),
+  take: z.number().int().positive().optional().default(10).describe("The number of documents to retrieve. Must be a positive integer."),
+  skip: z.number().int().positive().optional().default(0).describe("The number of documents to skip for pagination. Must be a non-negative integer."),
+  extended: z.boolean().optional().default(false).describe("Whether to retrieve extended information for the documents."),
+  status: JobStatusSchema.optional().default("all").describe("Filter by the overall job status."),
+  nodes: JobStatusSchema.optional().default("all").describe("Filter by the job status for layout nodes."),
+  edges: JobStatusSchema.optional().default("all").describe("Filter by the job status for edges."),
+  vectors: JobStatusSchema.optional().default("all").describe("Filter by the job status for vectors."),
+  category: JobStatusSchema.optional().default("all").describe("Filter by the job status for category.")
 };
 // client/schemas/feature.ts
 var FeaturesCoreSchema = {
@@ -67739,8 +67739,8 @@ var FeaturesCoreSchema = {
 };
 var FeaturesQueryRequestSchema = {
   ...FeaturesCoreSchema,
-  skip: z.number().int().min(0).optional().describe("An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0."),
-  take: z.number().int().min(1).optional().describe("An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1.")
+  skip: z.number().int().optional().default(0).describe("An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0."),
+  take: z.number().int().optional().default(10).describe("An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1.")
 };
 var ExportFeaturesRequestSchema = {
   ...FeaturesCoreSchema,
@@ -67751,9 +67751,9 @@ var GetOrganizationRequestSchema = {
   organizationId: z.string().uuid().describe("Unique identifier for the organization")
 };
 var GetOrganizationsRequestSchema = {
-  search: z.string().optional().describe("Search term to filter organizations by name"),
-  take: z.number().int().positive().default(10).describe("Maximum number of organizations to return per page"),
-  skip: z.number().int().min(0).default(0).describe("Number of organizations to skip for pagination"),
+  search: z.string().optional().default("").describe("Search term to filter organizations by name"),
+  take: z.number().int().default(10).describe("Maximum number of organizations to return per page"),
+  skip: z.number().int().default(0).describe("Number of organizations to skip for pagination"),
   extended: z.boolean().default(false).describe("Include extended organization details in the response")
 };
 // client/schemas/search.ts
@@ -67763,13 +67763,13 @@ var GestellSearchSimpleSchema = {
 };
 var GestellCoreSearchSchema = {
   ...GestellSearchSimpleSchema,
-  categoryId: z.string().uuid().optional().describe("Optional category ID to filter results (UUID)"),
+  categoryId: z.string().uuid().optional().default("").describe("Optional category ID to filter results (UUID)"),
   method: z.enum(["fast", "normal", "precise"]).optional().default("normal").describe("The search method to use"),
   type: z.enum(["keywords", "phrase", "summary"]).optional().default("phrase").describe("The type of search to perform"),
-  vectorDepth: z.number().int().positive().optional().describe("Depth of vector search"),
-  nodeDepth: z.number().int().positive().optional().describe("Depth of node search"),
-  maxQueries: z.number().int().positive().optional().describe("Maximum number of queries to run"),
-  maxResults: z.number().int().positive().optional().describe("Maximum number of results to return")
+  vectorDepth: z.number().int().positive().optional().default(8).describe("Depth of vector search"),
+  nodeDepth: z.number().int().positive().optional().default(3).describe("Depth of node search"),
+  maxQueries: z.number().int().positive().optional().default(2).describe("Maximum number of queries to run"),
+  maxResults: z.number().int().positive().optional().default(10).describe("Maximum number of results to return")
 };
 var GestellSearchSchema = {
   ...GestellCoreSearchSchema,
@@ -67778,7 +67778,7 @@ var GestellSearchSchema = {
 };
 var GestellPromptSchema = {
   ...GestellCoreSearchSchema,
-  template: z.string().optional().describe("Optional system template to use for the prompt, overrides the existing prompt instructions for the collections"),
+  template: z.string().optional().default("").describe("Optional system template to use for the prompt, overrides the existing prompt instructions for the collections"),
   cot: z.boolean().optional().default(true).describe("Flag to enable chain-of-thought reasoning"),
   messages: z.array(z.object({
     role: z.enum(["system", "user", "model"]),
@@ -67792,9 +67792,9 @@ var TablesCoreSchema = {
 };
 var TablesQueryRequestSchema = {
   ...TablesCoreSchema,
-  skip: z.number().min(0).optional().describe("An optional parameter to skip a specified number of results (for pagination); must be at least 0."),
-  take: z.number().min(1).optional().describe("An optional parameter to limit the number of results returned (for pagination); must be at least 1."),
-  prompt: z.string().min(1).optional().describe("The prompt to use to filter the table")
+  skip: z.number().int().optional().default(0).describe("An optional parameter to skip a specified number of results (for pagination); must be at least 0."),
+  take: z.number().int().optional().default(10).describe("An optional parameter to limit the number of results returned (for pagination); must be at least 1."),
+  prompt: z.string().optional().default("").describe("The prompt to use to filter the table")
 };
 var ExportTableRequestSchema = {
   ...TablesCoreSchema,

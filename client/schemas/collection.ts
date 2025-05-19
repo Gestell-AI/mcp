@@ -292,6 +292,7 @@ export const GetCollectionsRequestSchema = {
   search: z
     .string()
     .optional()
+    .default('')
     .describe(
       'Optional filter string to match name, description, or tags. Example: "finance Q2".'
     ),
@@ -304,6 +305,7 @@ export const GetCollectionsRequestSchema = {
     .number()
     .int()
     .optional()
+    .default(10)
     .describe('Optional maximum number of collections to return. Example: 5.'),
 
   /**
@@ -315,6 +317,7 @@ export const GetCollectionsRequestSchema = {
     .number()
     .int()
     .optional()
+    .default(0)
     .describe(
       'Optional number of collections to skip (pagination offset). Example: 10.'
     ),
@@ -326,6 +329,7 @@ export const GetCollectionsRequestSchema = {
   extended: z
     .boolean()
     .optional()
+    .default(false)
     .describe(
       'Optional flag to include extended details (documents in collection etc.).'
     )

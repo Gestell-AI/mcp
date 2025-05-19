@@ -16,6 +16,7 @@
         "categoryId": {
           "type": "string",
           "format": "uuid",
+          "default": "",
           "description": "Optional category ID to filter results (UUID)"
         },
         "method": {
@@ -41,21 +42,25 @@
         "vectorDepth": {
           "type": "integer",
           "exclusiveMinimum": 0,
+          "default": 8,
           "description": "Depth of vector search"
         },
         "nodeDepth": {
           "type": "integer",
           "exclusiveMinimum": 0,
+          "default": 3,
           "description": "Depth of node search"
         },
         "maxQueries": {
           "type": "integer",
           "exclusiveMinimum": 0,
+          "default": 2,
           "description": "Maximum number of queries to run"
         },
         "maxResults": {
           "type": "integer",
           "exclusiveMinimum": 0,
+          "default": 10,
           "description": "Maximum number of results to return"
         },
         "includeContent": {
@@ -71,7 +76,8 @@
       },
       "required": [
         "collectionId",
-        "prompt"
+        "prompt",
+        "categoryId"
       ],
       "additionalProperties": false
     }

@@ -22,12 +22,12 @@ export declare const FeaturesQueryRequestSchema: {
      * An optional parameter to skip a specified number of results (for pagination).
      * Must be an integer ≥ 0.
      */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * An optional parameter to limit the number of results returned (for pagination).
      * Must be an integer ≥ 1.
      */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query.
      * Must be a valid UUID.
@@ -59,22 +59,3 @@ export declare const ExportFeaturesRequestSchema: {
      */
     categoryId: z.ZodString;
 };
-/**
- * Request interface for querying features with optional pagination.
- */
-export interface FeaturesQueryRequest {
-    /** The ID of the collection to query. Must be a valid UUID. */
-    collectionId: string;
-    /** The ID of the category whose features are being requested. Must be a valid UUID. */
-    categoryId: string;
-    /**
-     * An optional parameter to limit the number of results returned (for pagination).
-     * Must be an integer ≥ 1.
-     */
-    take?: number;
-    /**
-     * An optional parameter to skip a specified number of results (for pagination).
-     * Must be an integer ≥ 0.
-     */
-    skip?: number;
-}

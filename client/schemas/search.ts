@@ -36,6 +36,7 @@ export const GestellCoreSearchSchema = {
     .string()
     .uuid()
     .optional()
+    .default('')
     .describe('Optional category ID to filter results (UUID)'),
 
   /**
@@ -74,6 +75,7 @@ export const GestellCoreSearchSchema = {
     .int()
     .positive()
     .optional()
+    .default(8)
     .describe('Depth of vector search'),
 
   /**
@@ -86,6 +88,7 @@ export const GestellCoreSearchSchema = {
     .int()
     .positive()
     .optional()
+    .default(3)
     .describe('Depth of node search'),
 
   /**
@@ -98,6 +101,7 @@ export const GestellCoreSearchSchema = {
     .int()
     .positive()
     .optional()
+    .default(2)
     .describe('Maximum number of queries to run'),
 
   /**
@@ -110,6 +114,7 @@ export const GestellCoreSearchSchema = {
     .int()
     .positive()
     .optional()
+    .default(10)
     .describe('Maximum number of results to return')
 }
 
@@ -162,6 +167,7 @@ export const GestellPromptSchema = {
   template: z
     .string()
     .optional()
+    .default('')
     .describe(
       'Optional system template to use for the prompt, overrides the existing prompt instructions for the collections'
     ),

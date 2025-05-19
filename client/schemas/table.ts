@@ -35,8 +35,9 @@ export const TablesQueryRequestSchema = {
    */
   skip: z
     .number()
-    .min(0)
+    .int()
     .optional()
+    .default(0)
     .describe(
       'An optional parameter to skip a specified number of results (for pagination); must be at least 0.'
     ),
@@ -47,8 +48,9 @@ export const TablesQueryRequestSchema = {
    */
   take: z
     .number()
-    .min(1)
+    .int()
     .optional()
+    .default(10)
     .describe(
       'An optional parameter to limit the number of results returned (for pagination); must be at least 1.'
     ),
@@ -59,8 +61,8 @@ export const TablesQueryRequestSchema = {
    */
   prompt: z
     .string()
-    .min(1)
     .optional()
+    .default('')
     .describe('The prompt to use to filter the table')
 }
 

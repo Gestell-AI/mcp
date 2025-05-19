@@ -13,15 +13,15 @@ export declare const UploadDocumentRequestSchema: {
     /** The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
     name: z.ZodString;
     /** Optional MIME type of the document (e.g., 'application/pdf'). */
-    type: z.ZodOptional<z.ZodString>;
+    type: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine. */
     file: z.ZodString;
     /** Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string. */
-    instructions: z.ZodOptional<z.ZodString>;
+    instructions: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Whether to dispatch a processing job. Defaults to true. Set to false to skip. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data. */
-    tables: z.ZodBoolean;
+    tables: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };
@@ -32,13 +32,13 @@ export declare const UpdateDocumentRequestSchema: {
     /** The UUID of the document to update. */
     documentId: z.ZodString;
     /** The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
-    name: z.ZodOptional<z.ZodString>;
+    name: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Updated instructions related to the document. If provided, must not be empty. */
-    instructions: z.ZodOptional<z.ZodString>;
+    instructions: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** Whether to dispatch a reprocessing job. Defaults to false. Set to true to dispatch a reprocessing job. */
     job: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Flag to perform additional table processing and analysis on the document. */
-    tables: z.ZodOptional<z.ZodBoolean>;
+    tables: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };
@@ -92,23 +92,23 @@ export type JobStatusType = z.infer<typeof JobStatusSchema>;
  */
 export declare const GetDocumentsRequestSchema: {
     /** A search query string to filter documents. */
-    search: z.ZodOptional<z.ZodString>;
+    search: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /** The number of documents to retrieve. Must be a positive integer. */
-    take: z.ZodOptional<z.ZodNumber>;
+    take: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /** The number of documents to skip for pagination. Must be a non-negative integer. */
-    skip: z.ZodOptional<z.ZodNumber>;
+    skip: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /** Whether to retrieve extended information for the documents. */
-    extended: z.ZodOptional<z.ZodBoolean>;
+    extended: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
     /** Filter by the overall job status. */
-    status: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    status: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for layout nodes. */
-    nodes: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    nodes: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for edges. */
-    edges: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    edges: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for vectors. */
-    vectors: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    vectors: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** Filter by the job status for category. */
-    category: z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>;
+    category: z.ZodDefault<z.ZodOptional<z.ZodEnum<["processing", "error", "ready", "cancelled", "unprocessed", "partial", "all"]>>>;
     /** The UUID of the collection associated with the document operation. */
     collectionId: z.ZodString;
 };

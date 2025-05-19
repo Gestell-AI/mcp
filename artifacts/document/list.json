@@ -11,20 +11,24 @@
         },
         "search": {
           "type": "string",
+          "default": "",
           "description": "A search query string to filter documents."
         },
         "take": {
           "type": "integer",
           "exclusiveMinimum": 0,
+          "default": 10,
           "description": "The number of documents to retrieve. Must be a positive integer."
         },
         "skip": {
           "type": "integer",
-          "minimum": 0,
+          "exclusiveMinimum": 0,
+          "default": 0,
           "description": "The number of documents to skip for pagination. Must be a non-negative integer."
         },
         "extended": {
           "type": "boolean",
+          "default": false,
           "description": "Whether to retrieve extended information for the documents."
         },
         "status": {
@@ -38,27 +42,33 @@
             "partial",
             "all"
           ],
+          "default": "all",
           "description": "Filter by the overall job status."
         },
         "nodes": {
           "$ref": "#/definitions/document.list/properties/status",
+          "default": "all",
           "description": "Filter by the job status for layout nodes."
         },
         "edges": {
           "$ref": "#/definitions/document.list/properties/status",
+          "default": "all",
           "description": "Filter by the job status for edges."
         },
         "vectors": {
           "$ref": "#/definitions/document.list/properties/status",
+          "default": "all",
           "description": "Filter by the job status for vectors."
         },
         "category": {
           "$ref": "#/definitions/document.list/properties/status",
+          "default": "all",
           "description": "Filter by the job status for category."
         }
       },
       "required": [
-        "collectionId"
+        "collectionId",
+        "skip"
       ],
       "additionalProperties": false
     }

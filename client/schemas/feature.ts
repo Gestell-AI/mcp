@@ -38,8 +38,8 @@ export const FeaturesQueryRequestSchema = {
   skip: z
     .number()
     .int()
-    .min(0)
     .optional()
+    .default(0)
     .describe(
       'An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0.'
     ),
@@ -51,8 +51,8 @@ export const FeaturesQueryRequestSchema = {
   take: z
     .number()
     .int()
-    .min(1)
     .optional()
+    .default(10)
     .describe(
       'An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1.'
     )
@@ -71,27 +71,4 @@ export const ExportFeaturesRequestSchema = {
   format: z
     .enum(['json', 'csv'])
     .describe('The export format: "json" or "csv".')
-}
-
-/**
- * Request interface for querying features with optional pagination.
- */
-export interface FeaturesQueryRequest {
-  /** The ID of the collection to query. Must be a valid UUID. */
-  collectionId: string
-
-  /** The ID of the category whose features are being requested. Must be a valid UUID. */
-  categoryId: string
-
-  /**
-   * An optional parameter to limit the number of results returned (for pagination).
-   * Must be an integer ≥ 1.
-   */
-  take?: number
-
-  /**
-   * An optional parameter to skip a specified number of results (for pagination).
-   * Must be an integer ≥ 0.
-   */
-  skip?: number
 }

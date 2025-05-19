@@ -22,7 +22,6 @@ export const UploadDocumentRequestSchema = {
   /** The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
   name: z
     .string()
-    .min(1)
     .describe(
       'The name of the document. Must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'
     ),
@@ -31,12 +30,12 @@ export const UploadDocumentRequestSchema = {
   type: z
     .string()
     .optional()
+    .default('')
     .describe('Optional MIME type of the document (e.g., "application/pdf").'),
 
   /** The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine. */
   file: z
     .string()
-    .min(1)
     .describe(
       'The path to the file to upload. Must be a non-empty string representing a valid file path. This should be the path to the file on the local machine'
     ),
@@ -45,6 +44,7 @@ export const UploadDocumentRequestSchema = {
   instructions: z
     .string()
     .optional()
+    .default('')
     .describe(
       'Optional additional instructions for processing the document. Only provide this if you need specialized instructions for Vision or Audio processing. 99% of the time this should be an empty string.'
     ),
@@ -61,6 +61,8 @@ export const UploadDocumentRequestSchema = {
   /** Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data. */
   tables: z
     .boolean()
+    .optional()
+    .default(false)
     .describe(
       'Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.'
     )
@@ -78,8 +80,8 @@ export const UpdateDocumentRequestSchema = {
   /** The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf"). */
   name: z
     .string()
-    .min(1)
     .optional()
+    .default('')
     .describe(
       'The updated name of the document. If provided, must not be empty. Is is required to end with a valid file extension (e.g., ".pdf").'
     ),
@@ -87,8 +89,8 @@ export const UpdateDocumentRequestSchema = {
   /** Updated instructions related to the document. If provided, must not be empty. */
   instructions: z
     .string()
-    .min(1)
     .optional()
+    .default('')
     .describe(
       'Updated instructions related to the document. If provided, must not be empty.'
     ),
@@ -106,6 +108,7 @@ export const UpdateDocumentRequestSchema = {
   tables: z
     .boolean()
     .optional()
+    .default(false)
     .describe(
       'Flag to perform additional table processing and analysis on the document. Only use this on financial documents or forms that have complex table data.'
     )
@@ -196,6 +199,7 @@ export const GetDocumentsRequestSchema = {
   search: z
     .string()
     .optional()
+    .default('')
     .describe('A search query string to filter documents.'),
 
   /** The number of documents to retrieve. Must be a positive integer. */
@@ -204,6 +208,7 @@ export const GetDocumentsRequestSchema = {
     .int()
     .positive()
     .optional()
+    .default(10)
     .describe(
       'The number of documents to retrieve. Must be a positive integer.'
     ),
@@ -212,8 +217,9 @@ export const GetDocumentsRequestSchema = {
   skip: z
     .number()
     .int()
-    .nonnegative()
+    .positive()
     .optional()
+    .default(0)
     .describe(
       'The number of documents to skip for pagination. Must be a non-negative integer.'
     ),
@@ -222,30 +228,31 @@ export const GetDocumentsRequestSchema = {
   extended: z
     .boolean()
     .optional()
+    .default(false)
     .describe('Whether to retrieve extended information for the documents.'),
 
   /** Filter by the overall job status. */
-  status: JobStatusSchema.optional().describe(
-    'Filter by the overall job status.'
-  ),
+  status: JobStatusSchema.optional()
+    .default('all')
+    .describe('Filter by the overall job status.'),
 
   /** Filter by the job status for layout nodes. */
-  nodes: JobStatusSchema.optional().describe(
-    'Filter by the job status for layout nodes.'
-  ),
+  nodes: JobStatusSchema.optional()
+    .default('all')
+    .describe('Filter by the job status for layout nodes.'),
 
   /** Filter by the job status for edges. */
-  edges: JobStatusSchema.optional().describe(
-    'Filter by the job status for edges.'
-  ),
+  edges: JobStatusSchema.optional()
+    .default('all')
+    .describe('Filter by the job status for edges.'),
 
   /** Filter by the job status for vectors. */
-  vectors: JobStatusSchema.optional().describe(
-    'Filter by the job status for vectors.'
-  ),
+  vectors: JobStatusSchema.optional()
+    .default('all')
+    .describe('Filter by the job status for vectors.'),
 
   /** Filter by the job status for category. */
-  category: JobStatusSchema.optional().describe(
-    'Filter by the job status for category.'
-  )
+  category: JobStatusSchema.optional()
+    .default('all')
+    .describe('Filter by the job status for category.')
 }

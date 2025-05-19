@@ -6,17 +6,16 @@
       "properties": {
         "search": {
           "type": "string",
+          "default": "",
           "description": "Search term to filter organizations by name"
         },
         "take": {
           "type": "integer",
-          "exclusiveMinimum": 0,
           "default": 10,
           "description": "Maximum number of organizations to return per page"
         },
         "skip": {
           "type": "integer",
-          "minimum": 0,
           "default": 0,
           "description": "Number of organizations to skip for pagination"
         },

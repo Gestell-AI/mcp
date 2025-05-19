@@ -16,12 +16,12 @@
         },
         "skip": {
           "type": "integer",
-          "minimum": 0,
+          "default": 0,
           "description": "An optional parameter to skip a specified number of results (for pagination). Must be ≥ 0."
         },
         "take": {
           "type": "integer",
-          "minimum": 1,
+          "default": 10,
           "description": "An optional parameter to limit the number of results returned (for pagination). Must be ≥ 1."
         }
       },

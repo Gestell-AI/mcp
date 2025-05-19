@@ -21,7 +21,7 @@ export declare const GestellCoreSearchSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -43,25 +43,25 @@ export declare const GestellCoreSearchSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
@@ -94,7 +94,7 @@ export declare const GestellSearchSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -116,25 +116,25 @@ export declare const GestellSearchSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
@@ -156,7 +156,7 @@ export declare const GestellPromptSchema: {
      * If provided, this string replaces the collection’s predefined template, allowing
      * customization of the prompt structure.
      */
-    template: z.ZodOptional<z.ZodString>;
+    template: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * Flag to enable chain-of-thought reasoning in prompt generation.
      * Defaults to true, enabling this feature unless explicitly disabled.
@@ -192,7 +192,7 @@ export declare const GestellPromptSchema: {
      * Optional category ID to filter the search results. If provided, it must be a UUID.
      * Used to narrow down the scope of the search within the specified collection.
      */
-    categoryId: z.ZodOptional<z.ZodString>;
+    categoryId: z.ZodDefault<z.ZodOptional<z.ZodString>>;
     /**
      * The search method to use, balancing accuracy and speed.
      * - 'fast': Prioritizes speed, potentially reducing accuracy.
@@ -214,25 +214,25 @@ export declare const GestellPromptSchema: {
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * comprehensive results but increase computational cost.
      */
-    vectorDepth: z.ZodOptional<z.ZodNumber>;
+    vectorDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional depth for node search, controlling how far the knowledge-graph node traversal extends.
      * Must be a positive integer (greater than 0) if provided. Higher values may yield more
      * detailed results but increase computational cost.
      */
-    nodeDepth: z.ZodOptional<z.ZodNumber>;
+    nodeDepth: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of concurrent sub-queries to run.
      * Must be a positive integer (greater than 0) if provided. Limits the number of simultaneous
      * queries, affecting resource usage and performance.
      */
-    maxQueries: z.ZodOptional<z.ZodNumber>;
+    maxQueries: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * Optional maximum number of results to return in the response.
      * Must be a positive integer (greater than 0) if provided. Limits the size of the result set,
      * impacting response payload size and processing time.
      */
-    maxResults: z.ZodOptional<z.ZodNumber>;
+    maxResults: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
     /**
      * The ID of the collection to query. This must be a UUID.
      * Required field that identifies the target collection for the search operation.
